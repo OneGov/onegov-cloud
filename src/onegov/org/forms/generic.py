@@ -11,6 +11,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -56,10 +57,10 @@ class ExportForm(Form):
     file_format = RadioField(
         label=_('Format'),
         choices=[
-            ('csv', _('CSV File')),
-            ('xlsx', _('Excel File')),
-            ('json', _('JSON File')),
-            ('xml', _('XML File')),
+            SelectChoice('csv', _('CSV File')),
+            SelectChoice('xlsx', _('Excel File')),
+            SelectChoice('json', _('JSON File')),
+            SelectChoice('xml', _('XML File')),
         ],
         default='csv',
         validators=[
@@ -142,9 +143,9 @@ class PaymentForm(Form):
         default='manual',
         validators=[InputRequired()],
         choices=[
-            ('manual', _('No credit card payments')),
-            ('free', _('Credit card payments optional')),
-            ('cc', _('Credit card payments required'))
+            SelectChoice('manual', _('No credit card payments')),
+            SelectChoice('free', _('Credit card payments optional')),
+            SelectChoice('cc', _('Credit card payments required'))
         ])
 
     def validate_minimum_price_total(self, field: DecimalField) -> None:

@@ -30,6 +30,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FloatField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -48,7 +49,6 @@ from onegov.translator_directory.utils import (nationality_choices,
 if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.request import TranslatorAppRequest
-    from wtforms.fields.choices import _Choice
 
 
 class RequestAccreditationForm(Form, DrivingDistanceMixin):
@@ -75,7 +75,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     gender = ChosenSelectField(
         label=_('Gender'),
         fieldset=_('Personal Information'),
-        choices=list(GENDERS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in GENDERS.items()
+        ],
         validators=[InputRequired()],
     )
 
@@ -102,9 +105,9 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         label=_('Marital status'),
         fieldset=_('Personal Information'),
         choices=(
-            ('ledig', 'ledig'),
-            ('verheiratet', 'verheiratet'),
-            ('geschieden', 'geschieden'),
+            SelectChoice('ledig'),
+            SelectChoice('verheiratet'),
+            SelectChoice('geschieden'),
         ),
         validators=[InputRequired()],
     )
@@ -224,8 +227,8 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         label=_('Availability'),
         fieldset=_('Contact'),
         choices=[
-            ('24h', '24h'),
-            ('Vereinbarung', 'Vereinbarung')
+            SelectChoice('24h'),
+            SelectChoice('Vereinbarung')
         ],
         validators=[InputRequired()],
     )
@@ -523,31 +526,31 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             )
 
     @cached_property
-    def gender_choices(self) -> list[_Choice]:
+    def gender_choices(self) -> list[SelectChoice]:
         return [
-            (id_, self.request.translate(choice))
+            SelectChoice(id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
 
     @cached_property
-    def language_choices(self) -> list[_Choice]:
+    def language_choices(self) -> list[SelectChoice]:
         languages = LanguageCollection(self.request.session)
         return [
-            (str(language.id), language.name)
+            SelectChoice(str(language.id), language.name)
             for language in languages.query()
         ]
 
     @cached_property
-    def expertise_professional_guilds_choices(self) -> list[_Choice]:
+    def expertise_professional_guilds_choices(self) -> list[SelectChoice]:
         return [
-            (id_, self.request.translate(choice))
+            SelectChoice(id_, self.request.translate(choice))
             for id_, choice in PROFESSIONAL_GUILDS.items()
         ]
 
     @cached_property
-    def expertise_interpreting_types_choices(self) -> list[_Choice]:
+    def expertise_interpreting_types_choices(self) -> list[SelectChoice]:
         return [
-            (id_, self.request.translate(choice))
+            SelectChoice(id_, self.request.translate(choice))
             for id_, choice in INTERPRETING_TYPES.items()
         ]
 

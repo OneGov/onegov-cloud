@@ -72,7 +72,7 @@ def test_access_extension() -> None:
     assert 'access' in form
     assert form['access'].data == 'public'
     assert {'mtan', 'secret_mtan'}.isdisjoint(
-        value for value, _ in form['access'].choices)  # type: ignore[attr-defined]
+        choice.value for choice in form['access'].choices)  # type: ignore[attr-defined]
 
     form['access'].data = 'private'
     form.populate_obj(topic)
@@ -86,7 +86,7 @@ def test_access_extension() -> None:
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
     assert {'mtan', 'secret_mtan'}.issubset(
-        value for value, _ in form['access'].choices)  # type: ignore[attr-defined]
+        choice.value for choice in form['access'].choices)  # type: ignore[attr-defined]
 
     form.process(obj=topic)
 

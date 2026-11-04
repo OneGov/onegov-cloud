@@ -5,6 +5,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ColorField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
+from wtforms import SelectChoice
 from wtforms.fields import BooleanField, IntegerField, RadioField
 from wtforms.validators import Optional, NumberRange
 
@@ -26,11 +27,11 @@ class AgencySettingsForm(Form):
         fieldset=_('PDF Layout'),
         default='default',
         choices=[
-            ('default', _('Default')),
-            ('ar', 'Kanton Appenzell Ausserrhoden'),
-            ('zg', 'Kanton Zug'),
-            ('bs', 'Kanton Basel-Stadt'),
-            ('lu', 'Kanton Luzern'),
+            SelectChoice('default', _('Default')),
+            SelectChoice('ar', 'Kanton Appenzell Ausserrhoden'),
+            SelectChoice('zg', 'Kanton Zug'),
+            SelectChoice('bs', 'Kanton Basel-Stadt'),
+            SelectChoice('lu', 'Kanton Luzern'),
         ],
     )
 
@@ -38,9 +39,9 @@ class AgencySettingsForm(Form):
         label=_('For root PDF, page after every:'),
         fieldset=_('PDF Layout'),
         choices=[
-            ('1', _('1 Heading')),
-            ('2', _('1.1 Heading')),
-            ('3', _('1.1.1 Heading')),
+            SelectChoice('1', _('1 Heading')),
+            SelectChoice('2', _('1.1 Heading')),
+            SelectChoice('3', _('1.1.1 Heading')),
         ],
         default='1'
     )
@@ -49,9 +50,9 @@ class AgencySettingsForm(Form):
         label=_("For organisation PDF's, page after every:"),
         fieldset=_('PDF Layout'),
         choices=[
-            ('1', _('1 Heading')),
-            ('2', _('1.1 Heading')),
-            ('3', _('1.1.1 Heading')),
+            SelectChoice('1', _('1 Heading')),
+            SelectChoice('2', _('1.1 Heading')),
+            SelectChoice('3', _('1.1.1 Heading')),
         ],
         default='1'
     )
@@ -71,7 +72,9 @@ class AgencySettingsForm(Form):
         fieldset=_('Customize search results'),
         description=_(
             'Level 1 represents the root agencies, Level 2 their children'),
-        choices=[]
+        choices=lambda form, field: [
+            form.level_choice(lvl) for lvl in form.topmost_levels
+        ]
     )
 
     agency_phone_internal_digits = IntegerField(
@@ -90,8 +93,8 @@ class AgencySettingsForm(Form):
         label=_('Field used for internal phone numbers'),
         fieldset=_('Customize search results'),
         choices=[
-            ('phone', _('Phone')),
-            ('phone_direct', _('Direct Phone Number or Mobile')),
+            SelectChoice('phone', _('Phone')),
+            SelectChoice('phone_direct', _('Direct Phone Number or Mobile')),
         ],
     )
 
@@ -108,14 +111,11 @@ class AgencySettingsForm(Form):
         default=True,
     )
 
-    def level_choice(self, lvl: int) -> tuple[str, str]:
-        return str(lvl), self.request.translate(
-            _('Level ${lvl}', mapping={'lvl': lvl}))
-
-    def on_request(self) -> None:
-        self.agency_display.choices = [
-            self.level_choice(lvl) for lvl in self.topmost_levels
-        ]
+    def level_choice(self, lvl: int) -> SelectChoice:
+        return SelectChoice(
+            str(lvl),
+            self.request.translate(_('Level ${lvl}', mapping={'lvl': lvl}))
+        )
 
     def process_obj(self, obj: Organisation) -> None:  # type:ignore
         super().process_obj(obj)

@@ -27,6 +27,7 @@ from onegov.pas.models import SettlementRun
 from pytest import fixture
 from tests.onegov.pas.conftest import DummyApp
 from uuid import uuid4
+from wtforms import SelectChoice
 
 
 from typing import Any, TYPE_CHECKING
@@ -321,11 +322,11 @@ def test_edit_commission_bulk_unique_parliamentarians(
 
     choices = form.parliamentarian_id.choices
     assert len(choices) == 2
-    assert set(choices) == {
-        (str(selected.id), selected.title),
-        (str(unselected.id), unselected.title),
-    }
-    assert form.parliamentarian_id.data == [str(selected.id)]
+    assert sorted(choices, key=lambda c: c.value) == sorted((
+        SelectChoice(selected.id.hex, selected.title),
+        SelectChoice(unselected.id.hex, unselected.title),
+    ), key=lambda c: c.value)
+    assert form.parliamentarian_id.data == [selected.id]
 
 
 @freeze_time('2024-01-01')
@@ -392,17 +393,15 @@ def test_commission_membership_forms(
     # on request
     form = CommissionMembershipForm()
     form.request = dummy_request
-    form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 2
     assert len(form.commission_id.choices) == 3
 
-    form = CommissionMembershipAddForm()
-    form.request = dummy_request
-    form.on_request()
+    form2 = CommissionMembershipAddForm()
+    form2.request = dummy_request
 
-    assert len(form.parliamentarian_id.choices) == 1
-    assert form.commission_id is None
+    assert len(form2.parliamentarian_id.choices) == 1
+    assert 'commission_id' not in form2
 
 
 def test_parliamentarian_role_form(
@@ -426,7 +425,6 @@ def test_parliamentarian_role_form(
     # on request
     form = PASParliamentarianRoleForm()
     form.request = dummy_request
-    form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 1
     assert len(form.parliamentary_group_id.choices) == 4

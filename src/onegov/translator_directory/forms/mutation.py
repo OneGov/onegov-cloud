@@ -1,3 +1,4 @@
+from copy import deepcopy
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO
@@ -32,6 +33,7 @@ from onegov.translator_directory.layout import DefaultLayout
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields.simple import EmailField
@@ -45,7 +47,6 @@ if TYPE_CHECKING:
     from onegov.translator_directory.models.mutation import TranslatorMutation
     from onegov.translator_directory.request import TranslatorAppRequest
     from wtforms import Field
-    from wtforms.fields.choices import _Choice
 
 
 BOOLS = [('True', _('Yes')), ('False', _('No'))]
@@ -71,18 +72,18 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     locale: str = 'de_CH'
 
     @cached_property
-    def language_choices(self) -> list[_Choice]:
+    def language_choices(self) -> list[SelectChoice]:
         languages = LanguageCollection(self.request.session)
         return [
-            (str(language.id), language.name)
+            SelectChoice(str(language.id), language.name)
             for language in languages.query()
         ]
 
     @cached_property
-    def certificate_choices(self) -> list[_Choice]:
+    def certificate_choices(self) -> list[SelectChoice]:
         certificates = LanguageCertificateCollection(self.request.session)
         return [
-            (str(certificate.id), certificate.name)
+            SelectChoice(str(certificate.id), certificate.name)
             for certificate in certificates.query()
         ]
 
@@ -90,11 +91,11 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
         self.locale = self.request.locale if self.request.locale else 'de_CH'
 
-        self.mother_tongues.choices = self.language_choices.copy()
-        self.spoken_languages.choices = self.language_choices.copy()
-        self.written_languages.choices = self.language_choices.copy()
-        self.monitoring_languages.choices = self.language_choices.copy()
-        self.certificates.choices = self.certificate_choices.copy()
+        self.mother_tongues.choices = deepcopy(self.language_choices)
+        self.spoken_languages.choices = deepcopy(self.language_choices)
+        self.written_languages.choices = deepcopy(self.language_choices)
+        self.monitoring_languages.choices = deepcopy(self.language_choices)
+        self.certificates.choices = deepcopy(self.certificate_choices)
         self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
@@ -107,24 +108,20 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
             value = getattr(self.model, name)
             if isinstance(field, ChosenSelectField):
-                assert isinstance(field.choices, list)
-                field.choices.insert(0, ('', ''))
-                field.choices = [
-                    (choice[0], self.request.translate(choice[1]))
-                    for choice in field.choices
-                ]
-                choice_lookup = dict(field.choices)  # type:ignore
+                for choice in field.choices:
+                    choice.label = self.request.translate(choice.label)
+
+                choice_lookup = {c.value: c.label for c in field.choices}
+                field.choices = [SelectChoice('', '_'), *field.choices]
                 field.long_description = choice_lookup.get(  # type:ignore
                     str(value), ''
                 )
             elif isinstance(field, ChosenSelectMultipleField):
-                assert isinstance(field.choices, list)
-                field.choices.insert(0, ('', ''))
-                field.choices = [
-                    (choice[0], self.request.translate(choice[1]))
-                    for choice in field.choices
-                ]
-                choice_lookup = dict(field.choices)  # type:ignore
+                for choice in field.choices:
+                    choice.label = self.request.translate(choice.label)
+
+                choice_lookup = {c.value: c.label for c in field.choices}
+                field.choices = [SelectChoice('', '_'), *field.choices]
                 field.long_description = ', '.join(  # type:ignore
                     choice_lookup.get(str(getattr(v, 'id', v)), '')
                     for v in value
@@ -404,28 +401,34 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     admission = ChosenSelectField(
         label=_('Admission'),
         fieldset=_('Proposed changes'),
-        choices=list(ADMISSIONS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in ADMISSIONS.items()
+        ],
         validators=[Optional()]
     )
 
     withholding_tax = ChosenSelectField(
         label=_('Withholding tax'),
         fieldset=_('Proposed changes'),
-        choices=BOOLS,
+        choices=[SelectChoice(value, label) for value, label in BOOLS],
         validators=[Optional()]
     )
 
     self_employed = ChosenSelectField(
         label=_('Self-employed'),
         fieldset=_('Proposed changes'),
-        choices=BOOLS,
+        choices=[SelectChoice(value, label) for value, label in BOOLS],
         validators=[Optional()]
     )
 
     gender = ChosenSelectField(
         label=_('Gender'),
         fieldset=_('Proposed changes'),
-        choices=list(GENDERS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in GENDERS.items()
+        ],
         validators=[Optional()]
     )
 
@@ -543,7 +546,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     confirm_name_reveal = ChosenSelectField(
         label=_('Name revealing confirmation'),
         fieldset=_('Proposed changes'),
-        choices=BOOLS,
+        choices=[SelectChoice(value, label) for value, label in BOOLS],
         validators=[Optional()]
     )
 
@@ -600,7 +603,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     expertise_professional_guilds = ChosenSelectMultipleField(
         label=_('Expertise by professional guild'),
         fieldset=_('Proposed changes'),
-        choices=list(PROFESSIONAL_GUILDS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in PROFESSIONAL_GUILDS.items()
+        ],
         validators=[Optional()]
     )
 
@@ -612,7 +618,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     expertise_interpreting_types = ChosenSelectMultipleField(
         label=_('Expertise by interpreting type'),
         fieldset=_('Proposed changes'),
-        choices=list(INTERPRETING_TYPES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in INTERPRETING_TYPES.items()
+        ],
         validators=[Optional()]
     )
 
@@ -630,7 +639,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     education_as_interpreter = ChosenSelectField(
         label=_('Education as interpreter'),
         fieldset=_('Proposed changes'),
-        choices=BOOLS,
+        choices=[SelectChoice(value, label) for value, label in BOOLS],
         validators=[Optional()]
     )
 
@@ -660,7 +669,7 @@ class ApplyMutationForm(Form):
     def on_request(self) -> None:
         choices = self.model.translated(self.request)
         self.changes.choices = [
-            (name, f'{label}: {choice}')
+            SelectChoice(name, f'{label}: {choice}')
             for name, (label, choice, original) in choices.items()
         ]
 

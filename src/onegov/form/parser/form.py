@@ -23,6 +23,7 @@ from wtforms.fields import EmailField
 from wtforms.fields import IntegerField
 from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import Email
@@ -363,7 +364,10 @@ def handle_field(
             fieldset=field.real_fieldset,
             depends_on=depends_on,
             required=field.required,
-            choices=[(c.label, c.display_label) for c in field.choices],
+            choices=[
+                SelectChoice(c.label, c.display_label)
+                for c in field.choices
+            ],
             default=next((c.label for c in field.choices if c.selected), None),
             pricing={
                 c.label: c.pricing.as_tuple()
@@ -388,7 +392,10 @@ def handle_field(
             fieldset=field.real_fieldset,
             depends_on=depends_on,
             required=field.required,
-            choices=[(c.label, c.display_label) for c in field.choices],
+            choices=[
+                SelectChoice(c.label, c.display_label)
+                for c in field.choices
+            ],
             default=[c.label for c in field.choices if c.selected],
             pricing={
                 c.label: c.pricing.as_tuple()

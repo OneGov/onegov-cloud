@@ -9,6 +9,7 @@ from onegov.election_day.models import Screen
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -35,7 +36,7 @@ def test_screen_form_validate(election_day_app_zg: TestApp) -> None:
         })
     )
     form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
-    form.majorz_election.choices = [('election', 'Election')]
+    form.majorz_election.choices = [SelectChoice('election', 'Election')]
     assert form.validate()
 
     form = ScreenForm(
@@ -51,7 +52,7 @@ def test_screen_form_validate(election_day_app_zg: TestApp) -> None:
         })
     )
     form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
-    form.majorz_election.choices = [('election', 'Election')]
+    form.majorz_election.choices = [SelectChoice('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ['error parsing attribute name']}
 
@@ -68,7 +69,7 @@ def test_screen_form_validate(election_day_app_zg: TestApp) -> None:
         })
     )
     form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
-    form.majorz_election.choices = [('election', 'Election')]
+    form.majorz_election.choices = [SelectChoice('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ["Invalid element '<fancy-stuff>'"]}
 
@@ -387,22 +388,22 @@ def test_screen_form_populate(election_day_app_zg: TestApp) -> None:
     form.request = DummyRequest(app=election_day_app_zg, session=session)  # type: ignore[assignment]
     form.on_request()
     assert form.simple_vote.choices == [
-        ('simple-2', 'Simple 2 [2001-01-01]'),
-        ('simple-1', 'Simple 1 [2001-01-01]')
+        SelectChoice('simple-2', 'Simple 2 [2001-01-01]'),
+        SelectChoice('simple-1', 'Simple 1 [2001-01-01]')
     ]
     assert form.complex_vote.choices == [
-        ('complex-1', 'Complex 1 [2001-01-01]')
+        SelectChoice('complex-1', 'Complex 1 [2001-01-01]')
     ]
     assert form.majorz_election.choices == [
-        ('majorz-2', 'Majorz 2 [2001-01-01]'),
-        ('majorz-1', 'Majorz 1 [2001-01-01]')
+        SelectChoice('majorz-2', 'Majorz 2 [2001-01-01]'),
+        SelectChoice('majorz-1', 'Majorz 1 [2001-01-01]')
     ]
     assert form.proporz_election.choices == [
-        ('proporz-1', 'Proporz 1 [2001-01-01]')
+        SelectChoice('proporz-1', 'Proporz 1 [2001-01-01]')
     ]
     assert form.election_compound.choices == [
-        ('elections-1', 'Elections 1 [2001-01-01]'),
-        ('elections-2', 'Elections 2 [2001-01-01]')
+        SelectChoice('elections-1', 'Elections 1 [2001-01-01]'),
+        SelectChoice('elections-2', 'Elections 2 [2001-01-01]')
     ]
     assert form.tags_simple_vote.text == (
         '<counted-entities class=""/>\n'

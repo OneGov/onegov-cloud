@@ -132,8 +132,8 @@ def test_commission_president_edit_attendence(
     count_before = session.query(Attendence).count()
     record_ids = [record.id for record in records]
     run_id = run.id
-    other_id = str(other.id)
-    president_id = str(president.id)
+    other_id = other.id.hex
+    president_id = president.id.hex
     endpoint = 'edit-commission-bulk-attendences' if bulk else 'edit'
     url = f'/attendence/{record_ids[0]}/{endpoint}'
     transaction.commit()

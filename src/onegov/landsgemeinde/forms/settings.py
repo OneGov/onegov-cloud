@@ -2,6 +2,7 @@ from wtforms import RadioField
 from wtforms.fields import EmailField
 from onegov.form import Form
 from onegov.landsgemeinde import _
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import Optional
@@ -58,9 +59,9 @@ class AssemblySettingsForm(Form):
         fieldset=_('Assembly settings'),
         validators=[InputRequired()],
         choices=[
-            ('assembly', _('Assembly')),
-            ('general_assembly', _('General Assembly')),
-            ('town_hall_meeting', _('Town Hall Meeting'))
+            SelectChoice('assembly', _('Assembly')),
+            SelectChoice('general_assembly', _('General Assembly')),
+            SelectChoice('town_hall_meeting', _('Town Hall Meeting'))
         ]
     )
 

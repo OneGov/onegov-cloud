@@ -4,7 +4,7 @@ from onegov.activity.matching.score import PreferGroups
 from onegov.activity.matching.score import Scoring
 from onegov.feriennet import _
 from onegov.form import Form
-from wtforms.fields import BooleanField, RadioField
+from wtforms.fields import BooleanField, RadioField, SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -31,8 +31,8 @@ class MatchForm(Form):
         label=_('Confirm matching:'),
         default='no',
         choices=[
-            ('no', _('No, preview only')),
-            ('yes', _('Yes, confirm matching'))
+            SelectChoice('no', _('No, preview only')),
+            SelectChoice('yes', _('Yes, confirm matching'))
         ]
     )
 

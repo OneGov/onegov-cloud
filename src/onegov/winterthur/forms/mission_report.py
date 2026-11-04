@@ -12,6 +12,7 @@ from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import TimeField
@@ -52,8 +53,8 @@ class MissionReportForm(Form):
     mission_type = RadioField(
         _('Mission type'),
         choices=[
-            ('single', _('Single')),
-            ('multi', _('Multi'))
+            SelectChoice('single', _('Single')),
+            SelectChoice('multi', _('Multi'))
         ],
         default='single',
         validators=[InputRequired()]

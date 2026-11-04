@@ -6,6 +6,7 @@ from operator import attrgetter
 from wtforms.fields import RadioField
 from wtforms.validators import InputRequired
 from wtforms.fields import DateField
+from wtforms.fields import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -18,6 +19,26 @@ else:
     FormSubmissionsExportBase = merge_forms(DateRangeForm, ExportForm)
 
 
+def registration_window_choices(
+    form: FormSubmissionsExport,
+    field: MultiCheckboxField
+) -> list[SelectChoice]:
+    # FIXME: circular import - a layout class just to get a date format?
+    from onegov.org.layout import DefaultLayout
+
+    layout = DefaultLayout(form.model, form.request)
+    return [
+        SelectChoice(
+            window.id.hex,
+            layout.format_date_range(window.start, window.end)
+        )
+        for window in sorted(
+            form.model.registration_windows,
+            key=attrgetter('start')
+        )
+    ]
+
+
 class FormSubmissionsExport(FormSubmissionsExportBase):
 
     if TYPE_CHECKING:
@@ -27,14 +48,14 @@ class FormSubmissionsExport(FormSubmissionsExportBase):
         label=_('Selection'),
         default='date',
         choices=[
-            ('date', _('By date')),
-            ('window', _('By registration window'))
+            SelectChoice('date', _('By date')),
+            SelectChoice('window', _('By registration window'))
         ]
     )
 
     registration_window = MultiCheckboxField(
         label=_('Registration Window'),
-        choices=None,
+        choices=registration_window_choices,
         depends_on=('selection', 'window')
     )
 
@@ -51,24 +72,5 @@ class FormSubmissionsExport(FormSubmissionsExportBase):
     )
 
     def on_request(self) -> None:
-        if self.registration_window.choices is None:
-            self.load_registration_windows()  # type:ignore[unreachable]
-
-            if not self.registration_window.choices:
-                self.hide(self.selection)
-
-    def load_registration_windows(self) -> None:
-        # FIXME: circular import - a layout class just to get a date format?
-        from onegov.org.layout import DefaultLayout
-
-        layout = DefaultLayout(self.model, self.request)
-
-        windows = sorted(
-            self.model.registration_windows,
-            key=attrgetter('start')
-        )
-
-        self.registration_window.choices = [
-            (window.id.hex, layout.format_date_range(window.start, window.end))
-            for window in windows
-        ]
+        if not self.registration_window.choices:
+            self.hide(self.selection)

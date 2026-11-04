@@ -1,7 +1,7 @@
+import transaction
+
 from collections import OrderedDict
 from datetime import timedelta
-import transaction
-from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
 from onegov.org.forms.fields import HtmlField
@@ -15,19 +15,19 @@ from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import MultiCheckboxField
 from onegov.newsletter import Recipient, RecipientCollection
 from onegov.org import _
+from onegov.org.utils import extract_categories_and_subcategories
 from sedate import replace_timezone, to_timezone, utcnow
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 from markupsafe import Markup
 
 
 from typing import Any, TYPE_CHECKING
-
-from onegov.org.utils import extract_categories_and_subcategories
-
 if TYPE_CHECKING:
     from collections.abc import Iterable, Callable
     from onegov.core.csv import DefaultRow
@@ -37,7 +37,6 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
     from typing import Self
-    from wtforms.fields.choices import _Choice
 
 
 class NewsletterForm(Form):
@@ -87,7 +86,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple(
-            (
+            SelectChoice(
                 str(item.id),
                 Markup(
                     '<div class="title">{}</div>'
@@ -148,7 +147,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple(
-            (
+            SelectChoice(
                 str(item.id),
                 Markup(
                     '<div class="title">{}</div>'
@@ -200,7 +199,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple(
-            (
+            SelectChoice(
                 str(item.id),
                 Markup(
                     '<div class="title">{}</div>'
@@ -259,8 +258,8 @@ class NewsletterSendForm(Form):
     send = RadioField(
         _('Send'),
         choices=(
-            ('now', _('Now')),
-            ('specify', _('At a specified time'))
+            SelectChoice('now', _('Now')),
+            SelectChoice('specify', _('At a specified time'))
         ),
         default='now'
     )
@@ -299,13 +298,13 @@ class NewsletterSendForm(Form):
             self.time.data = time
 
     def on_request(self) -> None:
-        choices: list[_Choice] = []
+        choices: list[SelectChoice] = []
         categories, subcategories = extract_categories_and_subcategories(
             self.request.app.org.newsletter_categories)
 
         for cat, sub in zip(categories, subcategories):
-            choices.append((cat, cat))
-            choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
+            choices.append(SelectChoice(cat, cat))
+            choices.extend(SelectChoice(s, f'\xa0\xa0\xa0{s}') for s in sub)
 
         if not choices:
             self.delete_field('categories')
@@ -317,7 +316,12 @@ class NewsletterSendForm(Form):
 class NewsletterTestForm(Form):
     selected_recipient = ChosenSelectField(
         label=_('Recipient'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(recpient.id.hex, recpient.address)
+            for recpient in form.request.session.query(Recipient)
+            .with_entities(Recipient.id, Recipient.address)
+            .filter_by(confirmed=True)
+        ],
     )
 
     @property
@@ -327,18 +331,6 @@ class NewsletterTestForm(Form):
             .filter_by(id=self.selected_recipient.data)
             .one()
         )
-
-    def on_request(self) -> None:
-        recipients = (
-            self.request.session.query(Recipient)
-            .with_entities(Recipient.id, Recipient.address)
-            .filter_by(confirmed=True)
-        )
-
-        self.selected_recipient.choices = [
-            (r.id.hex, r.address)
-            for r in recipients
-        ]
 
 
 class NewsletterSubscriberImportExportForm(Form):

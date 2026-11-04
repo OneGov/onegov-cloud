@@ -638,7 +638,7 @@ def test_attendance_choices_use_selected_settlement(
         ('Future', datetime.date(2024, 10, 1), None),
     ):
         person = people.add(first_name=name, last_name='Test')
-        ids[name] = str(person.id)
+        ids[name] = person.id.hex
         session.add(
             PASParliamentarianRole(
                 parliamentarian_id=person.id,
@@ -659,7 +659,7 @@ def test_attendance_choices_use_selected_settlement(
         )
     session.flush()
     run_id = str(run.id)
-    commission_id = str(commission.id)
+    commission_id = commission.id.hex
     session.flush()
     transaction.commit()
 
@@ -757,12 +757,12 @@ def test_fetch_commissions_parliamentarians_json(
     memberships.add(commission_id=commission2.id, parliamentarian_id=parl3.id)
 
     session.flush()
-    commission1_id = str(commission1.id)
-    commission2_id = str(commission2.id)
+    commission1_id = commission1.id.hex
+    commission2_id = commission2.id.hex
     parl1_title = parl1.title
     parl2_title = parl2.title
     parl3_title = parl3.title
-    parl3_id = str(parl3.id)
+    parl3_id = parl3.id.hex
     transaction.commit()
 
     client.login_admin()
@@ -801,7 +801,7 @@ def test_fetch_commissions_parliamentarians_json(
     commissions = PASCommissionCollection(session)
     commission3 = commissions.add(name='Empty Commission')
     session.flush()
-    commission3_id = str(commission3.id)
+    commission3_id = commission3.id.hex
 
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
@@ -1104,9 +1104,9 @@ def test_commission_president_bulk_add(
         )
     )
 
-    commission_id = str(commission.id)
-    bob_id = str(bob.id)
-    alice_id = str(alice.id)
+    commission_id = commission.id.hex
+    bob_id = bob.id.hex
+    alice_id = alice.id.hex
 
     users = UserCollection(session)
     president_user = users.by_username('zgalice')
@@ -1190,10 +1190,10 @@ def test_abschluss_blocks_bulk_add_only_for_same_commission(
             )
         )
 
-    commission_id = str(commission.id)
-    other_commission_id = str(other_commission.id)
-    bob_id = str(bob.id)
-    alice_id = str(alice.id)
+    commission_id = commission.id.hex
+    other_commission_id = other_commission.id.hex
+    bob_id = bob.id.hex
+    alice_id = alice.id.hex
 
     users = UserCollection(session)
     president_user = users.by_username('zgalice')
@@ -1604,8 +1604,8 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
                 role='member',
             )
         )
-    alice_id, bob_id = str(alice.id), str(bob.id)
-    commission_id = str(commission.id)
+    alice_id, bob_id = alice.id.hex, bob.id.hex
+    commission_id = commission.id.hex
     session.flush()
     transaction.commit()
 
@@ -1617,17 +1617,17 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     page.form['parliamentarian_id'] = [alice_id]
     page.form.submit().follow()
 
-    attendance = client.app.session().query(Attendence).one()
+    attendance = session.query(Attendence).one()
     group_id = attendance.bulk_edit_id
     edit_url = f'/attendence/{attendance.id}/edit-commission-bulk-attendences'
     page = client.get(edit_url)
     page.form['parliamentarian_id'] = [alice_id, bob_id]
     page.form.submit().follow()
 
-    records = client.app.session().query(Attendence).all()
+    records = session.query(Attendence).all()
     assert len(records) == 2
     assert {record.bulk_edit_id for record in records} == {group_id}
-    assert {str(record.parliamentarian_id) for record in records} == {
+    assert {record.parliamentarian_id.hex for record in records} == {
         alice_id,
         bob_id,
     }
@@ -1648,5 +1648,5 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     page.form['parliamentarian_id'] = [alice_id]
     page.form.submit().follow()
     remaining = client.app.session().query(Attendence).one()
-    assert str(remaining.parliamentarian_id) == alice_id
+    assert remaining.parliamentarian_id.hex == alice_id
     assert remaining.bulk_edit_id == group_id

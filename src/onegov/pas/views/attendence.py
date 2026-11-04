@@ -383,8 +383,8 @@ def add_attendence(
                 and form.date.data
                 and has_user_set_abschluss_for_commission(
                     request.session,
-                    UUID(form.parliamentarian_id.data),
-                    UUID(form.commission_id.data),
+                    form.parliamentarian_id.data,
+                    form.commission_id.data,
                     form.date.data,
                 )
             ):
@@ -456,10 +456,7 @@ def add_bulk_attendence(
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
             if not request.is_admin and form.commission_id.data:
                 blocked_parls: list[str] = []
-                try:
-                    commission_id = UUID(form.commission_id.data)
-                except (TypeError, ValueError):
-                    commission_id = None
+                commission_id = form.commission_id.data
 
                 user = (
                     request.session.query(User)
@@ -588,7 +585,7 @@ def edit_plenary_bulk_attendence(
         return request.redirect(request.class_link(AttendenceCollection))
 
     all_parliamentarians = [
-        str(p.id) for p in get_attendance_parliamentarians(request)
+        p.id for p in get_attendance_parliamentarians(request)
     ]
 
     if form.submitted(request):
@@ -606,13 +603,12 @@ def edit_plenary_bulk_attendence(
                 }
 
         data = form.get_useful_data()
-        raw_parl_ids = request.POST.getall('parliamentarian_id')
-        data.pop('parliamentarian_id', None)
+        parl_ids = data.pop('parliamentarian_id', ())
         collection = AttendenceCollection(request.session)
 
         unselected_parliamentarians = [
             pid for pid in all_parliamentarians
-            if pid not in raw_parl_ids
+            if pid not in parl_ids
         ]
         for parliamentarian in unselected_parliamentarians:
             if attendence := collection.query().filter(
@@ -622,7 +618,7 @@ def edit_plenary_bulk_attendence(
                 Change.add(request, 'delete', attendence)
                 collection.delete(attendence)
 
-        for parliamentarian_id in raw_parl_ids:
+        for parliamentarian_id in parl_ids:
             attendence = collection.query().filter(
                     Attendence.parliamentarian_id == parliamentarian_id,
                     Attendence.bulk_edit_id == form.bulk_edit_id.data,
@@ -708,10 +704,10 @@ def edit_commission_bulk_attendence(
             assert form.date.data is not None
             if (
                 form.bulk_edit_id.data != str(self.bulk_edit_id)
-                or form.commission_id.data != str(self.commission_id)
+                or form.commission_id.data != self.commission_id
                 or not all(
                     request.can_edit_commission_attendance(
-                        form.date.data, self.commission_id, UUID(person_id)
+                        form.date.data, self.commission_id, person_id
                     )
                     for person_id in (form.parliamentarian_id.data or [])
                 )
@@ -733,7 +729,7 @@ def edit_commission_bulk_attendence(
                 }
 
         data = form.get_useful_data()
-        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+        if parl_ids := form.parliamentarian_id.data:
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
             memberships = (
@@ -746,13 +742,13 @@ def edit_commission_bulk_attendence(
             )
             eligible = {p.id for p in get_attendance_parliamentarians(request)}
             commission_parliamentarians = [
-                str(membership.parliamentarian_id)
+                membership.parliamentarian_id
                 for membership in memberships
                 if membership.parliamentarian_id in eligible
             ]
             unselected_parliamentarians = [
                 pid for pid in commission_parliamentarians
-                if pid not in raw_parl_ids
+                if pid not in parl_ids
             ]
             for parliamentarian in unselected_parliamentarians:
                 if attendence := collection.query().filter(
@@ -763,7 +759,7 @@ def edit_commission_bulk_attendence(
                     collection.delete(attendence)
 
             notify_attendence = None
-            for parliamentarian_id in raw_parl_ids:
+            for parliamentarian_id in parl_ids:
                 attendence = collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian_id,
                         Attendence.bulk_edit_id == self.bulk_edit_id,
@@ -870,11 +866,10 @@ def add_plenary_attendence(self: AttendenceCollection,
                 }
 
         data = form.get_useful_data()
-        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            # Remove static field; choices are set dynamically via JS
-            data.pop('parliamentarian_id', None)
+        # Remove static field; choices are set dynamically via JS
+        if parl_ids := data.pop('parliamentarian_id', None):
             bulk_edit_id = uuid.uuid4()
-            for parliamentarian_id in raw_parl_ids:
+            for parliamentarian_id in parl_ids:
                 attendence = self.add(
                     parliamentarian_id=parliamentarian_id,
                     **data,
@@ -946,8 +941,8 @@ def edit_attendence(
             assert form.date.data is not None
             if (
                 form.type.data == 'plenary'
-                or form.commission_id.data != str(self.commission_id)
-                or form.parliamentarian_id.data != str(self.parliamentarian_id)
+                or form.commission_id.data != self.commission_id
+                or form.parliamentarian_id.data != self.parliamentarian_id
                 or not request.can_edit_commission_attendance(
                     form.date.data,
                     self.commission_id,

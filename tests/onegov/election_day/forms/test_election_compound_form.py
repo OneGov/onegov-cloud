@@ -8,6 +8,7 @@ from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 from wtforms.validators import InputRequired
 
 
@@ -57,10 +58,10 @@ def test_election_compound_form_on_request(session: Session) -> None:
     form.request.default_locale = 'de_CH'
     form.request.app.principal = Canton(name='zg', canton='zg')  # type: ignore[misc]
     form.on_request()
-    assert [x[0] for x in form.domain_elections.choices] == ['municipality']
-    assert [x[0] for x in form.region_elections.choices] == ['r1']
-    assert [x[0] for x in form.district_elections.choices] == ['d1']
-    assert [x[0] for x in form.municipality_elections.choices] == ['m1']
+    assert [x.value for x in form.domain_elections.choices] == ['municipality']
+    assert [x.value for x in form.region_elections.choices] == ['r1']
+    assert [x.value for x in form.district_elections.choices] == ['d1']
+    assert [x.value for x in form.municipality_elections.choices] == ['m1']
     assert isinstance(form.title_de.validators[0], InputRequired)
     assert form.title_fr.validators == []
     assert form.title_it.validators == []
@@ -71,12 +72,12 @@ def test_election_compound_form_on_request(session: Session) -> None:
     form.request.default_locale = 'fr_CH'
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
-    assert [x[0] for x in form.domain_elections.choices] == [
+    assert [x.value for x in form.domain_elections.choices] == [
         'region', 'district', 'municipality'
     ]
-    assert [x[0] for x in form.region_elections.choices] == ['r1']
-    assert [x[0] for x in form.district_elections.choices] == ['d1']
-    assert [x[0] for x in form.municipality_elections.choices] == ['m1']
+    assert [x.value for x in form.region_elections.choices] == ['r1']
+    assert [x.value for x in form.district_elections.choices] == ['d1']
+    assert [x.value for x in form.municipality_elections.choices] == ['m1']
     assert form.title_de.validators == []
     assert isinstance(form.title_fr.validators[0], InputRequired)
     assert form.title_it.validators == []
@@ -455,12 +456,12 @@ def test_election_compound_form_relations(session: Session) -> None:
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_compounds_historical.choices == [
-        ('second-compound', '02.01.2011 Second Compound'),
-        ('first-compound', '01.01.2011 First Compound'),
+        SelectChoice('second-compound', '02.01.2011 Second Compound'),
+        SelectChoice('first-compound', '01.01.2011 First Compound'),
     ]
     assert form.related_compounds_other.choices == [
-        ('second-compound', '02.01.2011 Second Compound'),
-        ('first-compound', '01.01.2011 First Compound'),
+        SelectChoice('second-compound', '02.01.2011 Second Compound'),
+        SelectChoice('first-compound', '01.01.2011 First Compound'),
     ]
 
     form.title_de.data = 'Third Compound'
@@ -483,14 +484,14 @@ def test_election_compound_form_relations(session: Session) -> None:
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_compounds_historical.choices == [
-        ('third-compound', '03.01.2011 SC Third Compound'),
-        ('second-compound', '02.01.2011 Second Compound'),
-        ('first-compound', '01.01.2011 First Compound'),
+        SelectChoice('third-compound', '03.01.2011 SC Third Compound'),
+        SelectChoice('second-compound', '02.01.2011 Second Compound'),
+        SelectChoice('first-compound', '01.01.2011 First Compound'),
     ]
     assert form.related_compounds_other.choices == [
-        ('third-compound', '03.01.2011 SC Third Compound'),
-        ('second-compound', '02.01.2011 Second Compound'),
-        ('first-compound', '01.01.2011 First Compound'),
+        SelectChoice('third-compound', '03.01.2011 SC Third Compound'),
+        SelectChoice('second-compound', '02.01.2011 Second Compound'),
+        SelectChoice('first-compound', '01.01.2011 First Compound'),
     ]
     form.apply_model(compound)
     assert form.related_compounds_historical.data == ['third-compound']
