@@ -218,6 +218,11 @@ class OrgRequest(CoreRequest[AppT]):
         # if we already accessed this url we are also still fine
         return self.mtan_accesses.by_url(self.path_url) is None
 
+    def is_mtan_protected(self, model: object) -> bool:
+        if self.is_manager or not hasattr(model, 'access'):
+            return False
+        return model.access in ('mtan', 'secret_mtan')
+
     def auto_accept(self, ticket: Ticket) -> bool:
         if self.app.org.ticket_auto_accept_style == 'role':
             roles = self.app.org.ticket_auto_accept_roles

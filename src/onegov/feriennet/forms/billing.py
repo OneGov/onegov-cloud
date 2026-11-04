@@ -9,6 +9,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
@@ -25,8 +26,8 @@ class BillingForm(Form):
         label=_('Confirm billing:'),
         default='no',
         choices=[
-            ('no', _('No, preview only')),
-            ('yes', _('Yes, confirm billing'))
+            SelectChoice('no', _('No, preview only')),
+            SelectChoice('yes', _('Yes, confirm billing'))
         ]
     )
 
@@ -72,8 +73,8 @@ class ManualBookingForm(Form):
         label=_('Kind'),
         default='discount',
         choices=(
-            ('discount', _('Discount')),
-            ('surcharge', _('Surcharge'))
+            SelectChoice('discount', _('Discount')),
+            SelectChoice('surcharge', _('Surcharge'))
         )
     )
 
@@ -131,17 +132,17 @@ class ManualBookingForm(Form):
             raise NotImplementedError
 
     def on_request(self) -> None:
-        self.target.choices = [
-            ('all', _('All')),
-            ('for-user', _('For a specific user'))
-        ]
-
         self.load_usernames()
         self.load_user_tags()
 
+        target_choices = [
+            SelectChoice('all', _('All')),
+            SelectChoice('for-user', _('For a specific user'))
+        ]
         if self.tags.choices:
-            self.target.choices.append(
-                ('for-users-with-tags', _('For users with tags')))
+            target_choices.append(
+                SelectChoice('for-users-with-tags', _('For users with tags')))
+        self.target.choices = target_choices
 
         if (self.request.params.get('for-user')
                 and not self.target.data):
@@ -154,10 +155,13 @@ class ManualBookingForm(Form):
         return UserCollection(self.request.session)
 
     def load_user_tags(self) -> None:
-        self.tags.choices = [(t, t) for t in self.usercollection.tags]
+        self.tags.choices = [SelectChoice(t) for t in self.usercollection.tags]
 
     def load_usernames(self) -> None:
-        self.username.choices = list(self.available_usernames)
+        self.username.choices = [
+            SelectChoice(value, label)
+            for value, label in self.available_usernames
+        ]
 
 
 class PaymentWithDateForm(Form):
@@ -171,8 +175,8 @@ class PaymentWithDateForm(Form):
         validators=(InputRequired(), ),
         label=_('Target'),
         choices=(
-            ('all', _('Whole invoice')),
-            ('specific', _('Only for specific items'))
+            SelectChoice('all', _('Whole invoice')),
+            SelectChoice('specific', _('Only for specific items'))
         ),
     )
 
@@ -185,8 +189,10 @@ class PaymentWithDateForm(Form):
 
     def on_request(self) -> None:
         self.items.choices = [
-            (i.id.hex,
-             f'{i.group} - {i.text} ({round(i.amount, 2)})')
+            SelectChoice(
+                i.id.hex,
+                f'{i.group} - {i.text} ({round(i.amount, 2)})'
+            )
             for i in self.invoice.items if not i.paid]
 
         if self.request.params['item-id'] != 'all':

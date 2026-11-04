@@ -1,30 +1,54 @@
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
+from onegov.form.utils import coerce_uuid
 from onegov.org import _
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.parliament.models.commission_membership import ROLES
 from wtforms.fields import DateField
+from wtforms.fields import SelectChoice
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.parliament.models import ParliamentarianRole
+
+
+def commission_choices(
+    form: Form,
+    field: ChosenSelectField
+) -> list[SelectChoice]:
+    choices = [
+        SelectChoice(commission.id.hex, commission.title)
+        for commission
+        in CommissionCollection(form.request.session).query()
+    ]
+    choices.insert(0, SelectChoice('', '-'))
+    return choices
 
 
 class ParliamentarianCommissionRoleForm(Form):
 
     parliamentarian_id = ChosenSelectField(
         label=_('Parliamentarian'),
+        choices=lambda form, field: [
+            SelectChoice(parliamentarian.id.hex, parliamentarian.title)
+            for parliamentarian
+            in ParliamentarianCollection(form.request.session).query()
+        ],
+        coerce=coerce_uuid,
         validators=[InputRequired()],
     )
 
     role = TranslatedSelectField(
         label=_('Role'),
-        choices=list(ROLES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in ROLES.items()
+        ],
         validators=[InputRequired()],
         default='member'
     )
@@ -41,20 +65,9 @@ class ParliamentarianCommissionRoleForm(Form):
 
     commission_id = ChosenSelectField(
         label=_('Commission'),
+        choices=commission_choices,
+        coerce=coerce_uuid
     )
-
-    def on_request(self) -> None:
-        self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in ParliamentarianCollection(self.request.session).query()
-        ]
-        self.commission_id.choices = [
-            (str(commission.id), commission.title)
-            for commission
-            in CommissionCollection(self.request.session).query()
-        ]
-        self.commission_id.choices.insert(0, ('', '-'))
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -67,7 +80,3 @@ class ParliamentarianCommissionRoleForm(Form):
             {*(exclude or ())},
             include
         )
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        return result

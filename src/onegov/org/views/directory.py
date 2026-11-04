@@ -453,6 +453,9 @@ def get_filters(
                     ),
                     name=view_name
                 ),
+                # every combination of filters is a separate url, so they
+                # should not be followed by crawlers
+                attrs={'rel': 'nofollow'},
                 rounded=singular
             )
             for value in values
@@ -1099,6 +1102,9 @@ def view_export(
     if not request.is_visible(self.directory):
         return HTTPForbidden()
 
+    if not request.is_manager:
+        self.exclude_mtan_protected = True
+
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
@@ -1134,7 +1140,7 @@ def view_export(
             'as metadata and images/files if the directory contains any.'
         )),
         'filters': filters,
-        'count': len(request.exclude_invisible(self.query().all()))
+        'count': self.query().count()
     }
 
 
@@ -1147,6 +1153,9 @@ def view_zip_file(
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
+
+    if not request.is_manager:
+        self.exclude_mtan_protected = True
 
     layout = DirectoryEntryCollectionLayout(self, request)
 
@@ -1165,7 +1174,15 @@ def view_zip_file(
         try:
             archive.write(
                 self.directory,
-                entry_filter=request.exclude_invisible,
+                entry_filter=lambda entries: [
+                    entry
+                    for entry in entries
+                    # NOTE: The query should already filter everything
+                    #       that should get excluded, but we do it again
+                    #       here to make absolutely sure.
+                    if request.is_visible(entry)
+                    if not request.is_mtan_protected(entry)
+                ],
                 query=self.query()
             )
         except DirectoryFileNotFound as err:
@@ -1188,6 +1205,9 @@ def view_zip_file(
 
     response.headers['Content-Disposition'] = (
         f'attachment; filename="{filename}"')
+
+    if request.is_logged_in:
+        response.headers['Cache-Control'] = 'private'
 
     return response
 

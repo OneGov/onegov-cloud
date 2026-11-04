@@ -5,6 +5,7 @@ from onegov.form.fields import DeliveryTimesField, MultiCheckboxField
 from onegov.org import _
 from onegov.reservation import Resource, ResourceCollection
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired, Email
@@ -26,6 +27,21 @@ WEEKDAYS = (
     ('SA', _('Sa')),
     ('SU', _('Su')),
 )
+
+
+def resource_choices(
+    form: ResourceRecipientForm,
+    field: MultiCheckboxField
+) -> list[SelectChoice]:
+    default_group = form.request.translate(_('General'))
+    return [
+        SelectChoice(resource_id.hex, f'{group or default_group} - {title}')
+        for group, title, resource_id in (
+            ResourceCollection(form.request.app.libres_context).query()
+            .with_entities(Resource.group, Resource.title, Resource.id)
+            .order_by(Resource.group, Resource.name)
+        )
+    ]
 
 
 class ResourceRecipientForm(Form):
@@ -95,7 +111,7 @@ class ResourceRecipientForm(Form):
     send_on = MultiCheckboxField(
         label=_('Send on'),
         fieldset='Tage und Ressourcen',
-        choices=WEEKDAYS,
+        choices=[SelectChoice(value, label) for value, label in WEEKDAYS],
         default=[key for key, value in WEEKDAYS],
         validators=[InputRequired()],
         depends_on=('daily_reservations', 'y'),
@@ -113,7 +129,7 @@ class ResourceRecipientForm(Form):
         label=_('Resources'),
         fieldset='Tage und Ressourcen',
         validators=[InputRequired()],
-        choices=None
+        choices=resource_choices,
     )
 
     def ensure_valid_delivery_times(self) -> bool | None:
@@ -159,14 +175,3 @@ class ResourceRecipientForm(Form):
     def on_request(self) -> None:
         if not self.request.POST and not self.daily_reservations_times.data:
             self.daily_reservations_times.data = ['06:00']  # legacy default
-
-        default_group = self.request.translate(_('General'))
-
-        self.resources.choices = [
-            (resource_id.hex, f'{group or default_group} - {title}')
-            for group, title, resource_id in (
-                ResourceCollection(self.request.app.libres_context).query()
-                .with_entities(Resource.group, Resource.title, Resource.id)
-                .order_by(Resource.group, Resource.name)
-            )
-        ]

@@ -24,6 +24,7 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Sequence
     from csv import Dialect
     from onegov.core.csv import DefaultCSVFile
@@ -311,6 +312,31 @@ def line_is_relevant(
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
     return line.sortgeschaeft == number
+
+
+def get_gelfnrs(
+    lines: Iterable[DefaultRow],
+    number: str,
+    district: str | None
+) -> set[str]:
+    """ Returns the WabstiC GeLfNr (which uniquely identifies an election) of
+    the lines matching the given SortGeschaeft and SortWahlkreis.
+
+    """
+    return {
+        line.gelfnr
+        for line in lines
+        if line_is_relevant(line, number, district=district)
+        and getattr(line, 'gelfnr', None)
+    }
+
+
+def line_matches_gelfnr(line: DefaultRow, gelfnrs: set[str]) -> bool:
+    """ Returns False if the line has a GeLfNr not contained in the given
+    GeLfNrs. """
+    if gelfnrs and getattr(line, 'gelfnr', None):
+        return line.gelfnr in gelfnrs
+    return True
 
 
 @overload

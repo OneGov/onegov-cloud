@@ -5,6 +5,7 @@ from onegov.user import UserCollection
 from onegov.user.models import User
 from onegov.translator_directory import _
 from onegov.translator_directory.constants import FINANZSTELLE
+from wtforms import SelectChoice
 from wtforms.validators import InputRequired
 
 
@@ -28,7 +29,10 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
 
     finanzstelle = ChosenSelectField(
         label=_('Cost Center (Finanzstelle)'),
-        choices=[],
+        choices=lambda: [
+            SelectChoice(key, fs.name)
+            for key, fs in FINANZSTELLE.items()
+        ],
         validators=[InputRequired()],
         description=_(
             'Select the cost center this user group is responsible for'
@@ -37,26 +41,17 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
 
     accountant_emails = ChosenSelectMultipleField(
         label=_('Accountant Users'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(user.username, f'{user.realname or user.username}')
+            for user in UserCollection(form.request.session).query()
+            .with_entities(User.username, User.realname)
+        ],
         validators=[InputRequired()],
         description=_(
             'Select users who are accountants for this cost center. '
             'Their emails will be used for notifications.'
         ),
     )
-
-    def on_request(self) -> None:
-
-        super().on_request()
-        self.finanzstelle.choices = [
-            (key, fs.name) for key, fs in FINANZSTELLE.items()
-        ]
-
-        users = UserCollection(self.request.session).query().all()
-        self.accountant_emails.choices = [
-            (user.username, f'{user.realname or user.username}')
-            for user in users
-        ]
 
     def ensure_accountants_are_editors(self) -> bool:
         if not self.accountant_emails.data:

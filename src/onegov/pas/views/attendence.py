@@ -6,6 +6,9 @@ from sqlalchemy import false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
+from onegov.core.templates import render_template
+from onegov.core.utils import module_path
+from onegov.core.utils import normalize_for_filename
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
@@ -36,7 +39,13 @@ from onegov.pas.utils import (
     get_attendance_parliamentarians,
 )
 from onegov.user import User
+from weasyprint import CSS, HTML  # type: ignore[import-untyped]
 from uuid import UUID
+from webob import Response
+from webob.exc import HTTPNotFound
+from weasyprint.text.fonts import (  # type: ignore[import-untyped]
+    FontConfiguration,
+)
 
 
 from typing import TYPE_CHECKING
@@ -44,7 +53,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from onegov.pas.request import PasRequest
-    from webob import Response
 
 
 @PasApp.html(
@@ -76,6 +84,21 @@ def view_attendences(
         key=lambda a: a.created or a.modified or datetime.min,
         reverse=True,
     )
+
+    attendence_ids = {str(a.id) for a in attendences_sorted}
+    creators: dict[str, str] = {}
+    if attendence_ids:
+        for change in request.session.query(Change).filter_by(
+            model='attendence', action='add'
+        ):
+            change_data = change.changes or {}
+            attendence_id = change_data.get('id')
+            if (
+                isinstance(attendence_id, str)
+                and attendence_id in attendence_ids
+                and change.user
+            ):
+                creators.setdefault(attendence_id, change.user)
 
     type_filters = [
         Link(
@@ -222,7 +245,13 @@ def view_attendences(
     allowances = allowance_q.all()
 
     edit_links: dict[uuid.UUID, str] = {}
+    editable_groups: dict[uuid.UUID, bool] = {}
     for a in attendences_sorted:
+        group_key = a.bulk_edit_id or a.id
+        if group_key not in editable_groups:
+            editable_groups[group_key] = request.can_edit_attendence(a)
+        if not editable_groups[group_key]:
+            continue
         if a.bulk_edit_id:
             name = (
                 'edit-plenary-bulk-attendences'
@@ -237,10 +266,18 @@ def view_attendences(
         'add_link': request.link(self, name='new'),
         'layout': layout,
         'attendences': attendences_sorted,
+        'creators': creators,
         'edit_links': edit_links,
         'title': layout.title,
-        'bulk_edit_groups': bulk_edit_groups,
-        'can_edit_attendences': request.is_admin,
+        'bulk_edit_groups': [
+            group for group in bulk_edit_groups if group[0].id in edit_links
+        ],
+        'bulk_pdf_links': {
+            group[0].id: request.link(group[0], name='bulk-attendence-pdf')
+            for group in bulk_edit_groups
+            if group[0].id in edit_links
+        },
+        'can_edit_attendences': bool(edit_links),
         'allowances': allowances,
         'filters': {
             'settlement_run': run_filters,
@@ -248,6 +285,69 @@ def view_attendences(
             'plenary_session': plenary_filters,
         },
     }
+
+
+@PasApp.view(
+    model=Attendence,
+    name='bulk-attendence-pdf',
+    permission=Private,
+    request_method='GET',
+)
+def view_bulk_attendence_pdf(
+    self: Attendence,
+    request: PasRequest,
+) -> Response:
+    if not self.bulk_edit_id or not request.can_edit_attendence(self):
+        raise HTTPNotFound()
+
+    attendances = (
+        request.session.query(Attendence)
+        .filter(
+            Attendence.bulk_edit_id == self.bulk_edit_id,
+            Attendence.type == self.type,
+        )
+        .order_by(Attendence.parliamentarian_id)
+        .all()
+    )
+    date_label = self.date.strftime('%d.%m.%Y')
+    html = render_template(
+        'bulk_attendence_pdf.pt',
+        request,
+        {
+            'attendances': attendances,
+            'date_label': date_label,
+            'duration': self.duration,
+            'type_label': request.translate(_(self.type_label)),
+            'commission': self.commission.title if self.commission else None,
+        },
+    )
+    font_config = FontConfiguration()
+    css_path = module_path(
+        'onegov.pas', 'views/templates/bulk_attendence_pdf.css'
+    )
+    with open(css_path) as css_file:
+        css = CSS(string=css_file.read())
+    logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
+    logo_css = CSS(
+        string=f"""
+        @page {{
+            @top-left {{
+                content: url('file://{logo_path}');
+                width: 3cm;
+            }}
+        }}
+    """
+    )
+    pdf = HTML(string=str(html)).write_pdf(
+        stylesheets=[css, logo_css],
+        font_config=font_config,
+    )
+    filename = normalize_for_filename(f'Massenbuchung_{self.date.isoformat()}')
+    return Response(
+        pdf,
+        content_type='application/pdf',
+        content_disposition=f'attachment; filename={filename}.pdf',
+    )
 
 
 @PasApp.form(
@@ -283,8 +383,8 @@ def add_attendence(
                 and form.date.data
                 and has_user_set_abschluss_for_commission(
                     request.session,
-                    UUID(form.parliamentarian_id.data),
-                    UUID(form.commission_id.data),
+                    form.parliamentarian_id.data,
+                    form.commission_id.data,
                     form.date.data,
                 )
             ):
@@ -356,10 +456,7 @@ def add_bulk_attendence(
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
             if not request.is_admin and form.commission_id.data:
                 blocked_parls: list[str] = []
-                try:
-                    commission_id = UUID(form.commission_id.data)
-                except (TypeError, ValueError):
-                    commission_id = None
+                commission_id = form.commission_id.data
 
                 user = (
                     request.session.query(User)
@@ -438,7 +535,8 @@ def add_bulk_attendence(
             notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
-                    parliamentarian_id=parliamentarian_id, **data
+                    parliamentarian_id=parliamentarian_id,
+                    **data,
                 )
                 attendence.bulk_edit_id = bulk_edit_id
                 Change.add(request, 'add', attendence)
@@ -487,7 +585,7 @@ def edit_plenary_bulk_attendence(
         return request.redirect(request.class_link(AttendenceCollection))
 
     all_parliamentarians = [
-        str(p.id) for p in get_attendance_parliamentarians(request)
+        p.id for p in get_attendance_parliamentarians(request)
     ]
 
     if form.submitted(request):
@@ -505,13 +603,12 @@ def edit_plenary_bulk_attendence(
                 }
 
         data = form.get_useful_data()
-        raw_parl_ids = request.POST.getall('parliamentarian_id')
-        data.pop('parliamentarian_id', None)
+        parl_ids = data.pop('parliamentarian_id', ())
         collection = AttendenceCollection(request.session)
 
         unselected_parliamentarians = [
             pid for pid in all_parliamentarians
-            if pid not in raw_parl_ids
+            if pid not in parl_ids
         ]
         for parliamentarian in unselected_parliamentarians:
             if attendence := collection.query().filter(
@@ -521,7 +618,7 @@ def edit_plenary_bulk_attendence(
                 Change.add(request, 'delete', attendence)
                 collection.delete(attendence)
 
-        for parliamentarian_id in raw_parl_ids:
+        for parliamentarian_id in parl_ids:
             attendence = collection.query().filter(
                     Attendence.parliamentarian_id == parliamentarian_id,
                     Attendence.bulk_edit_id == form.bulk_edit_id.data,
@@ -590,19 +687,35 @@ def edit_plenary_bulk_attendence(
 )
 def edit_commission_bulk_attendence(
     self: Attendence,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceCommissionBulkEditForm
 ) -> RenderData | Response:
     request.include('custom')
 
-    if not request.is_admin:
-        request.alert(_('Only admins can edit attendance records.'))
+    if not self.bulk_edit_id or not request.can_edit_attendence(self):
+        request.alert(_('Insufficient permissions.'))
         return request.redirect(request.class_link(AttendenceCollection))
 
     type_label = request.translate(self.type_label)
     title = _('Edit bulk: ${type}', mapping={'type': type_label})
 
     if form.submitted(request):
+        if not request.is_admin:
+            assert form.date.data is not None
+            if (
+                form.bulk_edit_id.data != str(self.bulk_edit_id)
+                or form.commission_id.data != self.commission_id
+                or not all(
+                    request.can_edit_commission_attendance(
+                        form.date.data, self.commission_id, person_id
+                    )
+                    for person_id in (form.parliamentarian_id.data or [])
+                )
+            ):
+                request.alert(_('Insufficient permissions.'))
+                return request.redirect(
+                    request.class_link(AttendenceCollection)
+                )
         if form.date.data:
             if error := validate_attendance_date(
                 request.session, form.date.data
@@ -616,7 +729,7 @@ def edit_commission_bulk_attendence(
                 }
 
         data = form.get_useful_data()
-        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+        if parl_ids := form.parliamentarian_id.data:
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
             memberships = (
@@ -629,27 +742,27 @@ def edit_commission_bulk_attendence(
             )
             eligible = {p.id for p in get_attendance_parliamentarians(request)}
             commission_parliamentarians = [
-                str(membership.parliamentarian_id)
+                membership.parliamentarian_id
                 for membership in memberships
                 if membership.parliamentarian_id in eligible
             ]
             unselected_parliamentarians = [
                 pid for pid in commission_parliamentarians
-                if pid not in raw_parl_ids
+                if pid not in parl_ids
             ]
             for parliamentarian in unselected_parliamentarians:
                 if attendence := collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian,
-                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                        Attendence.bulk_edit_id == self.bulk_edit_id,
                     ).first():
                     Change.add(request, 'delete', attendence)
                     collection.delete(attendence)
 
             notify_attendence = None
-            for parliamentarian_id in raw_parl_ids:
+            for parliamentarian_id in parl_ids:
                 attendence = collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian_id,
-                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                        Attendence.bulk_edit_id == self.bulk_edit_id,
                     ).first()
                 if attendence:
                     was_abschluss = attendence.abschluss
@@ -665,6 +778,7 @@ def edit_commission_bulk_attendence(
                     attendence = collection.add(
                         parliamentarian_id=parliamentarian_id, **data
                     )
+                    attendence.bulk_edit_id = self.bulk_edit_id
                     Change.add(request, 'add', attendence)
                     if attendence.abschluss and notify_attendence is None:
                         notify_attendence = attendence
@@ -688,27 +802,30 @@ def edit_commission_bulk_attendence(
     layout.editmode_links[1] = BackLink(
         attrs={'class': 'cancel-link'},
     )
-    layout.editmode_links.append(
-        Link(
-            text=_('Delete'),
-            url=layout.csrf_protected_url(
-                request.link(self, name='delete-attendences')),
-            traits=(
-                Confirm(
-                    _(
-                        'Do you really want to delete this bulk edit?'
-                    ),
-                    _('This cannot be undone.'),
-                    _('Delete Attendencess'),
-                    _('Cancel')
+    if request.is_admin:
+        layout.editmode_links.append(
+            Link(
+                text=_('Delete'),
+                url=layout.csrf_protected_url(
+                    request.link(self, name='delete-attendences')
                 ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.class_link(AttendenceCollection)
-                )),
-            attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete this bulk edit?'),
+                        _('This cannot be undone.'),
+                        _('Delete Attendencess'),
+                        _('Cancel'),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.class_link(
+                            AttendenceCollection
+                        ),
+                    ),
+                ),
+                attrs={'class': 'delete-link'},
+            )
         )
-    )
 
     return {
         'layout': layout,
@@ -749,13 +866,13 @@ def add_plenary_attendence(self: AttendenceCollection,
                 }
 
         data = form.get_useful_data()
-        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            # Remove static field; choices are set dynamically via JS
-            data.pop('parliamentarian_id', None)
+        # Remove static field; choices are set dynamically via JS
+        if parl_ids := data.pop('parliamentarian_id', None):
             bulk_edit_id = uuid.uuid4()
-            for parliamentarian_id in raw_parl_ids:
+            for parliamentarian_id in parl_ids:
                 attendence = self.add(
-                    parliamentarian_id=parliamentarian_id, **data
+                    parliamentarian_id=parliamentarian_id,
+                    **data,
                 )
                 attendence.bulk_edit_id = bulk_edit_id
                 Change.add(request, 'add', attendence)
@@ -807,8 +924,8 @@ def edit_attendence(
     form: AttendenceForm
 ) -> RenderData | Response:
 
-    if not request.is_admin:
-        request.alert(_('Only admins can edit attendance records.'))
+    if not request.can_edit_attendence(self):
+        request.alert(_('Insufficient permissions.'))
         return request.redirect(request.class_link(AttendenceCollection))
 
     if self.bulk_edit_id:
@@ -820,6 +937,22 @@ def edit_attendence(
         return request.redirect(request.link(self, name))
 
     if form.submitted(request):
+        if not request.is_admin:
+            assert form.date.data is not None
+            if (
+                form.type.data == 'plenary'
+                or form.commission_id.data != self.commission_id
+                or form.parliamentarian_id.data != self.parliamentarian_id
+                or not request.can_edit_commission_attendance(
+                    form.date.data,
+                    self.commission_id,
+                    self.parliamentarian_id,
+                )
+            ):
+                request.alert(_('Insufficient permissions.'))
+                return request.redirect(
+                    request.class_link(AttendenceCollection)
+                )
         if form.date.data:
             if error := validate_attendance_date(
                 request.session, form.date.data

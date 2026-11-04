@@ -1,5 +1,6 @@
 import sedate
 
+from functools import cached_property
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
@@ -21,8 +22,8 @@ from onegov.user import User
 from onegov.user import UserCollection
 from sqlalchemy.orm import joinedload
 from wtforms.fields import BooleanField
+from wtforms.fields import SelectChoice
 from wtforms.fields import TextAreaField
-from functools import cached_property
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
@@ -186,7 +187,7 @@ class TicketAssignmentForm(Form):
         ]
         self.usernames = {str(user.id): user.username for user in users}
         self.user.choices = [
-            (
+            SelectChoice(
                 str(user.id),
                 f'{user.title} ({", ".join(str(g.name) for g in user.groups)})'
                 if user.groups
@@ -196,6 +197,19 @@ class TicketAssignmentForm(Form):
         ]
 
 
+def tag_choices(
+    form: TicketChangeTagForm,
+    field: ChosenSelectField
+) -> list[SelectChoice]:
+    choices = [
+        SelectChoice(tag)
+        for item in form.request.app.org.ticket_tags
+        for tag in (item.keys() if isinstance(item, dict) else (item,))
+    ]
+    choices.insert(0, SelectChoice(''))
+    return choices
+
+
 class TicketChangeTagForm(Form):
 
     if TYPE_CHECKING:
@@ -203,16 +217,8 @@ class TicketChangeTagForm(Form):
 
     tag = ChosenSelectField(
         _('Tag'),
-        choices=[],
+        choices=tag_choices,
     )
-
-    def on_request(self) -> None:
-        choices = self.tag.choices = [
-            (tag, tag)
-            for item in self.request.app.org.ticket_tags
-            for tag in (item.keys() if isinstance(item, dict) else (item,))
-        ]
-        choices.insert(0, ('', ''))
 
 
 class RequestCancellationForm(Form):
@@ -245,7 +251,10 @@ class RequestCancellationForm(Form):
             return
 
         self.reservation_ids.choices = [
-            (r.id, self.model.handler.get_reservation_title(r))
+            SelectChoice(
+                str(r.id),
+                self.model.handler.get_reservation_title(r)
+            )
             for r in reservations
         ]
         if not self.request.POST:

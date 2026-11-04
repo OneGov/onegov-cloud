@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-10-22 13:13+0200\n"
+"POT-Creation-Date: 2026-10-29 16:05+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -429,6 +429,12 @@ msgstr "Ende Monat um einen Monat verlängern"
 
 msgid "Extend by one year at the end of the year"
 msgstr "Ende Jahr um ein Jahr verlängern"
+
+msgid "Extend by one year at a given date"
+msgstr "An spezifischem Datum um ein Jahr verlängern"
+
+msgid "Extend on"
+msgstr "Verlängern am"
 
 msgid "Start"
 msgstr "Von"
@@ -3812,9 +3818,6 @@ msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
 
-msgid "This event has been imported. Once saved, it will no longer be updated by the import."
-msgstr "Diese Veranstaltung wurde importiert. Nach dem Speichern wird sie durch den Import nicht mehr aktualisiert."
-
 msgid "Do you really want to delete this event?"
 msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
 
@@ -5080,6 +5083,9 @@ msgstr "Themen werden geladen..."
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
+msgid "Close menu"
+msgstr "Menü schliessen"
+
 msgid "Straight to ..."
 msgstr "Direkt zu ..."
 
@@ -5094,6 +5100,9 @@ msgstr "Suche"
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
+
+msgid "Sidebar"
+msgstr "Seitenleiste"
 
 msgid "Healthy"
 msgstr "Intakt"
@@ -7351,6 +7360,13 @@ msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
 
+msgid ""
+"This event has been imported. Once saved, it will no longer be updated by "
+"the import."
+msgstr ""
+"Diese Veranstaltung wurde importiert. Nach dem Speichern wird sie durch den "
+"Import nicht mehr aktualisiert."
+
 msgid "Your event was rejected"
 msgstr "Ihre Veranstaltung wurde abgelehnt"
 
@@ -8057,8 +8073,8 @@ msgstr ""
 "Ihre Stornierungsanfrage wurde eingereicht. Sie werden benachrichtigt, "
 "sobald sie bearbeitet wurde."
 
-#. We adjust the wording for users that do not know what a ticket is
 #.
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Anfrage"
 

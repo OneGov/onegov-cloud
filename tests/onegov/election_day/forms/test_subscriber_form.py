@@ -2,6 +2,7 @@ from onegov.election_day.forms import EmailSubscriptionForm
 from onegov.election_day.forms import SmsSubscriptionForm
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 
 
 def test_email_subscription_form() -> None:
@@ -29,7 +30,10 @@ def test_email_subscription_form() -> None:
     form.request.app.principal.segmented_notifications = True
     form.request.app.principal.get_entities = lambda x: ['a', 'b']  # type: ignore
     form.on_request()
-    assert form.domain_segment.choices == [('a', 'a'), ('b', 'b')]
+    assert form.domain_segment.choices == [
+        SelectChoice('a'),
+        SelectChoice('b')
+    ]
     assert form.validate()
 
 
@@ -67,5 +71,8 @@ def test_sms_subscription_form() -> None:
     form.request.app.principal.segmented_notifications = True
     form.request.app.principal.get_entities = lambda x: ['a', 'b']  # type: ignore
     form.on_request()
-    assert form.domain_segment.choices == [('a', 'a'), ('b', 'b')]
+    assert form.domain_segment.choices == [
+        SelectChoice('a'),
+        SelectChoice('b')
+    ]
     assert form.validate()

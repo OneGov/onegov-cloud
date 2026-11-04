@@ -75,7 +75,7 @@ class ModelBase:
         provided.
 
         """
-        mapper = inspect(cls).polymorphic_map.get(identity_value)  # type: ignore[union-attr]
+        mapper = inspect(cls).polymorphic_map.get(identity_value)
 
         if default is MISSING:
             assert mapper, 'No such polymorphic_identity: {}'.format(

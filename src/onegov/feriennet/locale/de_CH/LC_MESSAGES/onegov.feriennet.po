@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-08 07:39+0200\n"
+"POT-Creation-Date: 2026-11-02 09:28+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -441,8 +441,8 @@ msgstr "Vorschau"
 msgid "Proposed"
 msgstr "Beantragt"
 
-#. users like the term 'Published' better
 #.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Veröffentlicht"
 
@@ -714,8 +714,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 
@@ -854,6 +854,13 @@ msgstr "Ungültiger Betrag"
 
 msgid "Children of organisers"
 msgstr "Kinder von Veranstaltenden"
+
+msgid ""
+"Only individuals who offer at least one event during the current period are "
+"considered organizers."
+msgstr ""
+"Als Veranstaltende gelten nur Personen, die im aktuellen Zeitraum "
+"mindestens eine Durchführung anbieten"
 
 msgid "Prefer the following children:"
 msgstr "Folgende Personen bevorzugen:"
@@ -1878,15 +1885,6 @@ msgstr "Keine Buchungslimite"
 
 msgid "Booked"
 msgstr "Gebucht"
-
-msgid "These wishes overlap accepted bookings and are therefore blocked."
-msgstr ""
-"Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind daher "
-"blockiert."
-
-msgid "Unfortunately, these wishes could not be fulfilled."
-msgstr ""
-"Diese Wünsche konnten bei der Zuteilung leider nicht berücksichtigt werden."
 
 msgid "Free of charge"
 msgstr "Kostenlos"
@@ -3467,6 +3465,16 @@ msgstr "${count} E-Mails erfolgreich gesendet"
 
 msgid "The submitter email is not available"
 msgstr "Die E-Mail-Adresse des Absenders ist nicht verfügbar"
+
+#~ msgid "These wishes overlap accepted bookings and are therefore blocked."
+#~ msgstr ""
+#~ "Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind "
+#~ "daher blockiert."
+
+#~ msgid "Unfortunately, these wishes could not be fulfilled."
+#~ msgstr ""
+#~ "Diese Wünsche konnten bei der Zuteilung leider nicht berücksichtigt "
+#~ "werden."
 
 #~ msgid "No activities needing volunteers found."
 #~ msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."

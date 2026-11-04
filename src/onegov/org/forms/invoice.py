@@ -5,6 +5,7 @@ from onegov.org import _
 from onegov.pay.constants import MAX_AMOUNT
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
@@ -32,8 +33,8 @@ class ManualInvoiceItemForm(Form):
         label=_('Kind'),
         default='discount',
         choices=(
-            ('discount', _('Discount')),
-            ('surcharge', _('Surcharge'))
+            SelectChoice('discount', _('Discount')),
+            SelectChoice('surcharge', _('Surcharge'))
         )
     )
 

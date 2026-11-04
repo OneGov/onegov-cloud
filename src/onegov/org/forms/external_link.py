@@ -2,6 +2,7 @@ from onegov.form import Form
 from onegov.form.fields import URLField
 from onegov.org import _
 from onegov.org.models.external_link import ExternalLinkCollection
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -34,14 +35,16 @@ class ExternalLinkForm(Form):
 
     member_of = SelectField(
         label=_('Name of the list view this link will be shown'),
-        choices=[]
+        choices=lambda form, field: [
+            SelectChoice(id_, form.request.translate(_(name)))
+            for id_, name in (
+                form.model.form_choices()
+                if isinstance(form.model, ExternalLinkCollection)
+                else ()
+            )
+        ]
     )
 
     def on_request(self) -> None:
-        if isinstance(self.model, ExternalLinkCollection):
-            self.member_of.choices = [
-                (id_, self.request.translate(_(name)))
-                for id_, name in self.model.form_choices()
-            ]
-        else:
+        if not isinstance(self.model, ExternalLinkCollection):
             self.delete_field('member_of')

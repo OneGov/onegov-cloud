@@ -14,6 +14,7 @@ from onegov.form.fields import PanelField
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.widgets import html_params
@@ -372,32 +373,38 @@ class PageUrlForm(ChangeAdjacencyListUrlForm):
         return self.model.page
 
 
+def parent_choices(
+    form: MovePageForm,
+    field: ChosenSelectField
+) -> list[SelectChoice]:
+    pages = PageCollection(form.request.session)
+    choices = list(form.iterate_page_tree(pages.roots))
+    choices.insert(0, SelectChoice('0', form.request.translate(_('- Root -'))))
+    return choices
+
+
 class MovePageForm(Form):
     """ Form to move a page including its subpages. """
 
+    # FIXME: We should switch to a TreeSelectField and pre-disable
+    #        the choices which aren't allowed, then we also don't
+    #        need to add a separate validation function for it.
+    #        See ResourceBaseForm for an multi-select example of
+    #        the same thing.
     parent_id = ChosenSelectField(
         label=_('Destination'),
         coerce=int,
-        choices=[],
+        choices=parent_choices,
         validators=[
             InputRequired()
         ]
     )
 
-    def on_request(self) -> None:
-        pages = PageCollection(self.request.session)
-        self.parent_id.choices = list(self.iterate_page_tree(pages.roots))
-
-        # adding root element, ids start beyond 0, so 0 means no parent
-        self.parent_id.choices.insert(
-            0, (0, self.request.translate(_('- Root -')))
-        )
-
     def iterate_page_tree(
         self,
         pages: Iterable[Page],
         indent: str = '',
-    ) -> Iterator[tuple[int, str]]:
+    ) -> Iterator[SelectChoice]:
         """
         Iterates over the page tree and lists the elements with ident
         to show the page hierarchy in the choices list
@@ -408,7 +415,7 @@ class MovePageForm(Form):
             if isinstance(page, News):
                 continue  # prevent pages to be moved under a news page
 
-            yield page.id, f'{indent} {page.title}'
+            yield SelectChoice(str(page.id), f'{indent} {page.title}')
 
             yield from self.iterate_page_tree(
                 page.children,
@@ -429,7 +436,7 @@ class MovePageForm(Form):
 
             # prevent selecting a child node
             if any(
-                choice[0] == new_parent_id
+                choice.value == str(new_parent_id)
                 for choice in self.iterate_page_tree(self.model.page.children)
             ):
                 raise ValidationError(_('Invalid destination selected'))
