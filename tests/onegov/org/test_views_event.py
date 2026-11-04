@@ -1264,3 +1264,11 @@ def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
     edit = occurrence.click('Bearbeiten')
     cancel_href = edit.pyquery('a.cancel-link').attr('href')
     assert cancel_href == origin
+
+
+def test_view_occurrences_filters_nofollow(client: Client) -> None:
+    page = client.get('/events')
+    links = page.pyquery(
+        '.tag-filters a, .location-filters a, .date-filters a')
+    assert links
+    assert {link.attrib.get('rel') for link in links} == {'nofollow'}

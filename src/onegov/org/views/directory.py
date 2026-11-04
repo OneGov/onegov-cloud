@@ -453,6 +453,9 @@ def get_filters(
                     ),
                     name=view_name
                 ),
+                # every combination of filters is a separate url, so they
+                # should not be followed by crawlers
+                attrs={'rel': 'nofollow'},
                 rounded=singular
             )
             for value in values
