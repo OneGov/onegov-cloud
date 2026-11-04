@@ -129,6 +129,10 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             case _:
                 raise NotImplementedError
 
+    @property
+    def proxy(self) -> TopicProxy:
+        return TopicProxy(self.id)
+
     def is_supported_trait(self, trait: str) -> bool:
         return trait in {'link', 'page', 'iframe', 'api'}
 
@@ -171,6 +175,11 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 ])
 
         raise NotImplementedError
+
+
+class TopicProxy:
+    def __init__(self, topic_id: int) -> None:
+        self.id = topic_id
 
 
 class News(Page, TraitInfo, SearchableContent, AccessExtension,

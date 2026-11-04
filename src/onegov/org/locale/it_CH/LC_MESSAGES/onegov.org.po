@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-10-29 16:05+0100\n"
+"POT-Creation-Date: 2026-11-04 13:32+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1476,6 +1476,23 @@ msgstr "Documenti della riunione"
 msgid "Agenda item documents"
 msgstr "Documenti dell'elemento dell'agenda"
 
+msgid ""
+"This form can be used to report mutations to the data. You can either leave "
+"us a message or directly suggest changes to the corresponding fields."
+msgstr ""
+
+msgid "Your contact details"
+msgstr ""
+
+msgid "Message"
+msgstr "Messaggio"
+
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr ""
+
+msgid "Proposed changes"
+msgstr ""
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1592,11 +1609,57 @@ msgstr ""
 msgid "The domain of the URL is not allowed for iFrames."
 msgstr "Il dominio dell'URL non è consentito per gli iFrames."
 
-msgid "Destination"
-msgstr "Destinazione"
+msgid "Selected topic"
+msgstr ""
+
+msgid "No topic selected yet"
+msgstr ""
+
+msgid "Select"
+msgstr "Seleziona"
+
+msgid "Subpages"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "No topics found"
+msgstr ""
+
+msgid "Load more"
+msgstr ""
+
+msgid "The topics could not be loaded"
+msgstr ""
+
+msgid "Optional. If left empty, the title of the linked topic is used."
+msgstr ""
+
+msgid "Linked topic"
+msgstr ""
+
+msgid "No API of a source organisation is configured."
+msgstr ""
+
+msgid "Please select a topic."
+msgstr ""
+
+msgid "The API of the source organisation could not be reached."
+msgstr ""
+
+msgid "The selected topic is not publicly available."
+msgstr ""
+
+msgid ""
+"The source organisation does not allow this organisation to link its topics."
+msgstr ""
 
 msgid "- Root -"
 msgstr "- Principale -"
+
+msgid "Destination"
+msgstr "Destinazione"
 
 msgid "Invalid destination selected"
 msgstr "Destinazione non valida selezionata"
@@ -1803,12 +1866,11 @@ msgstr "Cronologia"
 msgid "Parliamentary Group(s)"
 msgstr "Gruppo/i parlamentare/i"
 
-msgid "Participations"
-msgstr "Partecipanti"
-
-#. type:ignore[union-attr]
 msgid "No active parliamentary groups"
 msgstr "Nessun gruppo parlamentare attivo"
+
+msgid "Participations"
+msgstr "Partecipanti"
 
 msgid "Tag"
 msgstr "Tag"
@@ -3058,6 +3120,18 @@ msgstr "Chiave API"
 msgid "Read only"
 msgstr "Sola lettura"
 
+msgid "Parent organisation"
+msgstr ""
+
+msgid "Child organisation"
+msgstr ""
+
+msgid "API URL of the parent organisation"
+msgstr ""
+
+msgid "e.g. https://onegov.govikon.ch/api/"
+msgstr ""
+
 msgid "Submit your event"
 msgstr "Invia il tuo evento"
 
@@ -3311,9 +3385,6 @@ msgstr "La tua nota su questo biglietto"
 
 msgid "Attachment"
 msgstr "Allegato"
-
-msgid "Message"
-msgstr "Messaggio"
 
 msgid "PDF"
 msgstr "PDF"
@@ -4495,6 +4566,15 @@ msgstr ""
 "Una mail sarà inviata al volontario contenente lo stato delle sue "
 "iscrizioni. Inviare solo se questi sono gli stati finali delle iscrizioni."
 
+msgid "Mutation"
+msgstr ""
+
+msgid "Edit Topic"
+msgstr "Modifica argomento"
+
+msgid "Apply proposed changes"
+msgstr ""
+
 msgid "New Link"
 msgstr "Nuovo collegamento"
 
@@ -4519,9 +4599,6 @@ msgstr "Nuovo argomento"
 
 msgid "Added a new topic"
 msgstr "Aggiunto un nuovo argomento"
-
-msgid "Edit Topic"
-msgstr "Modifica argomento"
 
 msgid "Move Topic"
 msgstr "Spostare argomento"
@@ -4579,6 +4656,31 @@ msgstr "Eliminare iFrame"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
+
+msgid "API link"
+msgstr ""
+
+msgid "Add API link"
+msgstr ""
+
+msgid "Added API link"
+msgstr ""
+
+msgid "Edit API link"
+msgstr ""
+
+msgid "Move API link"
+msgstr ""
+
+msgid "The API link was deleted"
+msgstr ""
+
+msgid "Delete API link"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete the API link \"${title}\"?"
+msgstr ""
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Una notizia non può essere incollata come argomento"
@@ -5459,6 +5561,9 @@ msgstr "Ancora nessuna iscrizione."
 
 msgid "Number of participants"
 msgstr "Numero di partecipanti"
+
+msgid "Mutation report"
+msgstr ""
 
 msgid "Hello!"
 msgstr "Ciao!"
@@ -6656,6 +6761,9 @@ msgstr "Archivia"
 msgid "Archive selected"
 msgstr "Archivio selezionato"
 
+msgid "Report change"
+msgstr ""
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -7552,9 +7660,6 @@ msgstr "La registrazione è stata annullata"
 msgid "The registration could not be cancelled"
 msgstr "La registrazione non può essere annullata"
 
-msgid "Select"
-msgstr "Seleziona"
-
 msgid "Select images"
 msgstr "Seleziona immagini"
 
@@ -7563,6 +7668,9 @@ msgstr "Aggiunto un nuovo album fotografico"
 
 msgid "New Photo Album"
 msgstr "Nuovo album fotografico"
+
+msgid "Proposed changes applied."
+msgstr ""
 
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
@@ -7707,6 +7815,9 @@ msgstr "${conteggio} eventi sono stati importati"
 
 msgid "Move"
 msgstr "Spostare"
+
+msgid "Your ticket has been opened"
+msgstr ""
 
 msgid "Your payment has been received"
 msgstr "Abbiamo ricevuto il tuo pagamento"
@@ -8253,6 +8364,9 @@ msgid ""
 msgstr ""
 "Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
 "\"."
+
+msgid "Source organisation API link"
+msgstr ""
 
 msgid "OneGov API"
 msgstr "API OneGov"

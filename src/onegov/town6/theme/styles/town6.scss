@@ -1963,3 +1963,17 @@ a.category-anchor {
 ol li a:not(.button) {
   display: inline !important;
 }
+
+.topic-mutation {
+    del {
+        border-radius: 3px;
+        text-decoration: line-through;
+        background-color: $red-light;
+    }
+
+    ins {
+        border-radius: 3px;
+        text-decoration: inherit !important;
+        background-color: $green-light;
+    }
+}

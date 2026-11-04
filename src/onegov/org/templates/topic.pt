@@ -38,6 +38,17 @@
                               tal:repeat="keyword page.keywords"
                               tal:content="keyword" />
                     </div>
+                    <div tal:condition="request.is_logged_in" class="borderless-side-panel">
+                        <h2 i18n:translate>Changes</h2>
+                        <div class="submit-yours">
+                            <ul class="more-list">
+                                <li><a class="list-link" href="${request.link(page.proxy, 'report-change')}">
+                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                                <span i18n:translate class="list-title">Report change</span>
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </tal:b>
                 <tal:b metal:fill-slot="after-text">
                      <div class="row" tal:condition="children">

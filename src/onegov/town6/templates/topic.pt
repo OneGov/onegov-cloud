@@ -77,6 +77,17 @@
                                   tal:content="keyword" />
                         </div>
                     </div>
+                    <div tal:condition="request.is_logged_in and page.trait == 'page'" class="side-panel">
+                        <h3 i18n:translate>Changes</h3>
+                        <div class="submit-yours">
+                            <ul class="more-list">
+                                <li><a class="list-link" href="${request.link(page.proxy, 'report-change')}">
+                                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                                <span i18n:translate class="list-title">Report change</span>
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </tal:b>
                 <tal:b metal:fill-slot="after-text">
                     <ul class="more-list page-links grid-x grid-padding-x">

@@ -6,6 +6,7 @@ from onegov.activity import Occasion, Volunteer
 from onegov.chat import Message, MessageCollection
 from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
+from onegov.core.html_diff import render_html_diff
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -17,6 +18,7 @@ from onegov.org.utils import (
     currency_for_submission,
     invoice_items_for_submission,
 )
+from onegov.page import PageCollection
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.search import SearchIndex
@@ -41,6 +43,8 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.event import Event
     from onegov.form import Form, FormSubmission
+    from onegov.org.models import Topic
+    from onegov.org.models.mutation import TopicMutation
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.collection import ExtendedTicketState
@@ -2223,3 +2227,139 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
             'ALL',
             self.request
         )
+
+
+class TopicMutationTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'TOP'}
+
+    if TYPE_CHECKING:
+        @property
+        def handler(self) -> TopicMutationHandler: ...
+
+    def reference_group(self, request: OrgRequest) -> str:
+        return self.title
+
+
+@handlers.registered_handler('TOP')
+class TopicMutationHandler(Handler):
+
+    handler_title = _('Topic')
+    code_title = _('Topics')
+
+    @cached_property
+    def collection(self) -> PageCollection:
+        return PageCollection(self.session)
+
+    @cached_property
+    def topic(self) -> Topic | None:
+        topic_id = self.data['handler_data']['id']
+        if topic_id is not None and not isinstance(topic_id, int):
+            try:
+                topic_id = int(topic_id)
+            except Exception:
+                return None
+        return self.collection.by_id(topic_id)  # type: ignore[return-value]
+
+    @cached_property
+    def mutation(self) -> TopicMutation | None:
+        if self.topic:
+            from onegov.org.models.mutation import TopicMutation
+            return TopicMutation(self.session, self.topic.id, self.ticket.id)
+        return None
+
+    @property
+    def deleted(self) -> bool:
+        return self.topic is None
+
+    @cached_property
+    def email(self) -> str:
+        return (
+            self.data['handler_data'].get('submitter_email', '')
+            or self.data['handler_data'].get('email', '')
+        )
+
+    @cached_property
+    def message(self) -> str:
+        return (
+            self.data['handler_data'].get('submitter_message', '')
+            or self.data['handler_data'].get('message', '')
+        )
+
+    @cached_property
+    def proposed_changes(self) -> dict[str, Any]:
+        return self.data['handler_data'].get('proposed_changes', {})
+
+    @cached_property
+    def state(self) -> str | None:
+        return self.data.get('state')
+
+    @property
+    def title(self) -> str:
+        return self.topic.title if self.topic else '<deleted>'
+
+    @property
+    def subtitle(self) -> str:
+        return _('Mutation')
+
+    @cached_property
+    def group(self) -> str:
+        return _('Topic')
+
+    def get_summary(
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> Markup:
+
+        from onegov.org.forms.mutation import TopicMutationForm
+        from onegov.org.layout import PageLayout
+        from onegov.core.utils import linkify
+        layout = PageLayout(self.topic, request)
+        form = TopicMutationForm()
+        return render_macro(
+            layout.macros['display_topic_mutation'],
+            request,
+            {
+                'topic': self.topic,
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
+                'proposed_changes': {
+                    name: render_html_diff(
+                        getattr(self.topic, name) or '',
+                        self.proposed_changes[name] or '',
+                    )
+                    for name in form.proposal_fields.keys()
+                    if name in self.proposed_changes
+                },
+                'labels': self.mutation.labels if self.mutation else {},
+                'layout': layout
+            }
+        )
+
+    def get_links(self, request: OrgRequest) -> list[Link]:  # type:ignore
+        if self.deleted:
+            return []
+
+        from onegov.org.models import Editor
+        assert self.topic is not None
+        links = [
+            Link(
+                text=_('Edit Topic'),
+                url=request.return_here(
+                    request.link(Editor('edit', self.topic))
+                ),
+                attrs={'class': 'edit-link'}
+            )
+        ]
+
+        if self.proposed_changes and self.state is None:
+            assert self.mutation is not None
+            links.append(
+                Link(
+                    text=_('Apply proposed changes'),
+                    url=request.return_here(
+                        request.link(self.mutation, 'apply')
+                    ),
+                    attrs={'class': 'accept-link'},
+                )
+            )
+
+        return links

@@ -191,7 +191,9 @@ class ApiTopicPickerWidget:
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         kwargs.pop('id', None)
         kwargs['class'] = 'api-topic-picker'
-        return Markup('<input type="hidden" {input}><div {picker}></div>').format(
+        return Markup(
+            '<input type="hidden" {input}><div {picker}></div>'
+        ).format(
             input=Markup(html_params(  # nosec: B704
                 id=field.id, name=field.name, value=field.data or '')),
             picker=Markup(html_params(  # nosec: B704
