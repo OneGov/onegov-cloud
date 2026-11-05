@@ -274,7 +274,7 @@ class Search(Pagination[Any]):
             query = query.filter(SearchIndex.last_change <= end)
 
         if self.language != 'simple':
-            query.filter(or_(
+            query = query.filter(or_(
                 SearchIndex.language == self.language,
                 SearchIndex.language.is_(None)
             ))

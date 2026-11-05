@@ -71,7 +71,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     @property
     def fts_language(self) -> str:
-        return language_from_locale(self.locale, 'auto')
+        return self.locale or 'auto'
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
