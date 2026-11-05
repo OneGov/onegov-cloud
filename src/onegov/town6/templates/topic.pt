@@ -57,7 +57,8 @@
                     files page.files;
                     sidepanel_links page.sidepanel_links;
                     manager request.is_manager;
-                    show_side_panel python:manager and bool(page.keywords);
+                    can_propose_change python:request.is_logged_in and page.trait == 'page';
+                    show_side_panel python:(manager and bool(page.keywords)) or can_propose_change;
                     ">
                 <tal:b metal:fill-slot="after-lead">
                     <div class="internal-notes"
@@ -77,7 +78,7 @@
                                   tal:content="keyword" />
                         </div>
                     </div>
-                    <div tal:condition="request.is_logged_in and page.trait == 'page'" class="side-panel">
+                    <div tal:condition="can_propose_change" class="side-panel">
                         <h3 i18n:translate>Changes</h3>
                         <div class="submit-yours">
                             <ul class="more-list">
