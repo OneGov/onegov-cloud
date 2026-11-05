@@ -1,12 +1,14 @@
 import morepath
+import niquests
 
 from babel import Locale
+from onegov.core.custom import json
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.security import Private, Public
 from onegov.org.models import Editor, Topic
 from onegov.org.views.editor import handle_new_page
 from onegov.org.views.page import view_topic
-from onegov.ilz import _, ILZApp
+from onegov.ilz import _, log, ILZApp
 from onegov.town6.layout import EditorLayout, PageLayout
 from webob.exc import HTTPNotFound
 
@@ -18,6 +20,91 @@ if TYPE_CHECKING:
     from onegov.ilz.request import ILZRequest
     from onegov.town6.request import TownRequest
     from webob import Response
+
+
+TRANSLATE_SYSTEM_PROMPT = """\
+You are an expert translator working for the Swiss government and are tasked
+with translating pages of a public website from {from_language} to
+{to_language}.
+
+The user prompt will give you a JSON object with all of the strings that need
+to be translated. The "title" key contains the title of the page, the "lead"
+key a short introduction in plain text. The "text" key contains HTML, make
+sure to generate valid HTML with exactly the same semantic structure, keep all
+tags, attributes and links as they are and only translate the visible text.
+
+Respond with a JSON object that contains all of the translated strings using
+the same keys.
+
+When translating strings be honest and reproduce the original intent, do not
+invent new text or alter the meaning of existing text in any way. Use the
+official terminology of the Swiss federal administration where applicable.
+"""
+
+#: The fields of the topic form which are translated using AI
+AI_TRANSLATED_FIELDS = ('title', 'lead', 'text')
+
+
+def ai_translate(
+    request: ILZRequest,
+    payload: dict[str, str],
+    from_locale: str,
+    to_locale: str
+) -> dict[str, str]:
+    """ Translates the given strings using the Infomaniak AI API.
+
+    Raises an exception if the translation fails.
+
+    """
+    product_id = request.app.infomaniak_product_id
+    # NOTE: The v1 endpoint no longer serves chat models (503)
+    url = (
+        f'https://api.infomaniak.com/2/ai/{product_id}'
+        f'/openai/v1/chat/completions'
+    )
+    system_prompt = TRANSLATE_SYSTEM_PROMPT.format(
+        from_language=Locale.parse(from_locale).get_display_name('en'),
+        to_language=Locale.parse(to_locale).get_display_name('en'),
+    )
+    response = niquests.post(
+        url,
+        headers={
+            'Authorization': f'Bearer {request.app.infomaniak_api_token}',
+            'Content-Type': 'application/json',
+        },
+        json={
+            'model': 'qwen3',
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': json.dumps(payload)}
+            ],
+            'temperature': 0,
+            'response_format': {
+                'type': 'json_schema',
+                'json_schema': {
+                    'name': 'translation_output',
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            key: {'type': 'string'}
+                            for key in payload
+                        },
+                        'required': list(payload),
+                        'additionalProperties': False,
+                    }
+                }
+            }
+        },
+        timeout=(10, 60),
+    )
+    response.raise_for_status()
+    content = response.json()['choices'][0]['message']['content']
+    translated = json.loads(content)
+    return {
+        key: value
+        for key, value in translated.items()
+        if key in payload and isinstance(value, str)
+    }
 
 
 @ILZApp.html(model=Topic, template='topic.pt', permission=Public)
@@ -144,11 +231,57 @@ def handle_translate_topic(
         language = locale
     title = _('Translate to ${language}', mapping={'language': language})
     layout = EditorLayout(self, request, title)
-    return handle_new_page(
+
+    src: Topic | None = topic
+    can_translate = bool(
+        request.app.infomaniak_api_token
+        and request.app.infomaniak_product_id
+    )
+    if (
+        can_translate
+        and not request.POST
+        and request.GET.get('translate') == '1'
+    ):
+        # NOTE: We need to fill in the source content ourselves, so the
+        #       translation isn't overwritten again by handle_new_page
+        form.process(obj=topic)
+        src = None
+        payload = {
+            key: str(value)
+            for key in AI_TRANSLATED_FIELDS
+            if key in form and (value := form[key].data)
+        }
+        try:
+            translated = ai_translate(request, payload, topic.locale, locale)
+        except Exception:
+            log.exception('AI translation of topic failed')
+            request.alert(_('The AI translation failed, please try again.'))
+        else:
+            for key, value in translated.items():
+                form[key].data = value
+            # NOTE: Hide the AI translate button after translation
+            can_translate = False
+
+    result = handle_new_page(
         self,
         request,
         form,
-        src=topic,
+        src=src,
         layout=layout,
         added_page_callback=setup_alt_locale_ids
     )
+
+    if can_translate and isinstance(result, dict):
+        # NOTE: This is a regular link (not intercooler), so all the form
+        #       widgets (e.g. tags input) are set up again after translation.
+        #       The spinner is shown by ilz.js
+        layout.editmode_links.insert(1, Link(
+            text=_('AI Translate'),
+            url=request.link(self, 'translate', query_params={
+                'locale': locale,
+                'translate': '1'
+            }),
+            attrs={'class': 'translate-link'}
+        ))
+
+    return result

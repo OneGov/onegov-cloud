@@ -64,3 +64,6 @@ msgstr "Traduire en ${language}"
 
 msgid "AI Translate"
 msgstr "Traduction par IA"
+
+msgid "The AI translation failed, please try again."
+msgstr "La traduction par IA a échoué, veuillez réessayer."
