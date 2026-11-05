@@ -1505,6 +1505,13 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     #       include everything we want to display.
     scheduler = self.scheduler
 
+    blocking_resources = self.blocking_resources()
+    all_occupancy_field_ids = sorted({
+        as_internal_id(occupancy_field)
+        for resource in blocking_resources.values()
+        for occupancy_field in resource.occupancy_fields
+    })
+
     # get all reservations and tickets
     query: Query[tuple[Reservation, Ticket, *tuple[str, ...]]]
     query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
@@ -1513,21 +1520,35 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
         only_managed=False
     ).with_entities(Reservation, Ticket)
     query = query.options(undefer(Reservation.data))
-    if self.occupancy_fields:
+    if all_occupancy_field_ids:
         query = query.outerjoin(
             FormSubmission,
             FormSubmission.id == Reservation.token
         ).add_columns(*(
-            FormSubmission.data[as_internal_id(field)].astext.label(field)
-            for field in self.occupancy_fields
+            FormSubmission.data[field_id].astext.label(field_id)
+            for field_id in all_occupancy_field_ids
         ))
+        extra_mapping = {
+            resource_id: [
+                all_occupancy_field_ids.index(as_internal_id(field))
+                for field in resource.occupancy_fields
+            ]
+            for resource_id, resource in blocking_resources.items()
+            if resource.occupancy_fields
+        }
+        if self.occupancy_fields:
+            extra_mapping[self.id] = [
+                all_occupancy_field_ids.index(as_internal_id(field))
+                for field in self.occupancy_fields
+            ]
+    else:
+        extra_mapping = {}
 
     # get all blockers
     blockers = scheduler.visible_blockers()
     blockers = blockers.filter(start <= ReservationBlocker.start)
     blockers = blockers.filter(ReservationBlocker.end <= end)
 
-    blocking_resources = self.blocking_resources()
     return *(
         holiday.as_dict()
         for holiday in utils.HolidayEventInfo.from_request(
@@ -1539,7 +1560,8 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
             request,
             self,
             query,
-            blocking_resources
+            blocking_resources,
+            extra_mapping
         )
     ), *(
         blk.as_dict()
