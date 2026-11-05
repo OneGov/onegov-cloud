@@ -104,6 +104,7 @@ def handle_new_page(
     src: object | None = None,
     layout: EditorLayout | PageLayout | None = None,
     added_page_callback: Callable[[Any], None] | None = None,
+    get_parent: Callable[[], Topic | News | None] | None = None,
 ) -> RenderData | Response:
     assert self.page is not None
     page = cast('Topic | News', self.page)
@@ -117,8 +118,10 @@ def handle_new_page(
 
     if form.submitted(request):
         pages = PageCollection(request.session)
+        # NOTE: The parent needs to be set when adding the page, moving
+        #       it to the root afterwards would delete it as an orphan
         added = cast('Topic | News', pages.add(
-            parent=page,
+            parent=get_parent() if get_parent is not None else page,
             title=form['title'].data,
             type=page.type,
             meta={'trait': self.trait}

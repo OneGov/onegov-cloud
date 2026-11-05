@@ -243,7 +243,13 @@ class OrmCacheDescriptor[T]:
             return self.cache_key_prefix
 
         role = getattr(getattr(obj, 'identity', None), 'role', None)
-        return f'{self.cache_key_prefix}-{role}'
+        key = f'{self.cache_key_prefix}-{role}'
+
+        # NOTE: In localizeable apps the visible content depends on the
+        #       locale of the request as well
+        if getattr(getattr(obj, 'app', None), 'localizeable', False):
+            key = f'{key}-{getattr(obj, "locale", None)}'
+        return key
 
     def assert_no_orm_objects(self, obj: object, depth: int = 0) -> None:
         """ Ensures the object contains no ORM objects

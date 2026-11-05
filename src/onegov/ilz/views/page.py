@@ -184,7 +184,8 @@ def handle_translate_topic(
         raise HTTPNotFound()
 
     # NOTE: If a translation already exists, redirect to it
-    if locale in topic.alt_locale_ids:
+    existing_id = topic.alt_locale_ids.get(locale)
+    if existing_id and request.session.get(Topic, existing_id) is not None:
         return morepath.redirect(request.class_link(
             Editor,
             {
@@ -194,18 +195,19 @@ def handle_translate_topic(
             },
         ))
 
+    def get_parent() -> Topic | None:
+        # use the translation of the parent page, if there is one
+        parent = topic.parent
+        if isinstance(parent, Topic) and locale in parent.alt_locale_ids:
+            parent = request.session.get(
+                Topic,
+                parent.alt_locale_ids[locale]
+            ) or parent
+        return parent  # type: ignore[return-value]
+
     def setup_alt_locale_ids(new_topic: Topic) -> None:
         assert topic.locale is not None
         with request.session.no_autoflush:
-            # determine the actual parent page we should be using
-            parent = topic.parent
-            if isinstance(parent, Topic) and locale in parent.alt_locale_ids:
-                parent = request.session.get(
-                    Topic,
-                    parent.alt_locale_ids[locale]
-                ) or parent
-
-            new_topic.parent = parent
             new_topic.locale = locale
             # link existing translations to new translation
             new_topic.alt_locale_ids = topic.alt_locale_ids.copy()
@@ -268,7 +270,8 @@ def handle_translate_topic(
         form,
         src=src,
         layout=layout,
-        added_page_callback=setup_alt_locale_ids
+        added_page_callback=setup_alt_locale_ids,
+        get_parent=get_parent
     )
 
     if can_translate and isinstance(result, dict):
