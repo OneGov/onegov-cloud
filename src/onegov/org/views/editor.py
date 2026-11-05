@@ -169,6 +169,13 @@ def handle_new_root_page(
         )
         form.populate_obj(page)
 
+        if (
+            request.app.localizeable
+            and self.trait == 'page'
+            and getattr(page, 'locale', '') is None
+        ):
+            page.locale = request.locale  # type:ignore[attr-defined]
+
         if self.trait == 'link':
             request.success(_('Added a new link'))
         else:

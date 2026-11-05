@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.utils import module_path
 from onegov.org.initial_content import load_content, add_pages
-from onegov.org.models import Organisation
+from onegov.org.models import Organisation, Topic
 
 
 from typing import TYPE_CHECKING
@@ -27,5 +27,9 @@ def create_new_organisation(
     session.add(org)
 
     add_pages(session, path)
+
+    for topic in session.query(Topic):
+        if topic.trait == 'page' and topic.locale is None:
+            topic.locale = locale
 
     return org
