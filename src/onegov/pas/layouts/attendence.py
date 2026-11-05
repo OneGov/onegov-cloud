@@ -48,6 +48,13 @@ class AttendenceCollectionLayout(DefaultLayout):
                     ),
                     attrs={'class': 'new-attendence'},
                 ),
+                Link(
+                    text=_('File study (bulk)'),
+                    url=self.request.link(
+                        self.model, 'new-file-study-bulk'
+                    ),
+                    attrs={'class': 'new-attendence'},
+                ),
             ])
         elif self.request.has_commission_president_role:
             links.append(

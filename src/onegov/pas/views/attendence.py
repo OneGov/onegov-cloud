@@ -25,8 +25,9 @@ from onegov.pas.custom import (
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
-from onegov.pas.forms.attendence import (AttendenceCommissionBulkEditForm,
-                                         AttendencePlenaryBulkEditForm)
+from onegov.pas.forms.attendence import AttendenceAddFileStudyBulkForm
+from onegov.pas.forms.attendence import AttendenceCommissionBulkEditForm
+from onegov.pas.forms.attendence import AttendencePlenaryBulkEditForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
@@ -419,25 +420,22 @@ def add_attendence(
     }
 
 
-@PasApp.form(
-    model=AttendenceCollection,
-    name='new-commission-bulk',
-    template='form.pt',
-    permission=Private,
-    form=AttendenceAddCommissionBulkForm
-)
-def add_bulk_attendence(
+def handle_commission_bulk_add(
     self: AttendenceCollection,
     request: PasRequest,
-    form: AttendenceAddCommissionBulkForm
+    form: AttendenceAddCommissionBulkForm,
+    title: str,
 ) -> RenderData | Response:
+    """ Shared handler for the bulk add forms which are bound to a single
+    commission (commission sessions and file studies).
+
+    """
+
     request.include('custom')
 
     if not request.is_admin and not request.has_commission_president_role:
         request.alert(_('Only admins can add bulk attendance records.'))
         return request.redirect(request.class_link(AttendenceCollection))
-
-    title = _('New commission session (bulk)')
 
     if form.submitted(request):
         if form.date.data:
@@ -562,6 +560,40 @@ def add_bulk_attendence(
         'form': form,
         'form_width': 'large',
     }
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-commission-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddCommissionBulkForm
+)
+def add_bulk_attendence(
+    self: AttendenceCollection,
+    request: PasRequest,
+    form: AttendenceAddCommissionBulkForm
+) -> RenderData | Response:
+    return handle_commission_bulk_add(
+        self, request, form, _('New commission session (bulk)')
+    )
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-file-study-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddFileStudyBulkForm
+)
+def add_file_study_bulk_attendence(
+    self: AttendenceCollection,
+    request: PasRequest,
+    form: AttendenceAddFileStudyBulkForm
+) -> RenderData | Response:
+    return handle_commission_bulk_add(
+        self, request, form, _('New file study (bulk)')
+    )
 
 
 @PasApp.form(
@@ -729,6 +761,8 @@ def edit_commission_bulk_attendence(
                 }
 
         data = form.get_useful_data()
+        # Newly added attendences inherit the type of the bulk group
+        data['type'] = self.type
         if parl_ids := form.parliamentarian_id.data:
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
