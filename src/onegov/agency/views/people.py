@@ -186,7 +186,10 @@ def get_people_xlsx(
             expires = datetime.now() + timedelta(seconds=max_age)
             fmt = '%a, %d %b %Y %H:%M:%S GMT'
 
-            response.headers.add('Cache-Control', f'max-age={max_age}, public')
+            response.headers.add(
+                'Cache-Control',
+                f'max-age={max_age}, private'
+            )
             response.headers.add('ETag', last_modified.isoformat())
             response.headers.add('Expires', expires.strftime(fmt))
             response.headers.add('Last-Modified', last_modified.strftime(fmt))
