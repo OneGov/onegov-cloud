@@ -4,6 +4,7 @@ import string
 from datetime import datetime, timedelta, UTC
 from sedate import to_timezone
 from urllib3.util import Retry
+from wtforms.fields.choices import SelectChoice
 
 
 from typing import Self, TYPE_CHECKING
@@ -11,7 +12,6 @@ if TYPE_CHECKING:
     from onegov.org.app import OrgApp
     from onegov.org.models.organisation import KabaConfiguration
     from onegov.reservation import Resource
-    from wtforms.fields.choices import _Choice
 
 
 class KabaApiError(Exception):
@@ -123,7 +123,7 @@ class KabaClient:
         self.raise_for_status(res)
         return res.json()['displayName']
 
-    def component_choices(self) -> list[_Choice]:
+    def component_choices(self) -> list[SelectChoice]:
         self.maybe_refresh_access_token()
         res = self.session.post(
             f'{self.api_version}/sites/{self.site_id}/devices/query',
@@ -133,7 +133,10 @@ class KabaClient:
         )
         self.raise_for_status(res)
         return [
-            ([self.site_id, item['id']], item['displayName'])
+            SelectChoice(
+                f'{self.site_id}:{item['id']}',
+                item['displayName']
+            )
             for item in res.json()
         ]
 

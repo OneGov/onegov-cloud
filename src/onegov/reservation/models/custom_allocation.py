@@ -8,11 +8,19 @@ class CustomAllocation(Allocation, ModelBase):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     @property
+    def is_virtual(self) -> bool:
+        return self.resource.version == 5
+
+    @property
     def resource_obj(self) -> Resource:
         session = object_session(self)
         assert session is not None
-        return session.query(
-            Resource).filter_by(id=self.resource).one()
+        return session.query(Resource).filter(
+            # NOTE: We automatically detect whether we are linked via virtual
+            #       resource id and apply the correct filter
+            Resource.virtual_id == self.resource if self.is_virtual
+            else Resource.id == self.resource
+        ).one()
 
     @property
     def access(self) -> str:

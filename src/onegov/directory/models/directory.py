@@ -315,17 +315,20 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             f = session.query(File).filter_by(
                                 id=file_id
                             ).first()
+                            expected_note = f'{field.id}:{idx}'
                             if f and f.type != 'directory':
                                 new = DirectoryFile(
                                     id=random_token(),
                                     name=f.name,
-                                    note=f.note,
+                                    note=expected_note,
                                     reference=f.reference
                                 )
                                 entry.files.append(new)
                                 updated[field.id][idx].update(
                                     {'data': f'@{new.id}'}
                                 )
+                            elif f and f.note != expected_note:
+                                f.note = expected_note
 
                     continue
                 elif field.type == 'fileinput':

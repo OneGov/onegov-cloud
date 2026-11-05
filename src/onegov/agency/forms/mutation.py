@@ -4,6 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import MultiCheckboxField
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import Email
@@ -244,17 +245,15 @@ class ApplyMutationForm(Form):
 
     changes = MultiCheckboxField(
         label=_('Proposed changes'),
-        choices=[]
-    )
-
-    def on_request(self) -> None:
-        def translate(name: str) -> str:
-            return self.request.translate(self.model.labels.get(name, name))
-
-        self.changes.choices = [
-            (name, f'{translate(name)}: {value}')
-            for name, value in self.model.changes.items()
+        choices=lambda form, field: [
+            SelectChoice(
+                name,
+                f'{form.request.translate(form.model.labels.get(name, name))}:'
+                f' {value}'
+            )
+            for name, value in form.model.changes.items()
         ]
+    )
 
     def apply_model(self) -> None:
         self.changes.data = list(self.model.changes.keys())

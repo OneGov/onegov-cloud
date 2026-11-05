@@ -5,6 +5,7 @@ from onegov.core.templates import render_macro
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TranslatedSelectField
+from onegov.form.utils import coerce_uuid
 from onegov.org import _
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessParticipation
@@ -18,6 +19,7 @@ from onegov.org.models.political_business import (
 from wtforms.fields import DateField
 from wtforms.fields import FormField
 from wtforms.fields import FieldList
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import SelectField
@@ -27,11 +29,9 @@ from wtforms.validators import Optional
 
 
 from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
-    from wtforms.fields.choices import _Choice
     from wtforms.fields.core import _Filter
     from wtforms.meta import _MultiDictLikeWithGetlist
 
@@ -40,6 +40,7 @@ class ParticipantForm(Form):
     parliamentarian_id = SelectField(
         label='',
         choices=(),
+        coerce=coerce_uuid,
         render_kw={
             'class_': 'participant-select',
             'data-placeholder': _('Select additional participant'),
@@ -51,9 +52,9 @@ class ParticipantForm(Form):
         depends_on=('parliamentarian_id', '!'),
         render_kw={'class_': 'indent-form-field'},
         choices=[
-            ('', ''),
-            ('First signatory', _('First signatory')),
-            ('Co-signatory', _('Co-signatory')),
+            SelectChoice(''),
+            SelectChoice('First signatory', _('First signatory')),
+            SelectChoice('Co-signatory', _('Co-signatory')),
         ]
     )
 
@@ -149,14 +150,20 @@ class PoliticalBusinessForm(Form):
 
     political_business_type = TranslatedSelectField(
         label=_('Type'),
-        choices=POLITICAL_BUSINESS_TYPE.items(),
+        choices=[SelectChoice('', '-'), *(
+            SelectChoice(value, label)
+            for value, label in POLITICAL_BUSINESS_TYPE.items()
+        )],
         validators=[InputRequired()],
         choices_sorted=True,
     )
 
     status = TranslatedSelectField(
         label=_('Business Status'),
-        choices=POLITICAL_BUSINESS_STATUS.items(),
+        choices=[SelectChoice('', '-'), *(
+            SelectChoice(value, label)
+            for value, label in POLITICAL_BUSINESS_STATUS.items()
+        )],
         validators=[InputRequired()],
         choices_sorted=True,
         default='-',
@@ -177,7 +184,13 @@ class PoliticalBusinessForm(Form):
     parliamentary_groups = ChosenSelectMultipleField(
         label=_('Parliamentary Group(s)'),
         validators=[Optional()],
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(group.id.hex, group.name)
+            for group in form.request.session.query(RISParliamentaryGroup)
+            .filter(RISParliamentaryGroup.end == None)
+            .order_by(RISParliamentaryGroup.name)
+        ] or [SelectChoice('', _('No active parliamentary groups'))],
+        coerce=coerce_uuid
     )
 
     participants = BusinessParticipationField(
@@ -224,15 +237,15 @@ class PoliticalBusinessForm(Form):
                 participant.parliamentarian_id: participant.participant_type
                 for participant in self.model.participants
             } if isinstance(self.model, PoliticalBusiness) else {}
-            choices: list[_Choice] = [
-                (
-                    str(participant.id),
+            choices = [
+                SelectChoice(
+                    participant.id.hex,
                     participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
             ]
-            choices.insert(0, ('', ''))
+            choices.insert(0, SelectChoice(''))
 
             # NOTE: Ensures translations work in FormField
             for field in self.participants:
@@ -247,29 +260,11 @@ class PoliticalBusinessForm(Form):
                     render_kw['data-no_results_text'])
 
                 field.form.participant_type.meta = self.meta
-                field.form.participant_type.choices = [  # type:ignore
-                    (value, self.request.translate(label) if label else label)
-                    for value, label in field.form.participant_type.choices
-                ]
+                for choice in field.form.participant_type.choices:
+                    if choice.label:
+                        choice.label = self.request.translate(choice.label)
         else:
             self.delete_field('participants')
-
-        self.political_business_type.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
-        self.status.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
-
-        groups = (
-            self.request.session.query(RISParliamentaryGroup)
-            .filter(RISParliamentaryGroup.end == None)
-            .order_by(RISParliamentaryGroup.name)
-            .all()
-        )
-        if not groups:
-            self.parliamentary_groups.choices.insert(  # type:ignore[union-attr]
-                0, ('', _('No active parliamentary groups')))
-        else:
-            self.parliamentary_groups.choices = [
-                (str(g.id), g.name) for g in groups
-            ]
 
     def process_obj(self, obj: PoliticalBusiness) -> None:  # type:ignore[override]
         super().process_obj(obj)
@@ -277,7 +272,7 @@ class PoliticalBusinessForm(Form):
         # only populate from model when the form did not receive formdata
         if self.parliamentary_groups.raw_data is None:
             self.parliamentary_groups.data = [
-                str(group.id) for group in obj.parliamentary_groups
+                group.id for group in obj.parliamentary_groups
             ]
 
     def populate_obj(  # type: ignore[override]
@@ -297,7 +292,7 @@ class PoliticalBusinessForm(Form):
 
         # convert multi-select ids into model instances
         data = self.parliamentary_groups.data or []
-        if data and data != ['']:
+        if data and data != [None]:
             obj.parliamentary_groups = (
                 self.request.session.query(RISParliamentaryGroup)
                 .filter(RISParliamentaryGroup.id.in_(data))

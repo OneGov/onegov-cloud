@@ -1,10 +1,10 @@
 from datetime import date, time, timedelta
 from functools import cached_property
-from uuid import UUID
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
@@ -17,6 +17,7 @@ from onegov.core.custom import json
 from onegov.form import Form
 from onegov.form.fields import (
     ChosenSelectField, DurationField, MultiCheckboxField, TimeField)
+from onegov.form.utils import coerce_uuid
 from onegov.org import _
 from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import WEEKDAYS
@@ -25,7 +26,7 @@ from onegov.org.forms.util import WEEKDAYS
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Sequence
+    from collections.abc import Callable, Generator, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
     from .allocation import DateContainer
@@ -37,6 +38,19 @@ if TYPE_CHECKING:
 RESERVED_FIELDS: list[str] = ['email', 'ticket_tag']
 
 
+def ticket_tag_choices(
+    form: ReservationForm,
+    field: ChosenSelectField
+) -> list[SelectChoice]:
+    choices = [
+        SelectChoice(tag)
+        for item in form.request.app.org.ticket_tags
+        for tag in (item.keys() if isinstance(item, dict) else (item,))
+    ]
+    choices.insert(0, SelectChoice(''))
+    return choices
+
+
 class ReservationForm(Form):
 
     if TYPE_CHECKING:
@@ -46,7 +60,7 @@ class ReservationForm(Form):
 
     ticket_tag = ChosenSelectField(
         label=_('Tag'),
-        choices=(),
+        choices=ticket_tag_choices,
         render_kw={},
     )
 
@@ -60,17 +74,10 @@ class ReservationForm(Form):
             self.delete_field('ticket_tag')
             return
 
-        choices = self.ticket_tag.choices = [
-            (tag, tag)
-            for item in self.request.app.org.ticket_tags
-            for tag in (item.keys() if isinstance(item, dict) else (item,))
-        ]
-        if not choices:
-            self.delete_field('ticket_tag')
-
-        choices.insert(0, ('', ''))
-
         self.css_class = 'resettable'
+        if not self.request.app.org.ticket_tags:
+            self.delete_field('ticket_tag')
+            return
 
         auto_fill_data = {
             tag: filtered_meta
@@ -131,8 +138,8 @@ class AddReservationForm(Form):
     whole_day = RadioField(
         label=_('Whole day'),
         choices=[
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ],
         default='no',
         fieldset=_('Time'),
@@ -154,15 +161,25 @@ class AddReservationForm(Form):
         depends_on=('whole_day', 'no')
     )
 
+    internal = RadioField(
+        label=_('Internal'),
+        description=_('Internal reservations ignore availability periods'),
+        fieldset=_('Options'),
+        choices=(
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
+        ),
+        default='no')
+
     quota_room = IntegerField(
         label=_('Quota'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Time'),
+        fieldset=_('Options'),
         default=1,
-        depends_on=('whole_day', 'no')
+        depends_on=('whole_day', 'no', 'internal', 'no')
     )
 
     quota_other = IntegerField(
@@ -171,7 +188,7 @@ class AddReservationForm(Form):
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Time'),
+        fieldset=_('Options'),
         default=1,
     )
 
@@ -182,6 +199,7 @@ class AddReservationForm(Form):
             self.delete_field('start_time')
             self.delete_field('end_time')
             self.delete_field('whole_day')
+            self.delete_field('internal')
             self.delete_field('quota_room')
 
     @property
@@ -240,7 +258,7 @@ class FindYourSpotForm(Form):
 
     weekdays = MultiCheckboxField(
         label=_('On Weekday(s)'),
-        choices=WEEKDAYS,
+        choices=[SelectChoice(str(value), label) for value, label in WEEKDAYS],
         coerce=int,
         default=[v for v, l in WEEKDAYS[:5]],
         validators=[InputRequired()],
@@ -278,7 +296,7 @@ class FindYourSpotForm(Form):
     rooms = MultiCheckboxField(
         label=_('Rooms'),
         choices=(),
-        coerce=lambda v: UUID(v) if isinstance(v, str) else v,
+        coerce=coerce_uuid,
         validators=[InputRequired()],
         render_kw={
             'prefix_label': False,
@@ -288,16 +306,25 @@ class FindYourSpotForm(Form):
     on_holidays = RadioField(
         label=_('On holidays'),
         choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ),
         default='no')
 
     during_school_holidays = RadioField(
         label=_('During school holidays'),
         choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
+        ),
+        default='no')
+
+    internal = RadioField(
+        label=_('Internal'),
+        description=_('Internal reservations ignore availability periods'),
+        choices=(
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ),
         default='no')
 
@@ -305,10 +332,19 @@ class FindYourSpotForm(Form):
         label=_('Automatically reserve the first available slot'),
         description=_('You will be able to change individual choices'),
         choices=(
-            ('for_every_room', _('Yes, for every selected room and day')),
-            ('for_every_day', _('Yes, for every selected day')),
-            ('for_first_day', _('Yes, for the first available selected day')),
-            ('no', _('No'))
+            SelectChoice(
+                'for_every_room',
+                _('Yes, for every selected room and day')
+            ),
+            SelectChoice(
+                'for_every_day',
+                _('Yes, for every selected day')
+            ),
+            SelectChoice(
+                'for_first_day',
+                _('Yes, for the first available selected day')
+            ),
+            SelectChoice('no', _('No'))
         ),
         validators=[InputRequired()],
         default='no')
@@ -318,6 +354,8 @@ class FindYourSpotForm(Form):
             self.delete_field('on_holidays')
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
+        if not self.request.is_manager:
+            self.delete_field('internal')
         if not self.request.POST:
             # by default search one week from now
             self.start.data = date.today()
@@ -334,7 +372,10 @@ class FindYourSpotForm(Form):
             self.auto_reserve_available_slots.choices = choices[1:]
             return
 
-        self.rooms.choices = [(room.id, room.title) for room in rooms]
+        self.rooms.choices = [
+            SelectChoice(room.id.hex, room.title)
+            for room in rooms
+        ]
         if not self.request.POST:
             # select all rooms by default
             self.rooms.data = [room.id for room in rooms]
@@ -383,6 +424,35 @@ class FindYourSpotForm(Form):
                     ))
         return None
 
+    def ensure_limited_number_of_candidates(self) -> bool | None:
+        if self.start.data is None or self.end.data is None:
+            return None
+
+        if hasattr(self, 'request'):
+            is_manager = self.request.is_manager
+        else:
+            is_manager = False
+
+        if not is_manager and (self.end.data - self.start.data).days > 731:
+            assert isinstance(self.end.errors, list)
+            self.end.errors.append(_(
+                'The end can be at most two years from the start'
+            ))
+            return False
+
+        num_candidates = len(self.included_dates)
+        if self.rooms:
+            num_candidates *= len(self.rooms.data or ())
+
+        if num_candidates > 750:
+            assert isinstance(self.end.errors, list)
+            self.end.errors.append(_(
+                'The number of possible reservation dates is too large. '
+                'Either lower the end date, or select fewer rooms / weekdays.'
+            ))
+            return False
+        return None
+
     @cached_property
     def exceptions(self) -> DateContainer:
         if not hasattr(self, 'request'):
@@ -420,6 +490,19 @@ class FindYourSpotForm(Form):
             if start <= date <= end:
                 return True
         return False
+
+    @cached_property
+    def included_dates(self) -> Sequence[date]:
+        def iter_dates(start: date, end: date) -> Generator[date]:
+            current = start
+            while current <= end:
+                if not self.is_excluded(current):
+                    yield current
+                current += timedelta(days=1)
+
+        assert self.start.data is not None
+        assert self.end.data is not None
+        return list(iter_dates(self.start.data, self.end.data))
 
 
 class ExportToExcelWorksheets(Form):

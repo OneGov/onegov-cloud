@@ -45,172 +45,196 @@
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
-    <div class="ie-11-wrapper">
-      <main>
+    <div class="off-canvas-wrap" data-offcanvas>
+      <div class="inner-wrap">
 
-        <header tal:define="header_options request.app.org.header_options or {}" >
-          <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
-                id="header_announcement"
-                style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
-                    <div class="row" tal:define="url header_options.get('announcement_url');">
-                      <div class="columns small-12">
-                          <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                              tal:condition="url" href="${url}">
-                              <i class="fa fa-link"></i> ${header_options['announcement']}</a>
-                          <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                              tal:condition="not url">${header_options['announcement']}</p>
-                      </div>
-                    </div>
+        <!--! Mobile sidebar, filled by sidebar_mobile.js -->
+        <aside class="right-off-canvas-menu show-for-small-only" id="offCanvasSidebar">
+          <div class="offcanvas-sidebar-header">
+            <button type="button" class="offcanvas-sidebar-close" aria-label="Close menu" i18n:attributes="aria-label">
+              <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
           </div>
-          <div id="header_links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
-              <div class="columns small-12">
-                <nav class="top-bar" data-topbar="" role="navigation">
-                  <ul class="title-area">
-                      <li class="name" style="width: 0;"></li>
-                      <li class="toggle-topbar">
-                          <a href="#"><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></a>
-                      </li>
-                  </ul>
+        </aside>
 
-                  <section class="top-bar-section" id="quicklinks" style="left: 0%;">
-                    <ul id="quicklinks-submenu">
-                      <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
-                    </ul>
-                  </section>
-              </nav>
-              </div>
-          </div>
-          <div class="globals">
-            <div class="row">
-              <div class="columns small-12 medium-8">
-                <ul tal:condition="request.is_logged_in" tal:condition="modules.links" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
-                    <li>
-                        <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
-                        <ul id="modules-dropdown" data-dropdown-content class="f-dropdown disable-scroll">
-                            <li tal:repeat="link modules.links">
-                                <tal:b replace="link(layout)" />
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
-                    </li>
-                </ul>
-                <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-                    <h4 tal:condition="header_options['left_header_name']|nothing"><a
-                            href="${header_options.get('left_header_url', '#')}"
-                            style="color:${color or '#fff'}; font-size: ${rem_size}rem">
-                            ${header_options['left_header_name']}
-                    </a></h4>
-                </div>
+        <div class="ie-11-wrapper">
+          <main>
 
+            <header tal:define="header_options request.app.org.header_options or {}" >
+              <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
+                    id="header_announcement"
+                    style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+                        <div class="row" tal:define="url header_options.get('announcement_url');">
+                          <div class="columns small-12">
+                              <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                  tal:condition="url" href="${url}">
+                                  <i class="fa fa-link"></i> ${header_options['announcement']}</a>
+                              <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                  tal:condition="not url">${header_options['announcement']}</p>
+                          </div>
+                        </div>
               </div>
-              <div class="columns small-12 medium-4">
-                <ul tal:condition="global_tools|nothing">
-                  <li tal:repeat="tool global_tools">
-                    <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                      <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                      <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
-                          <li tal:repeat="link tool.links">
-                              <tal:b replace="link(layout)" />
+              <div id="header_links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
+                  <div class="columns small-12">
+                    <nav class="top-bar" data-topbar="" role="navigation">
+                      <ul class="title-area">
+                          <li class="name" style="width: 0;"></li>
+                          <li class="toggle-topbar">
+                              <a href="#"><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></a>
                           </li>
                       </ul>
-                    </tal:b>
-                    <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                      <tal:b replace="link(layout)" />
-                    </tal:b>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
 
-          <div class="row header">
-            <div class="small-12 medium-8 columns logo">
-              <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
-              </a>
-            </div>
-            <div class="small-12 medium-4 columns">
-              <!--! The org's site search -->
-              <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                <div class="row collapse">
-                    <div class="columns small-10">
-                        <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                        <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" required maxlength="200" />
-                        <button type="reset" class="reset-button" tabindex="-1"></button>
+                      <section class="top-bar-section" id="quicklinks" style="left: 0%;">
+                        <ul id="quicklinks-submenu">
+                          <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+                        </ul>
+                      </section>
+                  </nav>
+                  </div>
+              </div>
+              <div class="globals">
+                <div class="row">
+                  <div class="columns small-12 medium-8">
+                    <ul tal:condition="request.is_logged_in" tal:condition="modules.links" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+                        <li>
+                            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
+                            <ul id="modules-dropdown" data-dropdown-content class="f-dropdown disable-scroll">
+                                <li tal:repeat="link modules.links">
+                                    <tal:b replace="link(layout)" />
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+                        </li>
+                    </ul>
+                    <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+                        <h4 tal:condition="header_options['left_header_name']|nothing"><a
+                                href="${header_options.get('left_header_url', '#')}"
+                                style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                                ${header_options['left_header_name']}
+                        </a></h4>
                     </div>
-                    <div class="columns small-2">
-                        <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
-                          <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="row typeahead">
-                  <div class="columns small-12" data-typeahead-container>
+
+                  </div>
+                  <div class="columns small-12 medium-4">
+                    <ul tal:condition="global_tools|nothing">
+                      <li tal:repeat="tool global_tools">
+                        <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                          <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                              <li tal:repeat="link tool.links">
+                                  <tal:b replace="link(layout)" />
+                              </li>
+                          </ul>
+                        </tal:b>
+                        <tal:b condition="tool.url|tool.id|nothing" define="link tool">
+                          <tal:b replace="link(layout)" />
+                        </tal:b>
+                      </li>
+                    </ul>
                   </div>
                 </div>
-              </form>
-            </div>
-          </div>
+              </div>
 
-          <div class="row locals">
+              <div class="row header">
+                <div class="small-12 medium-8 columns logo">
+                  <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                    <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                    <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                  </a>
+                </div>
+                <div class="small-12 medium-4 columns">
+                  <!--! The org's site search -->
+                  <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                    <div class="row collapse">
+                        <div class="columns small-10">
+                            <label for="search" class="show-for-sr" i18n:translate>Search</label>
+                            <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" required maxlength="200" />
+                            <button type="reset" class="reset-button" tabindex="-1"></button>
+                        </div>
+                        <div class="columns small-2">
+                            <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                              <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row typeahead">
+                      <div class="columns small-12" data-typeahead-container>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="row locals">
+                  <div class="small-12 columns">
+                      <div metal:use-macro="layout.macros['top_navigation']"></div>
+                      <div metal:use-macro="layout.macros['editbar']"></div>
+                      <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+                  </div>
+              </div>
+
+              <div class="row alerts">
+                <div class="small-12 columns" id="alert-boxes">
+                  <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
+                  <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
+                    <tal:b i18n:translate>The form contains errors. Please check the marked fields.</tal:b>
+                    <a href="#" class="close">&times;</a>
+                  </div>
+                  <tal:b metal:use-macro="layout.macros['consume_messages']" />
+                </div>
+              </div>
+            </header>
+
+            <article class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
+              <div class="small-12 medium-3 large-3 columns sidebar show-for-medium-up">
+                <div metal:use-macro="layout.macros['sidebar']" />
+              </div>
+              <div class="small-12 medium-9 large-9 columns">
+                <div class="row">
+                    <div class="small-12 columns">
+                      <section role="main" id="content">
+                        <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
+                        <div metal:define-slot="content"></div>
+                      </section>
+                    </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
               <div class="small-12 columns">
-                  <div metal:use-macro="layout.macros['top_navigation']"></div>
-                  <div metal:use-macro="layout.macros['editbar']"></div>
-                  <div metal:use-macro="layout.macros['breadcrumbs']"></div>
-              </div>
-          </div>
-
-          <div class="row alerts">
-            <div class="small-12 columns" id="alert-boxes">
-              <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
-              <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
-                <tal:b i18n:translate>The form contains errors. Please check the marked fields.</tal:b>
-                <a href="#" class="close">&times;</a>
-              </div>
-              <tal:b metal:use-macro="layout.macros['consume_messages']" />
-            </div>
-          </div>
-        </header>
-
-        <article class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
-          <div class="small-12 medium-3 large-3 columns sidebar show-for-medium-up">
-            <div metal:use-macro="layout.macros['sidebar']" />
-          </div>
-          <div class="small-12 medium-9 large-9 columns">
-            <div class="row">
-                <div class="small-12 columns">
-                  <section role="main" id="content">
-                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
-                    <div metal:define-slot="content"></div>
-                  </section>
+                <div class="row">
+                    <div class="small-12 columns">
+                      <section role="main" id="content">
+                        <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
+                        <div metal:define-slot="content"></div>
+                      </section>
+                    </div>
                 </div>
-            </div>
-          </div>
-        </article>
+              </div>
+            </article>
 
-        <article class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
-          <div class="small-12 columns">
-            <div class="row">
-                <div class="small-12 columns">
-                  <section role="main" id="content">
-                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
-                    <div metal:define-slot="content"></div>
-                  </section>
-                </div>
-            </div>
-          </div>
-        </article>
+            <footer>
+              <metal:footer use-macro="layout.macros['footer']" />
+            <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
+            </footer>
 
-        <footer>
-          <metal:footer use-macro="layout.macros['footer']" />
-        <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
-        </footer>
+          </main>
+        </div>
 
-      </main>
+        <!--! Closes the off-canvas menu when clicking on the content -->
+        <a class="exit-off-canvas"></a>
+
+      </div>
     </div>
+
+    <!--! Outside the off-canvas wrapper so position: fixed works; shown by sidebar_mobile.js -->
+    <button type="button" class="sidebar-toggler" aria-controls="offCanvasSidebar" aria-label="Sidebar" i18n:attributes="aria-label">
+        <i class="fa fa-filter" aria-hidden="true"></i>
+        <span class="text show-for-sr" i18n:translate>Sidebar</span>
+    </button>
 </body>
 
 </html>

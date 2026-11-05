@@ -415,24 +415,22 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
             elif isinstance(field, (MultiCheckboxField, RadioField)):
                 results[field.id] = {}
                 for choice in field.choices:
-                    results[field.id][choice[0]] = 0
+                    results[field.id][choice.value] = 0
 
         for submission in submissions:
             for field in fields:
-                if submission.data.get(field.id):
-                    if field.type not in aggregated:
-                        results[field.id].append(
-                            str(submission.data.get(field.id)))
-                    else:
-                        if isinstance(field, (RadioField)):
-                            for choice in field.choices:
-                                if choice[0] == submission.data.get(field.id,
-                                                                    []):
-                                    results[field.id][choice[0]] += 1
-                        if isinstance(field, (MultiCheckboxField)):
-                            for choice in field.choices:
-                                if choice[0] in submission.data.get(field.id,
-                                                                    []):
-                                    results[field.id][choice[0]] += 1
+                if not (field_data := submission.data.get(field.id)):
+                    continue
+
+                if field.type not in aggregated:
+                    results[field.id].append(str(field_data))
+                elif isinstance(field, (RadioField)):
+                    for choice in field.choices:
+                        if choice.value == field_data:
+                            results[field.id][choice.value] += 1
+                elif isinstance(field, (MultiCheckboxField)):
+                    for choice in field.choices:
+                        if choice.value in field_data:
+                            results[field.id][choice.value] += 1
 
         return results

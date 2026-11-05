@@ -414,7 +414,7 @@ class dict_markup_property[MarkupT: (Markup, Markup | None)](  # ruff:ignore[inv
     def _default_expr(self, owner: type[Any]) -> ColumnElement[MarkupT]:
         return type_coerce(
             getattr(owner, self.attribute)[self.key].as_string(),
-            MarkupText()  # type: ignore[arg-type]
+            MarkupText()
         )
 
     @overload

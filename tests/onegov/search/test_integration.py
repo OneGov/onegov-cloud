@@ -986,9 +986,9 @@ def test_suggestions(postgres_dsn: str) -> None:
     suggestions = session.query(
         func.unnest(
             SearchIndex.suggestion
-        ).distinct().label('suggestion'),
+        ).label('suggestion'),
         SearchIndex.public.label('public'),
-    ).subquery()
+    ).distinct().subquery()
     query = session.query(suggestions.c.suggestion)
 
     assert {s for s, in query.filter(

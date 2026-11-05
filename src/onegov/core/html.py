@@ -191,3 +191,28 @@ def html_to_text(
     plaintext = '\n\n'.join(lines)
 
     return plaintext
+
+
+def truncate_node(node: turbohtml.Node, limit: int) -> int:
+    """ Safely truncates a parsed `turbohtml` node to `limit` characters.
+
+    This avoids splitting HTML tags in the middle or leaving some tags
+    unclosed, it also ensures the limit only applies to the actual
+    text, not to the markup that doesn't get rendered.
+
+    Based on the recipe provided by the turbohtml docs on truncating:
+    https://turbohtml.readthedocs.io/en/stable/how-to/truncating.html
+    """
+    budget = limit
+    for child in list(node):
+        if budget <= 0:
+            child.decompose()
+        elif isinstance(child, turbohtml.Text):
+            if len(child.data) > budget:
+                child.data = child.data[:budget].rstrip() + '...'
+                budget = 0
+            else:
+                budget -= len(child.data)
+        elif isinstance(child, turbohtml.Element):
+            budget = truncate_node(child, budget)
+    return budget

@@ -13,6 +13,7 @@ from onegov.org.forms.settings import (
 from onegov.town6 import _
 from onegov.user import UserCollection, User
 from onegov.town6.theme import user_options
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 
 
@@ -31,9 +32,17 @@ class AppearanceSettingsForm(OrgAppearanceSettingsForm):
             'Choose the position of the page images on the content pages'),
         label=_('Page image position'),
         choices=(
-            ('as_content', _('As a content image (between the title and text '
-                             'of a content page)')),
-            ('header', _('As header image (wide above the page content)'))
+            SelectChoice(
+                'as_content',
+                _(
+                    'As a content image (between the title and '
+                    'text of a content page)'
+                )
+            ),
+            SelectChoice(
+                'header',
+                _('As header image (wide above the page content)')
+            )
         ),
         default='as_content'
     )
@@ -42,7 +51,10 @@ class AppearanceSettingsForm(OrgAppearanceSettingsForm):
         fieldset=_('Fonts'),
         label=_('Font family serif'),
         description=_('Used for text in html body'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(value, label)
+            for label, value in form.theme.font_families.items()
+        ],
         validators=[InputRequired()]
     )
 
@@ -50,7 +62,10 @@ class AppearanceSettingsForm(OrgAppearanceSettingsForm):
         fieldset=_('Fonts'),
         label=_('Font family sans-serif'),
         description=_('Used for all the headings'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(value, label)
+            for label, value in form.theme.font_families.items()
+        ],
         validators=[InputRequired()]
     )
 
@@ -104,16 +119,7 @@ class AppearanceSettingsForm(OrgAppearanceSettingsForm):
     def header_font_family(self) -> str | None:
         return self.theme.default_options.get('header-font-family-ui')
 
-    def populate_font_families(self) -> None:
-        self.body_font_family_ui.choices = [
-            (value, label) for label, value in self.theme.font_families.items()
-        ]
-        self.header_font_family_ui.choices = [
-            (value, label) for label, value in self.theme.font_families.items()
-        ]
-
     def on_request(self) -> None:
-        self.populate_font_families()
         # We delete this from the org form
         self.delete_field('font_family_sans_serif')
 
@@ -127,9 +133,9 @@ class ChatSettingsForm(Form):
     enable_chat = RadioField(
         label=_('Enable the chat'),
         choices=[
-            ('disabled', _('Disable chat')),
-            ('people_chat', _('Enable chat for chosen people')),
-            ('chatbot', _('Enable AI chatbot')),
+            SelectChoice('disabled', _('Disable chat')),
+            SelectChoice('people_chat', _('Enable chat for chosen people')),
+            SelectChoice('chatbot', _('Enable AI chatbot')),
         ],
         default='disabled'
     )
@@ -143,7 +149,12 @@ class ChatSettingsForm(Form):
 
     chat_staff = ChosenSelectMultipleField(
         label=_('Show chat for chosen people'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(person.id.hex, person.username)
+            for person in UserCollection(form.request.session).query()
+            .filter(User.role.in_(['editor', 'admin']))
+            .with_entities(User.id, User.username)
+        ],
         depends_on=('enable_chat', 'people_chat')
     )
 
@@ -203,14 +214,6 @@ class ChatSettingsForm(Form):
         obj.specific_opening_hours = self.specific_opening_hours.data
         obj.opening_hours_chat = self.json_to_time(
             self.opening_hours_chat.data) or None
-
-    def populate_chat_staff(self) -> None:
-        people = UserCollection(self.request.session).query().filter(
-            User.role.in_(['editor', 'admin']))
-        staff_members = [(
-            (p.id.hex, p.username)
-        ) for p in people]
-        self.chat_staff.choices = list(staff_members)
 
     def ensure_valid_opening_hours(self) -> bool:
         if not self.specific_opening_hours.data:
@@ -289,11 +292,39 @@ class ChatSettingsForm(Form):
             }
         })
 
-    def on_request(self) -> None:
-        self.populate_chat_staff()
-
 
 class RISSettingsForm(Form):
+
+    ris_parliamentarian_term = ChosenSelectField(
+        label=_('Designation for parliamentarians'),
+        description=_(
+            'This designation is used for parliamentarians throughout the '
+            'RIS pages and menus.'
+        ),
+        choices=(
+            SelectChoice(
+                'parliamentarians',
+                _('Parliamentarians')
+            ),
+            SelectChoice(
+                'residents_council_members',
+                _('Town council members')
+            ),
+        ),
+        default='parliamentarians',
+    )
+
+    def on_request(self) -> None:
+        self.ris_parliamentarian_term.choices = [
+            SelectChoice(
+                'parliamentarians',
+                self.request.translate(_('Parliamentarians')),
+            ),
+            SelectChoice(
+                'residents_council_members',
+                self.request.translate(_('Town council members')),
+            ),
+        ]
 
     # the url breadcrumbs shall point to for non-logged-in users
     ris_main_url = StringField(

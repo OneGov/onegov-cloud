@@ -44,7 +44,7 @@ from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
-from operator import itemgetter
+from operator import attrgetter
 from purl import URL
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
@@ -55,6 +55,7 @@ from wtforms.fields import FormField
 from wtforms.fields import IntegerField
 from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.utils import unset_value
@@ -75,7 +76,6 @@ if TYPE_CHECKING:
     from onegov.org.theme import OrgTheme
     from webob import Response
     from wtforms import Field
-    from wtforms.fields.choices import _Choice
     from wtforms.fields.core import _Filter
     from wtforms.meta import _MultiDictLikeWithGetlist
 
@@ -106,9 +106,9 @@ class OrganisationProfileSettingsForm(Form):
     locales = RadioField(
         label=_('Languages'),
         choices=(
-            ('de_CH', _('German')),
-            ('fr_CH', _('French')),
-            ('it_CH', _('Italian'))
+            SelectChoice('de_CH', _('German')),
+            SelectChoice('fr_CH', _('French')),
+            SelectChoice('it_CH', _('Italian'))
         ),
         validators=[InputRequired()]
     )
@@ -166,7 +166,10 @@ class AppearanceSettingsForm(Form):
 
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(value, label)
+            for label, value in form.theme.font_families.items()
+        ],
         validators=[InputRequired()]
     )
 
@@ -186,11 +189,11 @@ class AppearanceSettingsForm(Form):
     level_table_of_contents = RadioField(
         label=_('Table of Contents'),
         choices=(
-            ('none', _('No Table of Contents')),
-            ('h2', _('1 Level')),
-            ('h3', _('2 Levels')),
-            ('h4', _('3 Levels')),
-            ('h5', _('4 Levels')),
+            SelectChoice('none', _('No Table of Contents')),
+            SelectChoice('h2', _('1 Level')),
+            SelectChoice('h3', _('2 Levels')),
+            SelectChoice('h4', _('3 Levels')),
+            SelectChoice('h5', _('4 Levels')),
         ),
         default='h5',
     )
@@ -240,14 +243,7 @@ class AppearanceSettingsForm(Form):
         self.theme_options = model.theme_options or {}
         self.custom_css.data = model.custom_css or ''
 
-    def populate_font_families(self) -> None:
-        self.font_family_sans_serif.choices = [
-            (value, label) for label, value in self.theme.font_families.items()
-        ]
-
     def on_request(self) -> None:
-        self.populate_font_families()
-
         @self.request.after
         def clear_locale(response: Response) -> None:
             response.delete_cookie('locale')
@@ -769,13 +765,13 @@ class HomepageSettingsForm(Form):
         label=_('Homepage redirect'),
         default='no',
         choices=[
-            ('no', _('No')),
-            ('directories', _('Yes, to directories')),
-            ('events', _('Yes, to events')),
-            ('forms', _('Yes, to forms')),
-            ('publications', _('Yes, to publications')),
-            ('reservations', _('Yes, to reservations')),
-            ('path', _('Yes, to a non-listed path')),
+            SelectChoice('no', _('No')),
+            SelectChoice('directories', _('Yes, to directories')),
+            SelectChoice('events', _('Yes, to events')),
+            SelectChoice('forms', _('Yes, to forms')),
+            SelectChoice('publications', _('Yes, to publications')),
+            SelectChoice('reservations', _('Yes, to reservations')),
+            SelectChoice('path', _('Yes, to a non-listed path')),
         ])
 
     redirect_path = StringField(
@@ -858,13 +854,16 @@ class MapSettingsForm(Form):
         label=_('Geo provider'),
         default='geo-mapbox',
         choices=[
-            ('geo-admin', _('Swisstopo (Default)')),
-            ('geo-admin-aerial', _('Swisstopo Aerial')),
-            ('geo-mapbox', 'Mapbox'),
-            ('geo-vermessungsamt-winterthur', 'Vermessungsamt Winterthur'),
-            ('geo-zugmap-basisplan', 'ZugMap Basisplan Farbig'),
-            ('geo-zugmap-orthofoto', 'ZugMap Orthofoto'),
-            ('geo-bs', 'Geoportal Basel-Stadt'),
+            SelectChoice('geo-admin', _('Swisstopo (Default)')),
+            SelectChoice('geo-admin-aerial', _('Swisstopo Aerial')),
+            SelectChoice('geo-mapbox', 'Mapbox'),
+            SelectChoice(
+                'geo-vermessungsamt-winterthur',
+                'Vermessungsamt Winterthur'
+            ),
+            SelectChoice('geo-zugmap-basisplan', 'ZugMap Basisplan Farbig'),
+            SelectChoice('geo-zugmap-orthofoto', 'ZugMap Orthofoto'),
+            SelectChoice('geo-bs', 'Geoportal Basel-Stadt'),
         ])
 
 
@@ -938,10 +937,10 @@ class AnalyticsSettingsForm(Form):
     def on_request(self) -> None:
         available = self.request.app.available_analytics_providers
         choices = self.analytics_provider_name.choices = [
-            (name, provider.display_name)
+            SelectChoice(name, provider.display_name)
             for name, provider in available.items()
         ]
-        choices.insert(0, ('', _('None')))
+        choices.insert(0, SelectChoice('', _('None')))
         for provider_name, dependent_fields in (
             ('plausible', ['plausible_domain']),
             ('matomo', ['matomo_site_id']),
@@ -960,11 +959,11 @@ class AnalyticsSettingsForm(Form):
 
             # NOTE: In order to get an OR we need to use the AND
             #       of all the choices it can't be instead.
-            dependency = FieldDependency(*(  # type: ignore
+            dependency = FieldDependency(*(
                 arg
-                for name, _ in choices
-                if name not in providers
-                for arg in ('analytics_provider_name', f'!{name}')
+                for choice in choices
+                if choice.value not in providers
+                for arg in ('analytics_provider_name', f'!{choice.value}')
             ))
             for field_name in dependent_fields:
                 field = self[field_name]
@@ -995,32 +994,32 @@ class HolidaySettingsForm(Form):
     cantonal_holidays = MultiCheckboxField(
         label=_('Cantonal holidays'),
         choices=[
-            ('AG', _('Aargau')),
-            ('AR', _('Appenzell Ausserrhoden')),
-            ('AI', _('Appenzell Innerrhoden')),
-            ('BL', _('Basel-Landschaft')),
-            ('BS', _('Basel-Stadt')),
-            ('BE', _('Berne')),
-            ('FR', _('Fribourg')),
-            ('GE', _('Geneva')),
-            ('GL', _('Glarus')),
-            ('GR', _('Grisons')),
-            ('JU', _('Jura')),
-            ('LU', _('Lucerne')),
-            ('NE', _('Neuchâtel')),
-            ('NW', _('Nidwalden')),
-            ('OW', _('Obwalden')),
-            ('SH', _('Schaffhausen')),
-            ('SZ', _('Schwyz')),
-            ('SO', _('Solothurn')),
-            ('SG', _('St. Gallen')),
-            ('TG', _('Thurgau')),
-            ('TI', _('Ticino')),
-            ('UR', _('Uri')),
-            ('VS', _('Valais')),
-            ('VD', _('Vaud')),
-            ('ZG', _('Zug')),
-            ('ZH', _('Zürich')),
+            SelectChoice('AG', _('Aargau')),
+            SelectChoice('AR', _('Appenzell Ausserrhoden')),
+            SelectChoice('AI', _('Appenzell Innerrhoden')),
+            SelectChoice('BL', _('Basel-Landschaft')),
+            SelectChoice('BS', _('Basel-Stadt')),
+            SelectChoice('BE', _('Berne')),
+            SelectChoice('FR', _('Fribourg')),
+            SelectChoice('GE', _('Geneva')),
+            SelectChoice('GL', _('Glarus')),
+            SelectChoice('GR', _('Grisons')),
+            SelectChoice('JU', _('Jura')),
+            SelectChoice('LU', _('Lucerne')),
+            SelectChoice('NE', _('Neuchâtel')),
+            SelectChoice('NW', _('Nidwalden')),
+            SelectChoice('OW', _('Obwalden')),
+            SelectChoice('SH', _('Schaffhausen')),
+            SelectChoice('SZ', _('Schwyz')),
+            SelectChoice('SO', _('Solothurn')),
+            SelectChoice('SG', _('St. Gallen')),
+            SelectChoice('TG', _('Thurgau')),
+            SelectChoice('TI', _('Ticino')),
+            SelectChoice('UR', _('Uri')),
+            SelectChoice('VS', _('Valais')),
+            SelectChoice('VD', _('Vaud')),
+            SelectChoice('ZG', _('Zug')),
+            SelectChoice('ZH', _('Zürich')),
         ])
 
     other_holidays = TextAreaField(
@@ -1225,8 +1224,8 @@ class OrgTicketSettingsForm(Form):
     ticket_auto_accept_style = RadioField(
         label=_('Accept request and close ticket automatically based on:'),
         choices=(
-            ('category', _('Ticket category')),
-            ('role', _('User role')),
+            SelectChoice('category', _('Ticket category')),
+            SelectChoice('role', _('User role')),
         ),
         fieldset=_('Auto-accept and auto-close'),
         default='category'
@@ -1249,7 +1248,10 @@ class OrgTicketSettingsForm(Form):
         description=_("If auto-accepting is not possible, the ticket will be "
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
-        choices=AVAILABLE_ROLES,
+        choices=[
+            SelectChoice(value, label)
+            for value, label in AVAILABLE_ROLES
+        ],
         fieldset=_('Auto-accept and auto-close'),
         depends_on=('ticket_auto_accept_style', 'role')
     )
@@ -1481,19 +1483,20 @@ class OrgTicketSettingsForm(Form):
         return handlers.code_label(self.request, code)
 
     def on_request(self) -> None:
-
-        choices: list[_Choice] = [
-            (key, self.code_title(key)) for key in handlers.registry.keys()
+        choices = [
+            SelectChoice(key, self.code_title(key))
+            for key in handlers.registry.keys()
         ]
         auto_accept_choices = ('RSV', 'FRM')
         self.ticket_auto_accepts.choices = [
-            (key, self.code_title(key)) for key in auto_accept_choices
+            SelectChoice(key, self.code_title(key))
+            for key in auto_accept_choices
         ]
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions: list[_Choice] = sorted((
-            (
+        permissions = sorted((
+            SelectChoice(
                 p.id.hex,
                 ': '.join(x for x in (
                     self.code_title(p.handler_code), p.group
@@ -1504,18 +1507,18 @@ class OrgTicketSettingsForm(Form):
                 TicketPermission.handler_code,
                 TicketPermission.group
             ).filter(TicketPermission.exclusive.is_(True))
-        ), key=itemgetter(1))
+        ), key=attrgetter('label'))
 
         if not permissions:
             self.delete_field('permissions')
         else:
             self.permissions.choices = permissions
-            self.permissions.default = [p[0] for p in permissions]
+            self.permissions.default = [p.value for p in permissions]
 
         user_q = self.request.session.query(User).filter_by(role='admin')
         user_q = user_q.order_by(User.created.desc())
         self.auto_closing_user.choices = [
-            (u.username, u.title) for u in user_q
+            SelectChoice(u.username, u.title) for u in user_q
         ]
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
@@ -1576,7 +1579,13 @@ class NewsletterSettingsForm(Form):
         description=_('Send an email notification to the following users '
                       'when a recipient unsubscribes from the newsletter'),
         validators=[StrictOptional()],
-        choices=[]
+        choices=lambda form, field: [
+            SelectChoice(username)
+            for username, in form.request.session.query(User.username)
+            .filter(User.role.in_(['admin', 'editor']))
+            .order_by(User.username.desc())
+            if '@' in username
+        ]
     )
 
     enable_automatic_newsletters = BooleanField(
@@ -1748,14 +1757,6 @@ class NewsletterSettingsForm(Form):
         if model.notify_on_unsubscription:
             self.notify_on_unsubscription.data = model.notify_on_unsubscription
 
-    def on_request(self) -> None:
-        users = self.request.session.query(User).filter(
-            User.role.in_(['admin', 'editor']))
-        users = users.order_by(User.username.desc())
-        self.notify_on_unsubscription.choices = [
-            (u.username) for u in users if '@' in u.username
-        ]
-
 
 class LinkMigrationForm(Form):
 
@@ -1792,8 +1793,8 @@ class LinkHealthCheckForm(Form):
     scope = RadioField(
         label=_('Choose which links to check'),
         choices=(
-            ('external', _('External links only')),
-            ('internal', _('Internal links only')),
+            SelectChoice('external', _('External links only')),
+            SelectChoice('internal', _('Internal links only')),
         ),
         default='external'
     )
@@ -2125,10 +2126,18 @@ class EventSettingsForm(Form):
         label=_("Choose the filter type for events (default is 'Tags')"),
         fieldset=_('Filters'),
         choices=(
-            ('tags', _('A predefined set of tags')),
-            ('filters', _('Manually configurable filters')),
-            ('tags_and_filters', _('Both, predefined tags as well as '
-                                   'configurable filters')),
+            SelectChoice(
+                'tags',
+                _('A predefined set of tags')
+            ),
+            SelectChoice(
+                'filters',
+                _('Manually configurable filters')
+            ),
+            SelectChoice(
+                'tags_and_filters',
+                _('Both, predefined tags as well as configurable filters')
+            ),
         ),
         default='tags'
     )
@@ -2193,7 +2202,7 @@ class DataRetentionPolicyForm(Form):
         validators=[InputRequired()],
         default=0,
         coerce=int,
-        choices=TIMESPANS
+        choices=[SelectChoice(str(value), label) for value, label in TIMESPANS]
     )
 
     auto_delete_timespan = RadioField(
@@ -2201,7 +2210,7 @@ class DataRetentionPolicyForm(Form):
         validators=[InputRequired()],
         default=0,
         coerce=int,
-        choices=TIMESPANS
+        choices=[SelectChoice(str(value), label) for value, label in TIMESPANS]
     )
 
     audit_trail_delete_timespan = RadioField(
@@ -2212,7 +2221,7 @@ class DataRetentionPolicyForm(Form):
         validators=[InputRequired()],
         default=0,
         coerce=int,
-        choices=TIMESPANS,
+        choices=[SelectChoice(str(value), label) for value, label in TIMESPANS]
     )
 
 
@@ -2440,24 +2449,24 @@ class PeopleSettingsForm(Form):
     hidden_people_fields = MultiCheckboxField(
         label=_('Hide these fields for non-logged-in users'),
         choices=[
-            ('salutation', _('Salutation')),
-            ('academic_title', _('Academic Title')),
-            ('born', _('Born')),
-            ('profession', _('Profession')),
-            ('political_party', _('Political Party')),
-            ('parliamentary_group', _('Parliamentary Group')),
-            ('email', _('E-Mail')),
-            ('phone', _('Phone')),
-            ('phone_direct', _('Direct Phone Number or Mobile')),
-            ('organisation', _('Organisation')),
-            ('website', _('Website')),
-            ('website_2', _('Website 2')),
-            ('location_address', _('Location address')),
-            ('location_code_city', _('Location Code and City')),
-            ('postal_address', _('Postal address')),
-            ('postal_code_city', _('Postal Code and City')),
-            ('notes', _('Notes')),
-            ('external_user_id', _('External ID'))
+            SelectChoice('salutation', _('Salutation')),
+            SelectChoice('academic_title', _('Academic Title')),
+            SelectChoice('born', _('Born')),
+            SelectChoice('profession', _('Profession')),
+            SelectChoice('political_party', _('Political Party')),
+            SelectChoice('parliamentary_group', _('Parliamentary Group')),
+            SelectChoice('email', _('E-Mail')),
+            SelectChoice('phone', _('Phone')),
+            SelectChoice('phone_direct', _('Direct Phone Number or Mobile')),
+            SelectChoice('organisation', _('Organisation')),
+            SelectChoice('website', _('Website')),
+            SelectChoice('website_2', _('Website 2')),
+            SelectChoice('location_address', _('Location address')),
+            SelectChoice('location_code_city', _('Location Code and City')),
+            SelectChoice('postal_address', _('Postal address')),
+            SelectChoice('postal_code_city', _('Postal Code and City')),
+            SelectChoice('notes', _('Notes')),
+            SelectChoice('external_user_id', _('External ID'))
         ])
 
     def ensure_categories(self) -> bool | None:

@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, object_session, relationship
 from sqlalchemy.orm import DynamicMapped, Mapped
 from uuid import uuid4, UUID
+from wtforms import SelectChoice
 
 from onegov.core.mail import Attachment
 from onegov.core.orm import Base
@@ -29,7 +30,6 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
     from typing import Self
-    from wtforms.fields.choices import _Choice
     from .course import Course
     from .course_notification_template import (
         CancellationTemplate, CourseNotificationTemplate, InfoTemplate,
@@ -51,7 +51,7 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 def course_status_choices(
     request: FsiRequest | None = None,
     as_dict: Literal[False] = False
-) -> list[_Choice]: ...
+) -> list[SelectChoice]: ...
 
 
 @overload
@@ -72,7 +72,7 @@ def course_status_choices(
 def course_status_choices(
     request: FsiRequest | None = None,
     as_dict: bool = False
-) -> list[_Choice] | list[dict[str, str]]:
+) -> list[SelectChoice] | list[dict[str, str]]:
 
     if request:
         translations: Iterable[str] = (
@@ -83,7 +83,7 @@ def course_status_choices(
     zipped: zip[tuple[str, str]] = zip(COURSE_EVENT_STATUSES, translations)
     if as_dict:
         return [{val: key} for val, key in zipped]
-    return list(zipped)  # type:ignore[return-value]
+    return [SelectChoice(value, label) for value, label in zipped]
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):

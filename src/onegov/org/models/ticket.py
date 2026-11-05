@@ -583,10 +583,7 @@ class ReservationHandler(Handler):
     def resource(self) -> Resource | None:
         if self.deleted:
             return None
-        query = self.session.query(Resource)
-        query = query.filter(Resource.id == self.reservations[0].resource)
-
-        return query.one()
+        return self.reservations[0].resource_obj
 
     def reservations_query(self) -> Query[Reservation]:
         # libres allows for multiple reservations with a single request (token)

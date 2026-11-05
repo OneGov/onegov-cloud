@@ -735,6 +735,9 @@ def test_bug_semicolons_in_choices_with_filters(client: Client) -> None:
 
     # Get the url with the filter
     url = page.pyquery('.blank-label > a')[0].attrib['href']
+    assert {
+        link.attrib.get('rel') for link in page.pyquery('.blank-label > a')
+    } == {'nofollow'}
     page = client.get(url)
     assert 'Choices' in page
 

@@ -3628,6 +3628,15 @@ button {
         height: 2.25rem;
         text-shadow: none;
 
+        &.add-reservation {
+            height: 1.25rem;
+            font-size: .675rem;
+            border-radius: .4rem;
+            padding: .2em .4em;
+            margin: 2px 4px;
+            float: right;
+        }
+
         .fc-icon {
             margin-top: -4px;
         }
@@ -7407,7 +7416,7 @@ a#results {
 
         .event-unavailable {
             background-color: $red;
-            cursor: not-allowed;
+            cursor: not-allowed !important;
         }
 
         .event-partly-available {

@@ -29,11 +29,13 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.utils import complete_url
 from onegov.ticket import TicketCollection
+from operator import attrgetter
 from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
@@ -92,6 +94,19 @@ WEEKDAYS = (
     ('SA', _('Sa')),
     ('SU', _('Su')),
 )
+
+
+def tags_choices(
+    form: EventForm,
+    field: MultiCheckboxField
+) -> list[SelectChoice]:
+    if custom_tags := form.request.app.custom_event_tags:
+        return [SelectChoice(tag) for tag in custom_tags]
+
+    return sorted((
+        SelectChoice(str(tag), form.request.translate(tag))
+        for tag in TAGS
+    ), key=attrgetter('label'))
 
 
 class EventForm(Form):
@@ -194,7 +209,7 @@ class EventForm(Form):
 
     tags = MultiCheckboxField(
         label=_('Tags'),
-        choices=[(tag, tag) for tag in TAGS],
+        choices=tags_choices,
     )
 
     start_date = DateField(
@@ -219,15 +234,15 @@ class EventForm(Form):
         label=_('Repeat'),
         default='without',
         choices=(
-            ('without', _('Without')),
-            ('weekly', _('Weekly')),
-            ('dates', _('On additional dates'))
+            SelectChoice('without', _('Without')),
+            SelectChoice('weekly', _('Weekly')),
+            SelectChoice('dates', _('On additional dates'))
         )
     )
 
     weekly = MultiCheckboxField(
         label=_('Repeats itself every'),
-        choices=WEEKDAYS,
+        choices=[SelectChoice(value, label) for value, label in WEEKDAYS],
         render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'},
         depends_on=('repeat', 'weekly')
     )
@@ -289,23 +304,10 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self) -> None:
-        if self.tags:
-            if self.custom_tags():
-                self.tags.choices = [(tag, tag) for tag in
-                                     self.custom_tags() or ()]
-            self.sort_tags()
-
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
         if not self.email.data:
             self.populate_submitter()
-
-    def custom_tags(self) -> list[str] | None:
-        return self.request.app.custom_event_tags
-
-    def sort_tags(self) -> None:
-        assert isinstance(self.tags.choices, list)
-        self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
 
     def ensure_start_before_end(self) -> bool | None:
         if self.start_date.data and self.end_date.data:
@@ -585,11 +587,23 @@ class EventImportForm(Form):
                 getattr(occurrence, attribute, None)
                 or getattr(occurrence.event, attribute, None)
             )
+            if attribute in (
+                'external_event_url',
+                'event_registration_url',
+            ) and isinstance(result, str):
+                result = result.strip()
+                if result.casefold() in ('https://', 'https://keine'):
+                    result = ''
             if attribute == 'created' and isinstance(result, datetime):
                 result = to_timezone(
                     result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
-                result = result.strftime('%d.%m.%Y %H:%M')
+                date_format = (
+                    '%Y-%m-%d %H:%M'
+                    if attribute == 'created'
+                    else '%d.%m.%Y %H:%M'
+                )
+                result = result.strftime(date_format)
             if isinstance(result, bool):
                 return result
             if attribute == 'tags':
@@ -650,6 +664,16 @@ class EventImportForm(Form):
 
         def get(line: DefaultRow, column: str, attribute: str) -> Any:
             result = getattr(line, column)
+            if attribute in (
+                'external_event_url',
+                'event_registration_url',
+            ):
+                result = result.strip() if isinstance(result, str) else None
+                if result and result.casefold() in (
+                    'https://',
+                    'https://keine',
+                ):
+                    result = None
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)
             if attribute == 'tags':

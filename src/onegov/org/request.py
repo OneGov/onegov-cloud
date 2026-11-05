@@ -170,9 +170,21 @@ class OrgRequest(CoreRequest[AppT]):
         return self.app.org.email_for_new_tickets
 
     @cached_property
+    def mtan_number(self) -> str | None:
+        # we cache this for the duration of the request, so we can't
+        # get caught offguard by a redis cache eviction mid-request
+        return self.browser_session.get('mtan_number')
+
+    @cached_property
     def active_mtan_session(self) -> bool:
         mtan_verified = self.browser_session.get('mtan_verified')
         if mtan_verified is None:
+            return False
+
+        if self.mtan_number is None:
+            # if the number already got evicted from the session store
+            # then we need to re-verify
+            self.browser_session.pop('mtan_verified', None)
             return False
 
         session_duration = self.app.org.mtan_session_duration
@@ -183,9 +195,11 @@ class OrgRequest(CoreRequest[AppT]):
 
     @cached_property
     def mtan_accesses(self) -> TANAccessCollection:
+        # use the remembered mtan_number from active_mtan_session
+        assert self.mtan_number is not None
         return TANAccessCollection(
             self.session,
-            session_id=self.browser_session.mtan_number,
+            session_id=self.mtan_number,
             access_window=self.app.org.mtan_access_window
         )
 
@@ -202,6 +216,11 @@ class OrgRequest(CoreRequest[AppT]):
 
         # if we already accessed this url we are also still fine
         return self.mtan_accesses.by_url(self.path_url) is None
+
+    def is_mtan_protected(self, model: object) -> bool:
+        if self.is_manager or not hasattr(model, 'access'):
+            return False
+        return model.access in ('mtan', 'secret_mtan')
 
     def auto_accept(self, ticket: Ticket) -> bool:
         if self.app.org.ticket_auto_accept_style == 'role':

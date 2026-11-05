@@ -398,6 +398,12 @@ def test_occurrence_collection_query(session: Session) -> None:
         assert query(outdated=False, range='month').count() == 4
         assert query(outdated=False, range='past').count() == 1
 
+    occurrences = query(outdated=True).limit(2).all()
+    occurrences[0].location = None
+    occurrences[1].location = ''
+    session.flush()
+    assert query(outdated=True, locations=['NULL']).count() == 2
+
 
 def test_occurrence_collection_pagination(session: Session) -> None:
     occurrences = OccurrenceCollection(session)
@@ -1301,6 +1307,79 @@ def test_from_import(session: Session) -> None:
     ], future_events_only=True)
     # only adding the future event
     assert (len(a), len(u), len(p)) == (1, 0, 0)
+
+
+def test_from_import_locally_modified(session: Session) -> None:
+    events = EventCollection(session)
+
+    source = 'import-A'
+
+    def item(title: str, source_updated: str | None) -> EventImportItem:
+        return EventImportItem(
+            event=Event(
+                state='initiated',
+                title=title,
+                location='Location',
+                tags=[],
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'Europe/Zurich'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'Europe/Zurich'),
+                timezone='Europe/Zurich',
+                description='Description',
+                coordinates=Coordinates(47.37, 8.54),
+                source=source,
+                source_updated=source_updated
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        )
+
+    for index, source_updated in enumerate((None, '2026-01-01')):
+        source = f'import-{index}-A'
+
+        added, updated, purged = events.from_import(
+            [item('Title', source_updated)])
+        assert len(added) == 1
+        event = added[0]
+
+        # local changes are kept, even if the remote changes
+        event.title = 'Local Title'
+        event.locally_modified = True
+        added, updated, purged = events.from_import(
+            [item('Remote Title', source_updated and '2026-02-01')],
+            valid_state_transfers={'published': 'withdrawn'}
+        )
+        assert (added, updated, purged) == ([], [], [])
+        assert event.title == 'Local Title'
+
+        # state transfers still apply
+        item_ = item('Remote Title', source_updated and '2026-02-01')
+        item_.event.state = 'withdrawn'
+        added, updated, purged = events.from_import(
+            [item_],
+            valid_state_transfers={'published': 'withdrawn'}
+        )
+        assert updated == [event]
+        assert event.state == 'withdrawn'
+        assert event.title == 'Local Title'
+
+        # without the flag, the import updates the event again
+        event.locally_modified = False
+        added, updated, purged = events.from_import(
+            [item('Remote Title', source_updated and '2026-02-01')])
+        assert updated == [event]
+        assert event.title == 'Remote Title'
+        assert event.source_updated == (source_updated and '2026-02-01')
+
+        # the remote timestamp is tracked, so unchanged remotes are skipped
+        added, updated, purged = events.from_import(
+            [item('Remote Title', source_updated and '2026-02-01')])
+        assert (added, updated, purged) == ([], [], [])
+
+        # purging still applies
+        added, updated, purged = events.from_import([], [f'import-{index}'])
+        assert purged == [event.id]
 
 
 def test_from_ical(session: Session) -> None:

@@ -2,9 +2,51 @@ import json
 from typing import TYPE_CHECKING
 
 from freezegun import freeze_time
+from onegov.newsletter import RecipientCollection
+from onegov.org.models import RISParliamentarianCollection
 
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+def test_parliamentarian_creation_requires_private_permission(
+    client: Client,
+) -> None:
+    client.login_admin()
+    settings = client.get('/module-activation-settings')
+    settings.form['ris_enabled'] = True
+    settings.form.submit()
+    client.logout()
+
+    for logged_in in (False, True):
+        if logged_in:
+            client.login_member()
+
+        client.get('/parliamentarians', status=200)
+        client.get('/parliamentarians/new', status=403)
+        client.post(
+            '/parliamentarians/new',
+            {
+                'first_name': 'Synthetic',
+                'last_name': 'Parliamentarian',
+                'email_primary': 'synthetic@example.org',
+            },
+            status=403,
+        )
+        client.get('/commissions/new', status=403)
+        client.post(
+            '/commissions/new',
+            {
+                'name': 'Synthetic Commission',
+            },
+            status=403,
+        )
+
+        session = client.app.session()
+        assert RISParliamentarianCollection(session).query().count() == 0
+        assert not RecipientCollection(session).by_address(
+            'synthetic@example.org'
+        )
 
 
 def test_parliamentary_group_members_sorted_by_name(client: Client) -> None:
@@ -173,6 +215,14 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Neue Rolle hinzugefügt' in parliamentarian
         assert 'Ersatzmitglied' in parliamentarian
         assert 'Verkehrskommission' in parliamentarian
+
+        commission_page = client.get('/commissions').click(
+            'Verkehrskommission'
+        )
+        assert 'Zum Hinzufügen eines Mitglieds' in commission_page
+        edit_membership = commission_page.click('Mitgliedschaft bearbeiten')
+        assert edit_membership.form is not None
+        assert 'Ersatzmitglied' in edit_membership
 
         # add another parliamentarian
         new = client.get('/parliamentarians/new')

@@ -683,6 +683,32 @@ def test_edit_event(client: Client) -> None:
     assert "Stadtfest" in client.get('/events')
 
 
+def test_edit_imported_event(client: Client) -> None:
+    session = client.app.session()
+    event = session.query(Event).filter_by(title="150 Jahre Govikon").one()
+    event.source = 'import-1'
+    transaction.commit()
+
+    client.login_editor()
+
+    edit_page = client.get('/events').click("150 Jahre Govikon")
+    edit_page = edit_page.click("Bearbeiten")
+    assert "Diese Veranstaltung wurde importiert" in edit_page
+    edit_page.form['title'] = "Stadtfest"
+    edit_page.form.submit().follow()
+    assert "Stadtfest" in client.get('/events')
+
+    event = session.query(Event).filter_by(title="Stadtfest").one()
+    assert event.locally_modified
+    url = f'/event-management/{event.name}'
+    transaction.commit()
+
+    # the event page of imported events offers editing as well
+    event_page = client.get(url)
+    edit_page = event_page.click("Bearbeiten")
+    assert "Diese Veranstaltung wurde importiert" in edit_page
+
+
 def test_delete_event(client: Client) -> None:
 
     # Submit and publish an event
@@ -961,7 +987,7 @@ def test_export_events_json_xml_csv(client: Client) -> None:
             )
 
         assert event_fields['Highlight'] in (True, 'True', 'true')
-        assert event_fields['Erstellt'] == '23.03.2026 09:00'
+        assert event_fields['Erstellt'] == '2026-03-23 09:00'
         assert event_fields['Von'] == '24.03.2026 18:00'
         assert event_fields['Bis'] == '24.03.2026 22:00'
 
@@ -1238,3 +1264,11 @@ def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
     edit = occurrence.click('Bearbeiten')
     cancel_href = edit.pyquery('a.cancel-link').attr('href')
     assert cancel_href == origin
+
+
+def test_view_occurrences_filters_nofollow(client: Client) -> None:
+    page = client.get('/events')
+    links = page.pyquery(
+        '.tag-filters a, .location-filters a, .date-filters a')
+    assert links
+    assert {link.attrib.get('rel') for link in links} == {'nofollow'}

@@ -6,6 +6,7 @@ from io import BytesIO
 from math import isclose
 from markupsafe import Markup
 from onegov.chat import MessageCollection
+from onegov.core.html import truncate_node
 from onegov.org import _
 from onegov.org.constants import (
     INVOICE_GROUPS, PAYMENT_STATES, PAYMENT_SOURCES, TICKET_STATES)
@@ -78,6 +79,8 @@ class TicketBasePdf(OrgPdf):
                             self.strip(item.inner_xml), self.style.bold)
                         data.append([p, ''])
                     if item.tag == 'dd':
+                        # safely truncates the text to 1500 characters
+                        truncate_node(item, 1500)
                         data[-1][1] = MarkupParagraph(
                             self.strip(item.inner_xml))
                 if data:
@@ -354,9 +357,6 @@ class TicketPdf(TicketBasePdf):
             if row is None:
                 continue
 
-            if row[1] and len(row[1]) > 2000:
-                row[1] = row[1][:2000] + '...'
-
             table.append(row)
 
         for date_, data in tables.items():
@@ -398,6 +398,9 @@ class TicketPdf(TicketBasePdf):
 
         if text_el is None:
             return [timestamp_html, None]
+
+        # safely truncates the text to 1500 characters
+        truncate_node(text_el, 1500)
         return [timestamp_html, self.strip(text_el.inner_xml)]
 
     def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
