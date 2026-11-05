@@ -984,7 +984,8 @@ class ReservationEventInfo:
         request: OrgRequest,
         resource: Resource,
         reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]],
-        blocking_resources: dict[UUID, Resource]
+        blocking_resources: dict[UUID, Resource],
+        extra_mapping: dict[UUID, list[int]]
     ) -> list[Self]:
 
         include_title = len(blocking_resources) > 0
@@ -993,7 +994,10 @@ class ReservationEventInfo:
                 res := blocking_resources.get(reservation.resource, resource),
                 reservation,
                 ticket,
-                extra,
+                [
+                    extra[idx]
+                    for idx in extra_mapping.get(reservation.resource, ())
+                ],
                 request,
                 css_classes=() if res is resource else (
                     'event-blocking-resource',
