@@ -49,10 +49,7 @@ def api_source_base_url(api_url: str) -> str:
     -> https://onegov.govikon.ch/
 
     """
-    base = api_url.rstrip('/')
-    if base.endswith('/api'):
-        base = base[:-len('/api')]
-    return base + '/'
+    return api_url.rstrip('/').removesuffix('/api') + '/'
 
 
 def api_topic_url(api_url: str, topic_id: int) -> str:
