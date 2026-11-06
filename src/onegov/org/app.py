@@ -64,6 +64,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
 
     localizeable = False
     fuzzy_search = False
+    search_instant_results = False
     serve_static_files = True
     request_class: type[OrgRequest[Self]] = OrgRequest
 

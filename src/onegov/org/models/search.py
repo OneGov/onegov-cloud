@@ -333,15 +333,18 @@ class Search(Pagination[Any]):
         words of the search index (for terms which are not in the index).
 
         Returns an empty dict if the query uses websearch operators, since
-        we can't easily combine those with the fuzzy terms.
+        we can't easily combine those with the fuzzy terms. Plain queries
+        have no operators.
 
         """
-        if self.plain or not self.query:
+        if not self.query:
             return {}
 
         query = self.query.lower()
-        if '"' in query or ' or ' in f' {query} ' or re.search(
-            r'(^|\s)-', query
+        if not self.plain and (
+            '"' in query
+            or ' or ' in f' {query} '
+            or re.search(r'(^|\s)-', query)
         ):
             return {}
 
@@ -533,6 +536,44 @@ class Search(Pagination[Any]):
     @cached_property
     def subset_count(self) -> int:
         return self.available_results
+
+    def instant_results(self, limit: int = 5) -> list[dict[str, str]]:
+        """ The first few results with title, type and url, shown directly
+        below the search field while typing.
+
+        """
+        if not self.query.lstrip('#'):
+            return []
+
+        search = self.page_by_index(0)
+        search.results_per_page = limit
+        request = self.request
+
+        def title(result: Searchable) -> str:
+            prop = result.fts_title_property
+            value = getattr(result, prop, None) if prop else None
+            return str(
+                value
+                or getattr(result, 'title', None)
+                or getattr(result, 'name', None)
+                or ''
+            )
+
+        def type_title(result: Searchable) -> str:
+            # NOTE: Same as in Search.document_type_filter_labels
+            title = type(result).fts_type_title
+            if not isinstance(title, str):
+                title = title(request)
+            return request.translate(title)
+
+        return [
+            {
+                'title': title(result),
+                'type': type_title(result),
+                'url': request.link(result),
+            }
+            for result in search.load_batch(search.subset())
+        ]
 
     def suggestions(self) -> tuple[str, ...]:
         if not self.query:

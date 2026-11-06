@@ -4,7 +4,8 @@
 
     * data-typeahead-source (on the form), link to the suggestion url which
       is called with a q parameter and which is expected to return a plain list
-      of suggestions
+      of suggestions, or a list of results (objects with a title, a type and
+      an url), which are linked directly
 
     * data-typeahead-target (on the form), link to the search url which is
       called with a q parameter if a search is executed, an option lucky
@@ -33,6 +34,21 @@ var getSearchUrl = function(target, query, lucky) {
 };
 
 /*
+    Results are either plain suggestions (strings) or actual search results
+    (objects with a title, a type and an url)
+*/
+var isSearchResult = function(result) {
+    return typeof result === 'object' && result !== null;
+};
+
+var getResultUrl = function(target, result, lucky) {
+    if (isSearchResult(result)) {
+        return result.url;
+    }
+    return getSearchUrl(target, result, lucky);
+};
+
+/*
     Renders the result list
 */
 var TypeaheadList = React.createClass({
@@ -47,6 +63,16 @@ var TypeaheadList = React.createClass({
         return (
             <ul>
                 {results.map(function(result) {
+                    if (isSearchResult(result)) {
+                        return (
+                            <li key={result.url} className={'typeahead-result' + (active === result ? ' active' : '')}>
+                                <a href={result.url}>
+                                    <span className="typeahead-result-title">{result.title}</span>
+                                    <small className="typeahead-result-type">{result.type}</small>
+                                </a>
+                            </li>
+                        );
+                    }
                     return (
                         <li key={result} className={active === result ? 'active' : ''}>
                             <a href={getSearchUrl(target, result)}>{result}</a>
@@ -62,7 +88,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = getSearchUrl(this.props.target, this.state.active);
+        window.location = getResultUrl(this.props.target, this.state.active);
         return true;
     },
     right: function() {
@@ -70,7 +96,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = getSearchUrl(this.props.target, this.state.active, true);
+        window.location = getResultUrl(this.props.target, this.state.active, true);
         return true;
     },
     up: function() {

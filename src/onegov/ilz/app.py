@@ -20,6 +20,7 @@ class ILZApp(TownApp):
 
     localizeable = True
     fuzzy_search = True
+    search_instant_results = True
     request_class = ILZRequest  # type: ignore[assignment]
 
 

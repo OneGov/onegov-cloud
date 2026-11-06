@@ -4,3 +4,16 @@
     @include icon-bold('\f110');
     animation: fa-spin 2s infinite linear;
 }
+
+// search results shown directly below the search field
+.typeahead .typeahead-result a {
+    align-items: baseline;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.typeahead .typeahead-result-type {
+    flex-shrink: 0;
+    opacity: .6;
+}
