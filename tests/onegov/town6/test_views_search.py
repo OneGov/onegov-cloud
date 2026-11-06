@@ -92,6 +92,36 @@ def test_search_topic_keywords(client_with_fts: Client) -> None:
     assert "0 Resultate" in client.get('/search?q=Feuerwehr')
 
 
+def test_fuzzy_search(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    new_page = client.get('/topics/themen').click('Thema')
+    new_page.form['title'] = "Abfallentsorgung"
+    new_page.form['text'] = "<p>Die Kehrichtabfuhr ist am Montag.</p>"
+    new_page.form.submit()
+
+    # without fuzzy search, typos and partial words are not found
+    assert "0 Resultate" in client.get('/search?q=Abfalentsorgung')
+    assert "0 Resultate" in client.get('/search?q=Kehricht')
+
+    client.app.fuzzy_search = True
+
+    # missing letter
+    assert "Abfallentsorgung" in client.get('/search?q=Abfalentsorgung')
+    # swapped letters
+    assert "Abfallentsorgung" in client.get('/search?q=Abfallentsorgnug')
+    # partial word
+    assert "Abfallentsorgung" in client.get('/search?q=Kehricht')
+    # all terms need to match
+    assert "Abfallentsorgung" in client.get('/search?q=Kehricht Montga')
+    assert "0 Resultate" in client.get('/search?q=Kehricht Feuerwehr')
+    # quoted terms are still searched exactly
+    assert "0 Resultate" in client.get('/search?q="Abfalentsorgung"')
+    # unrelated terms are still not found
+    assert "0 Resultate" in client.get('/search?q=Feuerwehr')
+
+
 def test_view_search_is_limiting(client_with_fts: Client) -> None:
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only

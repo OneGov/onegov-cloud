@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 class ILZApp(TownApp):
 
     localizeable = True
+    fuzzy_search = True
     request_class = ILZRequest  # type: ignore[assignment]
 
 

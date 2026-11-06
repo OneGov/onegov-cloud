@@ -1,4 +1,5 @@
 import math
+import re
 
 from functools import cached_property
 from onegov.core.collection import Pagination
@@ -9,7 +10,9 @@ from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
 from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
-from sqlalchemy import func, inspect, or_, type_coerce
+from sqlalchemy import bindparam, func, inspect, or_, text, type_coerce
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.types import Text
 from sqlalchemy_utils import escape_like
 from wtforms import SelectChoice
 
@@ -21,7 +24,44 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
     from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ColumnElement
     from uuid import UUID
+
+
+#: Fuzzy search settings, see :meth:`Search.fuzzy_ts_query`
+FUZZY_MAX_TERMS = 8
+FUZZY_MAX_WORDS = 5
+FUZZY_MIN_TERM_LENGTH = 4
+FUZZY_MIN_SIMILARITY = 0.45
+FUZZY_RANK_WEIGHT = 0.5
+
+#: Finds the words of the search index which are similar to the given terms,
+#: either by trigram similarity (missing/additional letters) or by edit
+#: distance (swapped letters). Terms are normalized like the indexed words.
+#:
+#: FIXME: ts_stat scans the whole search index for each search, which is fine
+#:        for smaller instances, but bigger instances would need a separate
+#:        table with the words of the index.
+FUZZY_WORDS_QUERY = text("""
+    WITH terms AS (
+        SELECT DISTINCT lower(unaccent(term)) AS term
+          FROM unnest(:terms) AS term
+    ), words AS (
+        SELECT word FROM ts_stat('SELECT data_vector FROM search_index')
+    )
+    SELECT terms.term, words.word, similarity(words.word, terms.term)
+      FROM terms
+      LEFT JOIN words ON words.word = terms.term OR (
+          length(terms.term) >= :min_length AND (
+              similarity(words.word, terms.term) >= :min_similarity
+              OR levenshtein_less_equal(
+                  words.word, terms.term,
+                  CASE WHEN length(terms.term) >= 6 THEN 2 ELSE 1 END
+              ) <= CASE WHEN length(terms.term) >= 6 THEN 2 ELSE 1 END
+          )
+      )
+     ORDER BY terms.term, words.word = terms.term DESC, 3 DESC
+""").bindparams(bindparam('terms', type_=ARRAY(Text)))
 
 
 class Search(Pagination[Any]):
@@ -288,30 +328,111 @@ class Search(Pagination[Any]):
             return 'simple'
         return language or 'simple'
 
+    def fuzzy_terms(self) -> dict[str, list[str]]:
+        """ Returns the normalized terms of the query, each with the similar
+        words of the search index (for terms which are not in the index).
+
+        Returns an empty dict if the query uses websearch operators, since
+        we can't easily combine those with the fuzzy terms.
+
+        """
+        if self.plain or not self.query:
+            return {}
+
+        query = self.query.lower()
+        if '"' in query or ' or ' in f' {query} ' or re.search(
+            r'(^|\s)-', query
+        ):
+            return {}
+
+        terms = re.findall(r'\w+', query)[:FUZZY_MAX_TERMS]
+        if not terms:
+            return {}
+
+        rows = self.request.session.execute(FUZZY_WORDS_QUERY, {
+            'terms': terms,
+            'min_length': FUZZY_MIN_TERM_LENGTH,
+            'min_similarity': FUZZY_MIN_SIMILARITY,
+        })
+
+        result: dict[str, list[str]] = {}
+        for term, word, __ in rows:
+            words = result.setdefault(term, [])
+            if word is not None:
+                words.append(word)
+
+        return {
+            term: (
+                # known words are not expanded, otherwise we would
+                # e.g. find 'die' for 'dies'
+                [] if term in words else words[:FUZZY_MAX_WORDS]
+            )
+            for term, words in result.items()
+        }
+
+    def fuzzy_ts_query(self) -> ColumnElement[Any] | None:
+        """ A query which also matches words starting with one of the terms
+        and similar words (typos), e.g. 'Inhlat' finds 'Inhalt'.
+
+        """
+        if not getattr(self.request.app, 'fuzzy_search', False):
+            return None
+
+        terms = self.fuzzy_terms()
+        if not terms:
+            return None
+
+        def quote(lexeme: str) -> str:
+            escaped = lexeme.replace('\\', '\\\\').replace("'", "''")
+            return f"'{escaped}'"
+
+        expression = ' & '.join(
+            '({})'.format(' | '.join((
+                f'{quote(term)}:*',
+                *(quote(word) for word in words)
+            )))
+            for term, words in terms.items()
+        )
+        # NOTE: The words are taken from the vectors, so they mustn't be
+        #       stemmed again, which is why we use the simple configuration
+        return func.to_tsquery('simple', expression)
+
     def generic_search(self) -> Query[SearchIndex]:
         if self.plain:
             ts_query = func.plainto_tsquery(self.language, self.query)
         else:
             ts_query = func.websearch_to_tsquery(self.language, self.query)
 
+        def relevance(ts_query: ColumnElement[Any]) -> ColumnElement[float]:
+            return 100.0 * func.ts_rank(
+                SearchIndex.title_vector,
+                ts_query,
+            ) + func.ts_rank_cd(
+                SearchIndex.data_vector,
+                ts_query,
+                2 | 4 | 16
+            )
+
+        matches: ColumnElement[bool] = SearchIndex.data_vector.op('@@')(
+            ts_query)
+        rank = relevance(ts_query)
+        if (fuzzy_ts_query := self.fuzzy_ts_query()) is not None:
+            # exact matches are always ranked higher than fuzzy ones
+            matches = or_(
+                matches,
+                SearchIndex.data_vector.op('@@')(fuzzy_ts_query)
+            )
+            rank = rank + FUZZY_RANK_WEIGHT * relevance(fuzzy_ts_query)
+
         decay = 0.99
         scale = (90 * 24 * 3600)  # 90 days to reach target decay
         offset = (7 * 24 * 3600)  # 7 days without decay
         two_times_variance_squared = -(scale**2 / math.log(decay))
         query = self.request.session.query(SearchIndex).filter(
-            SearchIndex.data_vector.op('@@')(ts_query)
+            matches
         ).order_by(
             (
-                (
-                    100.0 * func.ts_rank(
-                        SearchIndex.title_vector,
-                        ts_query,
-                    ) + func.ts_rank_cd(
-                        SearchIndex.data_vector,
-                        ts_query,
-                        2 | 4 | 16
-                    )
-                )
+                rank
                 # FIXME: We could probably improve performance a lot if
                 #        we stored the time decay in the search table and
                 #        recomputed it once a day in a crobjob

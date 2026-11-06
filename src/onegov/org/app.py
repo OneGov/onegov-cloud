@@ -63,6 +63,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
              PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     localizeable = False
+    fuzzy_search = False
     serve_static_files = True
     request_class: type[OrgRequest[Self]] = OrgRequest
 
