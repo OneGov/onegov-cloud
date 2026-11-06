@@ -875,7 +875,7 @@ msgid "New commission session (bulk)"
 msgstr "Neue Massenbuchung Kommissionssitzung"
 
 msgid "New file study (bulk)"
-msgstr ""
+msgstr "Neue Massenbuchung Aktenstudium"
 
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
