@@ -570,6 +570,19 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
 
 
+class AttendenceAddFileStudyBulkForm(AttendenceAddCommissionBulkForm):
+    """ Bulk form for file studies. """
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['type'] = 'study'
+        return result
+
+    def on_request(self) -> None:
+        super().on_request()
+        self.delete_field('type')
+
+
 class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     """ Edit form for bulk attendance changes. """
 
@@ -631,11 +644,6 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
 
 class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
     """ Edit form for commission bulk attendance changes. """
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        result['type'] = 'commission'
-        return result
 
     def process_obj(self, obj: Attendence) -> None:   # type: ignore[override]
         super().process_obj(obj)

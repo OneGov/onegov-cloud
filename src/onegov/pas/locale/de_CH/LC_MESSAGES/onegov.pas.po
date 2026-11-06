@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-10-30 16:21+0100\n"
+"POT-Creation-Date: 2026-11-05 16:54+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -381,6 +381,9 @@ msgstr "Massenbuchung Plenarsitzung"
 msgid "Commission session (bulk)"
 msgstr "Massenbuchung Kommissionssitzung"
 
+msgid "File study (bulk)"
+msgstr "Massenbuchung Aktenstudium"
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -743,9 +746,6 @@ msgstr "Noch keine Fraktionen erfasst."
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
-msgid "on"
-msgstr "vom"
-
 msgid ""
 "Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the "
 "canton at events. Paid via settlement runs (max. 4 per run)."
@@ -854,9 +854,6 @@ msgstr "Neu"
 msgid "Only admins can add bulk attendance records."
 msgstr "Nur Administratoren können Massenanwesenheiten erfassen."
 
-msgid "New commission session (bulk)"
-msgstr "Neue Massenbuchung Kommissionssitzung"
-
 msgid "a selected parliamentarian"
 msgstr "ein:e ausgewählte:r Parlamentarier:in"
 
@@ -873,6 +870,12 @@ msgstr "Keine Parlamentarier:innen ausgewählt"
 
 msgid "Added session"
 msgstr "Sitzung hinzugefügt"
+
+msgid "New commission session (bulk)"
+msgstr "Neue Massenbuchung Kommissionssitzung"
+
+msgid "New file study (bulk)"
+msgstr "Neue Massenbuchung Aktenstudium"
 
 msgid "You do not have permission to edit plenary sessions."
 msgstr "Sie haben keine Berechtigung, Plenarsitzungen zu bearbeiten."
@@ -1041,6 +1044,9 @@ msgid "Cannot delete closed settlement run. Please reopen it first."
 msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
+
+#~ msgid "on"
+#~ msgstr "vom"
 
 #~ msgid "Only admins can edit attendance records."
 #~ msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
