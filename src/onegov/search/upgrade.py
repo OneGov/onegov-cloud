@@ -111,3 +111,20 @@ def add_search_index_rank_modifier(context: UpgradeContext) -> None:
         )
     )
     # existing files/tickets rows correct themselves on next reindex
+
+
+@upgrade_task('Add language to search_index')
+def add_search_index_language(context: UpgradeContext) -> None:
+    if not context.has_table('search_index'):
+        return
+    if context.has_column('search_index', 'language'):
+        return
+    context.operations.add_column(
+        'search_index',
+        Column('language', String, nullable=True)
+    )
+    context.operations.create_index(
+        'ix_search_index_language',
+        'search_index',
+        columns=['language']
+    )

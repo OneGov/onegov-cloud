@@ -374,8 +374,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def suggestions_url(self) -> str:
-        """ The URL to the suggestions JSON view. """
-        return self.request.class_link(Search, name='suggest')
+        """ The URL to the suggestions JSON view (or to the instant results,
+        if the app shows those instead). """
+        return self.request.class_link(Search, name=self.suggestions_view)
+
+    @cached_property
+    def suggestions_view(self) -> str:
+        if getattr(self.app, 'search_instant_results', False):
+            return 'instant'
+        return 'suggest'
 
     @cached_property
     def events_url(self) -> str:

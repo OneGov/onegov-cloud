@@ -80,6 +80,7 @@ def browser(
     browser.baseurl = wsgi_server.url
     browser.wsgi_server = wsgi_server  # type: ignore[attr-defined]
     yield browser
+    browser.close_contexts()
 
 
 def test_init(browser: ExtendedBrowser) -> None:

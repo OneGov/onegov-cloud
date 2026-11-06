@@ -99,6 +99,8 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.mutation import TopicMutation
+from onegov.org.models.page import TopicProxy
 from onegov.org.models.political_business import PoliticalBusinessStatus
 from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.resource import FindYourSpotCollection
@@ -1618,3 +1620,28 @@ def get_commission_membership(
     id: UUID
 ) -> RISCommissionMembership | None:
     return RISCommissionMembershipCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=TopicMutation,
+    path='/mutation/topic/{target_id}/{ticket_id}',
+    converters={'target_id': int, 'ticket_id': UUID}
+)
+def get_topic_mutation(
+    app: OrgApp,
+    target_id: int,
+    ticket_id: UUID
+) -> TopicMutation:
+    return TopicMutation(app.session(), target_id, ticket_id)
+
+
+@OrgApp.path(
+    model=TopicProxy,
+    path='/topic/{id}',
+    converters={'id': int}
+)
+def get_agency_proxy(app: OrgApp, id: int) -> Topic | None:
+    result = PageCollection(app.session()).by_id(id)
+    if isinstance(result, Topic):
+        return result
+    return None

@@ -85,7 +85,7 @@ def test_view_api(
     assert not endpoints.queries[4].data
     assert endpoints.queries[5].rel == 'topics'
     assert endpoints.queries[5].href == 'http://localhost/api/topics'
-    assert not endpoints.queries[5].data
+    assert [d.name for d in endpoints.queries[5].data] == ['parent']
 
     # Configure event filters
     settings = client.get('/event-settings')
@@ -641,7 +641,7 @@ def test_view_api_search(
     assert filters(endpoints.queries[2]).keys() == {'search'}
     assert endpoints.queries[5].rel == 'topics'
     assert endpoints.queries[5].href == 'http://localhost/api/topics'
-    assert filters(endpoints.queries[5]).keys() == {'search'}
+    assert filters(endpoints.queries[5]).keys() == {'parent', 'search'}
     # Additional endpoints
     assert endpoints.queries[1].rel == 'forms'
     assert endpoints.queries[1].href == 'http://localhost/api/forms'

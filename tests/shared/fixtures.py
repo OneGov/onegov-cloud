@@ -402,8 +402,7 @@ def browser(playwright_browser: Browser) -> Iterator[ExtendedBrowser]:
     """
     wrapped = ExtendedBrowser(playwright_browser)
     yield wrapped
-    for context in wrapped._spawned_contexts:
-        context.close()
+    wrapped.close_contexts()
 
 
 @pytest.fixture(scope="function")

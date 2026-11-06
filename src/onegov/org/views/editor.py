@@ -14,8 +14,9 @@ from onegov.org.models import News
 from onegov.page import PageCollection
 
 
-from typing import cast, TYPE_CHECKING
+from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.org.models import Topic
@@ -101,24 +102,33 @@ def handle_new_page(
     request: OrgRequest,
     form: Form,
     src: object | None = None,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | PageLayout | None = None,
+    added_page_callback: Callable[[Any], None] | None = None,
+    get_parent: Callable[[], Topic | News | None] | None = None,
 ) -> RenderData | Response:
     assert self.page is not None
     page = cast('Topic | News', self.page)
     site_title = page.trait_messages[self.trait]['new_page_title']
 
     if layout:
-        layout.site_title = site_title  # type:ignore[union-attr]
+        if layout_site_title := getattr(layout, 'site_title', None):
+            site_title = layout_site_title
+        else:
+            layout.site_title = site_title  # type:ignore[union-attr]
 
     if form.submitted(request):
         pages = PageCollection(request.session)
+        # NOTE: The parent needs to be set when adding the page, moving
+        #       it to the root afterwards would delete it as an orphan
         added = cast('Topic | News', pages.add(
-            parent=page,
+            parent=get_parent() if get_parent is not None else page,
             title=form['title'].data,
             type=page.type,
             meta={'trait': self.trait}
         ))
         form.populate_obj(added)
+        if added_page_callback is not None:
+            added_page_callback(added)
 
         request.success(added.trait_messages[self.trait]['new_page_added'])
         return morepath.redirect(request.link(added))
@@ -161,6 +171,13 @@ def handle_new_root_page(
             meta={'trait': self.trait},
         )
         form.populate_obj(page)
+
+        if (
+            request.app.localizeable
+            and self.trait == 'page'
+            and getattr(page, 'locale', '') is None
+        ):
+            page.locale = request.locale  # type:ignore[attr-defined]
 
         if self.trait == 'link':
             request.success(_('Added a new link'))

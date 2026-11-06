@@ -2600,3 +2600,24 @@
         </div>
     </form>
 </metal:inline_search>
+
+<metal:display_topic_mutation define-macro="display_topic_mutation" i18n:domain="onegov.org">
+    <h2 i18n:translate>Mutation report</h2>
+    <dl class="topic-mutation">
+        <dt i18n:translate>Topic</dt>
+        <dd><a href="${request.link(topic)}">${topic.title}</a></dd>
+
+        <dt i18n:translate>Path</dt>
+        <dd><span tal:repeat="ancestor topic.ancestors">${ancestor.title}</span> <span>${topic.title}</span></dd>
+
+        <dt tal:condition="message" i18n:translate>Message</dt>
+        <dd tal:condition="message" tal:content="message"></dd>
+    </dl>
+    <h2 i18n:translate>Proposed changes</h2>
+    <dl class="topic-mutation">
+        <tal:b tal:condition="proposed_changes" tal:repeat="change proposed_changes">
+            <dt>${labels.get(change, change)}</dt>
+            <dd>${proposed_changes[change]}</dd>
+        </tal:b>
+    </dl>
+</metal:display_topic_mutation>

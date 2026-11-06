@@ -70,6 +70,11 @@ def check_rate_limit(request: CoreRequest) -> dict[str, str]:
     assert isinstance(request.app, ApiApp)
     addr = request.client_addr or 'unknown'
 
+    # FIXME: Demo only! Linked API topics are synced from the local
+    #        instance on every page view, which would exceed the limit
+    if addr in ('127.0.0.1', '::1'):
+        return {}
+
     limit, expiration = request.app.rate_limit
     requests, timestamp = request.app.rate_limit_cache.get_or_create(
         addr,

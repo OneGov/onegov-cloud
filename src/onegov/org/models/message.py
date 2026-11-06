@@ -361,3 +361,19 @@ class TimeReportMessage(Message, TicketMessageMixin):
         origin: str = 'internal',
     ) -> Self:
         return super().create(ticket, request, change=change, origin=origin)
+
+
+class TopicMutationMessage(Message, TicketMessageMixin):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'topic_mutation'
+    }
+
+    @classmethod
+    def create(  # type:ignore[override]
+        cls,
+        ticket: Ticket,
+        request: OrgRequest,
+        change: str
+    ) -> Self:
+        return super().create(ticket, request, change=change)

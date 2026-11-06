@@ -124,6 +124,18 @@ def handle_form_change_name[T: FormDefinition](
     submissions = form.submissions
     windows = form.registration_windows
 
+    # HACK: Link existing form translations to new form name
+    if hasattr(form, 'alt_locale_ids'):
+        for linked_form_name in form.alt_locale_ids.values():
+            linked = session.get(form.__class__, linked_form_name)
+            if linked is not None and hasattr(linked, 'alt_locale_ids'):
+                linked.alt_locale_ids = {
+                    locale: (
+                        new_form.name if form_name == form.name else form_name
+                    )
+                    for locale, form_name in linked.alt_locale_ids.items()
+                }
+
     with session.no_autoflush:
         # This placed elsewhere will not work
         form.submissions = []
@@ -356,6 +368,20 @@ def delete_form_definition(
         for s in submissions:
             handle_ticket(s)
 
+    # HACK: Remove ourselves from linked forms
+    if hasattr(self, 'alt_locale_ids'):
+        for form_name in self.alt_locale_ids.values():
+            form = request.session.get(self.__class__, form_name)
+            if form is None:
+                continue
+
+            assert hasattr(form, 'alt_locale_ids')
+            form.alt_locale_ids = {
+                locale: name
+                for locale, name in form.alt_locale_ids.items()
+                if name != self.name
+            }
+
     FormCollection(request.session).definitions.delete(
         self.name,
         with_submissions=True,
@@ -410,8 +436,8 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
         specification=request.app.formcode_specification
     )
     url = (
-        f'https://api.infomaniak.com/1/ai/{product_id}'
-        f'/openai/chat/completions'
+        f'https://api.infomaniak.com/2/ai/{product_id}'
+        f'/openai/v1/chat/completions'
     )
 
     try:

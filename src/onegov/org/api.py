@@ -537,9 +537,14 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        filters: dict[str, Collection[str] | str | None] = {
+            'parent': "Only returns the children of the given topic id "
+                      "(or the root topics for 'root')"
+        }
         if self.app.fts_search_enabled:
-            return {'search': 'Performs a full-text search for the given term'}
-        return {}
+            filters['search'] = (
+                'Performs a full-text search for the given term')
+        return filters
 
     @property
     def title(self) -> str:
@@ -555,8 +560,23 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
+            elif key == 'parent':
+                parent = self.scalarize_value(key, values)
+                if parent and parent != 'root' and not parent.isdigit():
+                    raise ApiInvalidParamException(
+                        f'Invalid parent: {parent!r}')
+                result.parent = parent
         result.batch_size = self.batch_size
         return result
+
+    def by_id(self, id: int | str) -> Topic | None:
+        # only return topics which are visible to the current user
+        try:
+            id = int(id)
+        except ValueError:
+            return None
+        collection = TopicCollection(self.request)
+        return collection.subset().filter(Topic.id == id).first()
 
     def item_data(self, item: Topic) -> dict[str, Any]:
         if item.publication_start:
@@ -569,10 +589,23 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
         else:
             publication_end = None
 
+        if item.inherit_contact and item.contact_inherited_from:
+            source = TopicCollection(self.request).by_id(
+                item.contact_inherited_from)
+            contact = getattr(source, 'contact', None)
+        elif not item.inherit_contact:
+            contact = item.contact
+        else:
+            contact = None
+
         data = {
             'title': item.title,
+            'trait': item.trait,
             'lead': item.lead,
             'text': item.text,
+            'contact': contact,
+            'sidepanel_links': item.sidepanel_links or [],
+            'sidepanel_contact': item.sidepanel_contact or [],
             'publication_start': publication_start,
             'publication_end': publication_end,
             'created': item.created.isoformat(),
