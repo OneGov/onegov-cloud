@@ -33,6 +33,7 @@ from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -59,7 +60,10 @@ class AgendaItemForm(NamedFileForm):
     state = RadioField(
         _('State'),
         fieldset=_('General'),
-        choices=list(STATES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in STATES.items()
+        ],
         validators=[
             InputRequired()
         ],

@@ -134,3 +134,18 @@ class InvoiceCollection[
             self.session.flush()
 
         return invoice
+
+    def delete(
+        self,
+        invoice: Invoice,
+        *,
+        raise_on_payment_links: bool = False
+    ) -> None:
+        for item in invoice.items:
+            if raise_on_payment_links and item.payments:
+                raise ValueError(f'Invoice item {item.id} contains payments')
+            # unlink the invoice item from any payments
+            item.payments = []
+            self.session.delete(item)
+        self.session.delete(item)
+        self.session.flush()

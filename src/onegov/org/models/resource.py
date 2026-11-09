@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
     from onegov.org.request import OrgRequest
+    from sqlalchemy.ext.hybrid import hybrid_property
     from sqlalchemy.orm import Mapped, Query
 
 
@@ -62,10 +63,18 @@ class SharedMethods:
         date: date | None
         view: str | None
         timezone: Mapped[str]
+        virtual_id: hybrid_property[UUID]
 
         @property
         def scheduler(self) -> Scheduler: ...
-        def get_scheduler(self, context: Context) -> Scheduler: ...
+        @property
+        def virtual_scheduler(self) -> Scheduler: ...
+        def get_scheduler(
+            self,
+            context: Context,
+            *,
+            virtual: bool = False
+        ) -> Scheduler: ...
 
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
@@ -84,16 +93,6 @@ class SharedMethods:
             return False
 
         return True
-
-    @property
-    def future_managed_reservations(self) -> Query[Reservation]:
-        return self.scheduler.managed_reservations().filter(  # type:ignore
-            Reservation.end >= sedate.utcnow())
-
-    @property
-    def future_managed_reserved_slots(self) -> Query[ReservedSlot]:
-        return self.scheduler.managed_reserved_slots().filter(
-            ReservedSlot.end >= sedate.utcnow())
 
     @property
     def calendar_date_range(self) -> tuple[datetime, datetime]:
@@ -127,6 +126,16 @@ class SharedMethods:
         expiration_date: datetime | None = None
     ) -> None:
 
+        # FIXME: Ideally this would also clean up any virtual allocations
+        #        that are no longer needed, but since this clean up isn't
+        #        scoped to a specific resource, we'd have to manually write
+        #        it or incur an unreasonably high cost, for something that
+        #        is intended to run at the start of some requests. If we
+        #        refactor this into a cronjob instead, we could perhaps
+        #        get away with doing something more expensive. But we also
+        #        might just want to add a cheaper bulk query to libres that
+        #        does this for us or write the query here and make sure it's
+        #        well tested.
         session = self.libres_context.get_service('session_provider').session()
         queries = self.scheduler.queries
 
@@ -163,7 +172,8 @@ class SharedMethods:
         self,
         request: OrgRequest,
         status: str = 'pending',
-        with_data: bool = False
+        with_data: bool = False,
+        with_virtual: bool = False
     ) -> Query[Reservation]:
         """ The reservations associated with this resource and user. """
 
@@ -171,7 +181,12 @@ class SharedMethods:
         scheduler = self.get_scheduler(request.app.libres_context)
 
         res = scheduler.queries.reservations_by_session(session)
-        res = res.filter(Reservation.resource == self.id)
+        if with_virtual:
+            res = res.filter(Reservation.resource.in_(
+                [self.id, self.virtual_id]
+            ))
+        else:
+            res = res.filter(Reservation.resource == self.id)
         res = res.filter(Reservation.status == status)
         res = res.order_by(None)  # clear existing order
         res = res.order_by(Reservation.start)
@@ -196,16 +211,26 @@ class SharedMethods:
         start: datetime | None = None,
         end: datetime | None = None,
         exclude_pending: bool = True,
-        only_managed: bool = True
+        only_managed: bool = True,
+        # FIXME: This kind of conflicts with only_managed, maybe we should
+        #        merge these two boolean arguments into a ternary argument
+        #        indicating which reservations you want:
+        #        only_managed, include_virtual, all_visible
+        include_virtual: bool = False
     ) -> Query[Reservation]:
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 
         """
-        if only_managed:
-            query = self.scheduler.managed_reservations()
-        else:
-            query = self.scheduler.visible_reservations()
+        query = self.scheduler.session.query(Reservation)
+
+        resource_ids = {self.id}
+        if not only_managed:
+            resource_ids.update(self.scheduler.blocking_resources)
+        elif include_virtual:
+            resource_ids.add(self.virtual_id)
+        query = query.filter(Reservation.resource.in_(resource_ids))
+
         if start:
             query = query.filter(start <= Reservation.start)
         if end:
@@ -214,13 +239,12 @@ class SharedMethods:
         query = query.join(
             Ticket, Reservation.token == cast(Ticket.handler_id, UUIDType))
 
-        query = query.order_by(Reservation.start)
-        query = query.order_by(Ticket.subtitle)
+        query = query.order_by(Reservation.start, Ticket.subtitle)
         query = query.filter(Reservation.status == 'approved')
         if exclude_pending:
             query = query.filter(Reservation.data['accepted'] == True)
 
-        return query  # type: ignore[return-value]
+        return query
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(
@@ -277,13 +301,23 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     )
 
     @property
+    def has_future_reservations(self) -> bool:
+        future = self.scheduler.session.query(Reservation).filter(
+            Reservation.resource.in_([self.id, self.virtual_id])
+        ).filter(Reservation.end >= sedate.utcnow())
+        return self.scheduler.session.query(future.exists()).scalar()
+
+    @property
+    def has_future_reserved_slots(self) -> Query[ReservedSlot]:
+        future = self.scheduler.session.query(ReservedSlot).filter(
+            ReservedSlot.resource.in_([self.id, self.virtual_id])
+        ).filter(ReservedSlot.end >= sedate.utcnow())
+        return self.scheduler.session.query(future.exists()).scalar()
+
+    @property
     def deletable(self) -> bool:
-        if self.future_managed_reserved_slots.first():
+        if self.has_future_reserved_slots or self.has_future_reservations:
             return False
-
-        if self.future_managed_reservations.first():
-            return False
-
         return True
 
 

@@ -7,7 +7,7 @@ from onegov.form.fields import FormcodeField
 from onegov.form.fields import TreeSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
-from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.utils import coerce_uuid
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import ChangeUrlForm
@@ -20,12 +20,12 @@ from onegov.org.forms.util import PRICING_METHODS, WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.reservation import Resource
 from sqlalchemy import func
-from uuid import UUID
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -37,7 +37,6 @@ from wtforms.validators import ValidationError
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from markupsafe import Markup
     from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
     from wtforms import Field
@@ -52,34 +51,6 @@ def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
 
     site_id, component = value
     return site_id, component
-
-
-def coerce_uuid(value: object) -> UUID | None:
-    if isinstance(value, UUID):
-        return value
-    if value is None:
-        return None
-    if not isinstance(value, str):
-        raise TypeError('Value needs to be a UUID, str or None')
-    if value in ('', 'None'):
-        return None
-    return UUID(value)
-
-
-class ComponentSelectWidget(ChosenSelectWidget):
-    @classmethod
-    def render_option(
-        cls,
-        value: Any,
-        label: str,
-        selected: bool,
-        **kwargs: Any
-    ) -> Markup:
-        if value:
-            value = ':'.join(value)
-        else:
-            value = ''
-        return super().render_option(value, label, selected, **kwargs)
 
 
 class ResourceBaseForm(Form):
@@ -176,11 +147,11 @@ class ResourceBaseForm(Form):
         default='n',
         validators=[InputRequired()],
         choices=(
-            ('n', _(
+            SelectChoice('n', _(
                 'No closing date')),
-            ('d', _(
+            SelectChoice('d', _(
                 'Stop accepting reservations days before the allocation')),
-            ('h', _(
+            SelectChoice('h', _(
                 'Stop accepting reservations hours before the allocation')),
         )
     )
@@ -213,9 +184,9 @@ class ResourceBaseForm(Form):
         default='n',
         validators=[InputRequired()],
         choices=(
-            ('n', _(
+            SelectChoice('n', _(
                 'No opening date')),
-            ('d', _(
+            SelectChoice('d', _(
                 'Start accepting reservations days before the allocation')),
         )
     )
@@ -281,8 +252,8 @@ class ResourceBaseForm(Form):
         default='timeGridWeek',
         validators=[InputRequired()],
         choices=(
-            ('timeGridWeek', _('Week view')),
-            ('dayGridMonth', _('Month view')),
+            SelectChoice('timeGridWeek', _('Week view')),
+            SelectChoice('dayGridMonth', _('Month view')),
         ))
 
     kaba_components = ChosenSelectMultipleField(
@@ -290,7 +261,6 @@ class ResourceBaseForm(Form):
         choices=(),
         coerce=coerce_component_tuple,
         fieldset='dormakaba',
-        widget=ComponentSelectWidget(multiple=True)
     )
 
     reply_to = EmailField(
@@ -326,7 +296,10 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         default='free',
         validators=[InputRequired()],
-        choices=PRICING_METHODS,
+        choices=[
+            SelectChoice(value, label)
+            for value, label in PRICING_METHODS
+        ],
     )
 
     price_per_item = DecimalField(
@@ -350,7 +323,10 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'pricing_scheme'),
-        choices=()
+        choices=lambda form, field: [
+            SelectChoice(scheme.name, scheme.label)
+            for scheme in form.request.app.resource_pricing_schemes
+        ]
     )
 
     currency = StringField(
@@ -371,9 +347,9 @@ class ResourceBaseForm(Form):
         default='per_item',
         validators=[InputRequired()],
         choices=(
-            ('one_off', _('One-off')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
+            SelectChoice('one_off', _('One-off')),
+            SelectChoice('per_item', _('Per item')),
+            SelectChoice('per_hour', _('Per hour'))
         )
     )
 
@@ -383,23 +359,19 @@ class ResourceBaseForm(Form):
         default='resource',
         validators=[InputRequired()],
         choices=(
-            ('resource', _('Just the price per item/hour')),
-            ('extras', _('Just the prices in extra fields')),
-            ('everything', _('The total price at the end'))
+            SelectChoice('resource', _('Just the price per item/hour')),
+            SelectChoice('extras', _('Just the prices in extra fields')),
+            SelectChoice('everything', _('The total price at the end'))
         ),
     )
 
     def on_request(self) -> None:
-        scheme_choices = self.pricing_scheme.choices = [
-            (scheme.name, scheme.label)
-            for scheme in self.request.app.resource_pricing_schemes
-        ]
-        if not scheme_choices:
+        if not self.pricing_scheme.choices:
             self.delete_field('pricing_scheme')
             self.pricing_method.choices = [
-                (value, label)
-                for value, label in PRICING_METHODS
-                if value != 'pricing_scheme'
+                choice
+                for choice in self.pricing_method.choices
+                if choice.value != 'pricing_scheme'
             ]
 
         if hasattr(self.model, 'type'):
@@ -718,7 +690,7 @@ class ResourceCleanupForm(DateRangeForm):
 
     weekdays = MultiCheckboxField(
         label=_('Weekdays'),
-        choices=WEEKDAYS,
+        choices=[SelectChoice(str(value), label) for value, label in WEEKDAYS],
         coerce=int,
         validators=[InputRequired()],
         render_kw={

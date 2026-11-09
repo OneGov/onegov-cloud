@@ -1,4 +1,5 @@
 from io import BytesIO
+from pdfrw import PdfReader, PdfWriter  # type: ignore[import-untyped]
 from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
@@ -100,7 +101,7 @@ def _settlement_totals(
                 continue
             name = party.name
         else:
-            name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
+            name = parliamentarian.title
 
         compensation = Compensation(base=row[4], adjusted=row[5])
         total_compensations[name] = (
@@ -210,13 +211,20 @@ def get_commission_closure_status(
 
             # Check if this parliamentarian has closed attendance for this
             # commission
-            closed_attendance = session.query(Attendence).filter(
-                Attendence.parliamentarian_id == parliamentarian.id,
-                Attendence.commission_id == commission.id,
-                Attendence.date >= settlement_run.start,
-                Attendence.date <= settlement_run.end,
-                Attendence.abschluss == True
-            ).first()
+            closed_attendance = (
+                session.query(Attendence)
+                .filter(
+                    (
+                        (Attendence.parliamentarian_id == parliamentarian.id)
+                        | Attendence.bulk_edit_id.isnot(None)
+                    ),
+                    Attendence.commission_id == commission.id,
+                    Attendence.date >= settlement_run.start,
+                    Attendence.date <= settlement_run.end,
+                    Attendence.abschluss == True,
+                )
+                .first()
+            )
 
             if closed_attendance:
                 completed_members += 1
@@ -403,6 +411,16 @@ def view_settlement_run(
             'title': _('Settlements by Parliamentarian'),
             'links': [
                 Link(
+                    _('All Parliamentarians (PDF)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='all-parliamentarians-pdf',
+                        ),
+                        name='run-export',
+                    ),
+                ),
+                Link(
                     _('All Parliamentarians (ZIP)'),
                     request.link(
                         SettlementRunAllExport(
@@ -570,6 +588,8 @@ def generate_settlement_pdf(
                 )
             )
 
+    # By requirement, zero bookings appear only in the Excel control list.
+    settlement_data = [row for row in settlement_data if row[5] != 0]
     totals = _settlement_totals(
         settlement_data,
         group_by,
@@ -665,7 +685,7 @@ def _generate_settlement_html(
    """
 
     for settlement_row in settlement_data:
-        name = f'{settlement_row[1].first_name} {settlement_row[1].last_name}'
+        name = settlement_row[1].title
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
@@ -953,6 +973,29 @@ def view_settlement_run_all_export(
             csv_bytes,
             content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
+        )
+    elif self.category == 'all-parliamentarians-pdf':
+        parliamentarians = get_parliamentarians_with_settlements(
+            request.session,
+            self.settlement_run.start,
+            self.settlement_run.end,
+            settlement_run_id=self.settlement_run.id,
+        )
+        writer = PdfWriter()
+        for parliamentarian in parliamentarians:
+            pdf_bytes = generate_parliamentarian_settlement_pdf(
+                self.settlement_run, request, parliamentarian
+            )
+            writer.addpages(PdfReader(fdata=pdf_bytes).pages)
+
+        pdf_buffer = BytesIO()
+        writer.write(pdf_buffer)
+        run_name = normalize_for_filename(self.settlement_run.name)
+        filename = f'Parlamentarier_{run_name}.pdf'
+        return Response(
+            pdf_buffer.getvalue(),
+            content_type='application/pdf',
+            content_disposition=f'attachment; filename="{filename}"',
         )
     elif self.category == 'all-parliamentarians-zip':
         session = request.session

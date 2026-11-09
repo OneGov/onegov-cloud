@@ -5,7 +5,6 @@ from decimal import Decimal
 from dataclasses import replace
 from functools import lru_cache
 from libres import new_scheduler
-from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import (
@@ -18,19 +17,20 @@ from onegov.pay import InvoiceItemMeta, Price, process_payment
 from onegov.reservation.observer import observes
 from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import align_date_to_day, utcnow
-from sqlalchemy import column, func
+from sqlalchemy import column, func, literal_column
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from uuid import uuid4, UUID
+from uuid import uuid4, uuid5, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    # type gets shadowed by type in model, so we use Type as an alias
+    # type gets shadowed by type in model
     from builtins import type as type_t
     from collections.abc import Collection, Sequence
     from libres.context.core import Context
+    from libres.db.models import Allocation
     from libres.db.scheduler import Scheduler
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
@@ -235,10 +235,29 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         'polymorphic_identity': 'generic'
     }
 
-    allocations: Mapped[list[Allocation]] = relationship(
+    __table_args__ = (
+        Index(
+            'ix_resources_virtual_id',
+            func.uuid_generate_v5(id, literal_column("'virtual'"))
+        ),
+    )
+
+    # NOTE: These relationships only exist so deletion of resources cascade
+    #       and also deletes related allocations, since there is no foreign key
+    #       on the allocations table that could do that cascade for us
+    #       this also ensures we get an integrity error if we try to
+    #       delete a resource that still has reservations.
+    _allocations: Mapped[list[Allocation]] = relationship(
         cascade='all, delete-orphan',
-        primaryjoin='Resource.id == Allocation.resource',
-        foreign_keys='Allocation.resource'
+        primaryjoin='Allocation.resource == Resource.id',
+        foreign_keys='Allocation.resource',
+        overlaps='_virtual_allocations',
+    )
+    _virtual_allocations: Mapped[list[Allocation]] = relationship(
+        cascade='all, delete-orphan',
+        primaryjoin='Allocation.resource == Resource.virtual_id',
+        foreign_keys='Allocation.resource',
+        overlaps='_allocations',
     )
 
     parents: Mapped[list[Resource]] = relationship(
@@ -317,6 +336,32 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         self.content['deadline'] = value
 
+    @staticmethod
+    def get_virtual_id(resource_id: UUID) -> UUID:
+        assert resource_id.version != 5
+        return uuid5(resource_id, 'virtual')
+
+    @hybrid_property
+    def virtual_id(self) -> UUID:
+        """ The resource's secondary virtual id.
+
+        The virtual resource can be used as a second layer with its own
+        allocations that can overlap allocations on the first layer while
+        reservations on these two layers properly block one another.
+
+        We generally use this to provide an internal unrestricted layer
+        where partly-available full-day allocations get created on-demand
+        to fit any reservations
+        """
+        assert self.id, 'the id needs to be set'
+        result = self.__dict__['virtual_id'] = self.get_virtual_id(self.id)
+        return result
+
+    @virtual_id.inplace.expression
+    @classmethod
+    def _virtual_id_expression(cls) -> ColumnElement[UUID]:
+        return func.uuid_generate_v5(cls.id, literal_column("'virtual'"))
+
     def highlight_allocations(
         self,
         allocations: Sequence[Allocation]
@@ -338,6 +383,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         self,
         libres_context: Context | None = None
     ) -> set[UUID]:
+        """ Returns a set of blocking resource ids.
+
+        This excludes virtual resource ids, which will also act as blocking
+        entities when creating reservations.
+        """
         assert self.id, 'the id needs to be set'
         if libres_context is None:
             assert hasattr(
@@ -350,7 +400,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def blocking_resources(self) -> dict[UUID, Resource]:
         resource_ids = self.blocking_resource_ids()
         if not resource_ids:
-            return {}
+            return {self.virtual_id: self}
         session: Session = self.libres_context.get_service(
             'session_provider'
         ).session()
@@ -360,21 +410,42 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                 Resource.id.in_(resource_ids)
             )
         }
-        for resource in blocking_resources.values():
+        for resource in tuple(blocking_resources.values()):
             resource.bind_to_libres_context(self.libres_context)
+            # add a second mapping from the virtual id to the resource
+            blocking_resources[resource.virtual_id] = resource
+        blocking_resources[self.virtual_id] = self
         return blocking_resources
 
-    def get_scheduler(self, libres_context: Context) -> _OurScheduler:
+    def get_scheduler(
+        self,
+        libres_context: Context,
+        *,
+        virtual: bool = False
+    ) -> _OurScheduler:
         assert self.id, 'the id needs to be set'
         assert self.timezone, 'the timezone needs to be set'
+
+        blocking_ids = {
+            blocking_id
+            for _blocking_id in self.blocking_resource_ids(libres_context)
+            for blocking_id in (
+                _blocking_id,
+                uuid5(_blocking_id, 'virtual')
+            )
+        }
+        if virtual:
+            blocking_ids.add(self.id)
+        else:
+            blocking_ids.add(self.virtual_id)
 
         # HACK: we work around the name being a str in libres, but a
         #       UUID in onegov
         return new_scheduler(  # type:ignore[return-value]
             libres_context,
-            self.id,  # type:ignore[arg-type]
+            self.virtual_id if virtual else self.id,  # type:ignore[arg-type]
             self.timezone,
-            blocking_names=self.blocking_resource_ids(libres_context),  # type:ignore[arg-type]
+            blocking_names=blocking_ids,  # type:ignore[arg-type]
             **extra_scheduler_arguments()
         )
 
@@ -382,6 +453,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def scheduler(self) -> _OurScheduler:
         assert hasattr(self, 'libres_context'), 'not bound to libres context'
         return self.get_scheduler(self.libres_context)
+
+    @property
+    def virtual_scheduler(self) -> _OurScheduler:
+        assert hasattr(self, 'libres_context'), 'not bound to libres context'
+        return self.get_scheduler(self.libres_context, virtual=True)
 
     def bind_to_libres_context(self, libres_context: Context) -> None:
         self.libres_context = libres_context

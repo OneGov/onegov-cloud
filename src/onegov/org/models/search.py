@@ -11,6 +11,7 @@ from operator import itemgetter
 from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
 from sqlalchemy import func, inspect, type_coerce
 from sqlalchemy_utils import escape_like
+from wtforms import SelectChoice
 
 
 from typing import TYPE_CHECKING, Any
@@ -21,7 +22,6 @@ if TYPE_CHECKING:
     from onegov.search import Searchable
     from sqlalchemy.orm import Query
     from uuid import UUID
-    from wtforms.fields.choices import _Choice
 
 
 class Search(Pagination[Any]):
@@ -98,9 +98,9 @@ class Search(Pagination[Any]):
         return labels
 
     @cached_property
-    def document_type_filter_choices(self) -> list[_Choice]:
+    def document_type_filter_choices(self) -> list[SelectChoice]:
         return [
-            (
+            SelectChoice(
                 label,
                 self.TYPE_LABEL_TEMPLATE.format(
                     label=label,
@@ -378,7 +378,7 @@ class Search(Pagination[Any]):
                 #       since been removed.
                 continue
 
-            primary_key, = inspect(base_model).primary_key  # type: ignore[union-attr]
+            primary_key, = inspect(base_model).primary_key
 
             results_by_id.update(
                 self.request.session.query(primary_key, base_model)

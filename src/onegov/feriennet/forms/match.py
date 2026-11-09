@@ -4,7 +4,7 @@ from onegov.activity.matching.score import PreferGroups
 from onegov.activity.matching.score import Scoring
 from onegov.feriennet import _
 from onegov.form import Form
-from wtforms.fields import BooleanField, RadioField
+from wtforms.fields import BooleanField, RadioField, SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -16,6 +16,9 @@ class MatchForm(Form):
 
     prefer_organiser = BooleanField(
         label=_('Children of organisers'),
+        description=_(
+            'Only individuals who offer at least one event during the current '
+            'period are considered organizers.'),
         fieldset=_('Prefer the following children:'),
         default=False)
 
@@ -28,8 +31,8 @@ class MatchForm(Form):
         label=_('Confirm matching:'),
         default='no',
         choices=[
-            ('no', _('No, preview only')),
-            ('yes', _('Yes, confirm matching'))
+            SelectChoice('no', _('No, preview only')),
+            SelectChoice('yes', _('Yes, confirm matching'))
         ]
     )
 

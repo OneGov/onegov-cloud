@@ -38,19 +38,21 @@ rc.defaultOptions = {
     showHolidays: false,
 
     /*
-        Url called when a new selection is made. For example:
+        Url called for internal reservations. For example:
 
-            selectUrl: https://example.org/on-select
+            internalReserveUrl: https://example.org/on-select
 
         Will be called like this:
 
-            https://example.org/on-select
-                ?start=2016-02-04T2200:00.000Z
-                &end=2016-02-05T2300:00.000Z
+            https://example.org/reserve
+                ?date=20160204
+                &start=22:00
+                &end=23:00
                 &whole_day=no
-                &view=dayGridMonth
+
+        Only possible when editable is true
     */
-    selectUrl: null,
+    internalReserveUrl: null,
 
     /*
         Url which returns all available resources in the following format:
@@ -97,7 +99,7 @@ rc.events = [
 rc.targetEvent = null;
 
 rc.passEventsToCalendar = function(calendar, target, source) {
-    var cal = $(calendar);
+    var cal = $(calendar.el || calendar);
 
     _.each(rc.events, function(eventName) {
         target.on(eventName, _.debounce(function(_e, data) {
@@ -186,24 +188,90 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
     // implements editing
     if (rcOptions.editable) {
 
-        // create events on selection
-        fcOptions.select = function(info) {
-            var view = info.view;
-            var url = new Url(rcOptions.selectUrl);
-            url.query.start = info.startStr;
+        // internal reservations are not possible for every kind of resource
+        // so checking for editable is not enough, we need to check the url
+        // has been set as well.
+        if (rcOptions.internalReserveUrl !== null) {
 
-            if (view.type === "dayGridMonth" || view.type === "multiMonthYear") {
+            // open internal reservation form on selection
+            fcOptions.select = function(info) {
+                var calendar = info.view.calendar;
+                var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="' + moment(info.start).format('YYYY-MM-DD') + '"]').get(0) || calendar.el;
+                var wrapper = $('<div class="reservation-actions">');
+                $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
+                var reservation = $('<div class="reservation-form">').appendTo(wrapper);
+                ReservationForm.renderInternal(
+                    reservation.get(0),
+                    info.start,
+                    info.end,
+                    rc.previousReservationState,
+                    function(state) {
+                        rc.targetEvent = $(element);
+                        rc.internalReserve(
+                            calendar,
+                            rcOptions.internalReserveUrl,
+                            moment(info.start).format('YYYYMMDD'),
+                            state.start,
+                            state.end,
+                            state.wholeDay
+                        );
+                        $(this).closest('.popup').popup('hide');
+                    }
+                );
+
+                rc.showPopup(calendar, element, wrapper);
+            };
+
+            // only allow selections for at most an entire day
+            // reservations cannot span multiple days and need to be in the future
+            fcOptions.selectAllow = function(info) {
+                var start = moment(info.start);
                 var end = moment(info.end);
-                url.query.end = end.subtract(1, 'days').format('YYYY-MM-DD');
-                url.query.whole_day = 'yes';
-                url.query.view = view.type;
-            } else {
-                url.query.end = info.endStr;
-                url.query.whole_day = 'no';
-                url.query.view = view.type;
-            }
-            window.location.href = url.toString();
-        };
+                if (info.allDay) {
+                    return !start.isBefore(Date.now(), 'day') && start.isSame(end.subtract(1, 'days'), 'day');
+                }
+                return start.isAfter(Date.now()) && start.isSame(end, 'day');
+            };
+
+            // add button for adding internal reservations to date headers
+            fcOptions.dayHeaderDidMount = function(info) {
+                // only render a button for today and future days
+                if (!info.isToday && !info.isFuture) {
+                    return;
+                }
+
+                var button = $('<button type="button" class="fc-button fc-button-primary add-reservation" aria-pressed="false"></button>');
+                button.attr('title', locale('Internal reservation'));
+                button.html('<span class="fa fa-plus"/>');
+                button.click(function() {
+                    var calendar = info.view.calendar;
+                    var wrapper = $('<div class="reservation-actions">');
+                    $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
+                    var reservation = $('<div class="reservation-form">').appendTo(wrapper);
+                    ReservationForm.renderInternal(
+                        reservation.get(0),
+                        info.date,
+                        info.date,
+                        rc.previousReservationState,
+                        function(state) {
+                            rc.targetEvent = $(info.el);
+                            rc.internalReserve(
+                                calendar,
+                                rcOptions.internalReserveUrl,
+                                moment(info.date).format('YYYYMMDD'),
+                                state.start,
+                                state.end,
+                                state.wholeDay
+                            );
+                            $(this).closest('.popup').popup('hide');
+                        }
+                    );
+
+                    rc.showPopup(calendar, info.el, wrapper);
+                });
+                button.appendTo($(info.el).find('a').eq(0).parent());
+            };
+        }
 
         // edit events on drag&drop, resize
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
@@ -409,6 +477,16 @@ rc.reserve = function(calendar, url, start, end, quota, wholeDay) {
     url.query.start = start;
     url.query.end = end;
     url.query.quota = quota;
+    url.query.whole_day = wholeDay && '1' || '0';
+
+    rc.post(calendar, url.toString());
+};
+
+rc.internalReserve = function(calendar, url, date, start, end, wholeDay) {
+    url = new Url(url);
+    url.query.date = date;
+    url.query.start = start;
+    url.query.end = end;
     url.query.whole_day = wholeDay && '1' || '0';
 
     rc.post(calendar, url.toString());
@@ -778,9 +856,9 @@ rc.renderPartitions = function(event, element, view) {
     _.each(event_partitions, function(partition) {
         var reserved = partition[1];
         if (reserved === false) {
-            partitions += '<div style="height:'+partition[0]+'%;" class="partition-free"></div>';
+            partitions += '<div style="height:' + partition[0] + '%;" class="partition-free"></div>';
         } else {
-            partitions += '<div style="height:'+partition[0]+'%;" class="partition-occupied"></div>';
+            partitions += '<div style="height:' + partition[0] + '%;" class="partition-occupied"></div>';
         }
     });
 
@@ -1046,7 +1124,7 @@ ReservationForm = React.createClass({
             state.wholeDay = false;
         }
 
-        state.end = state.end === '00:00' && '24:00' || state.end;
+        state.end = state.end === '00:00' && '23:59' || state.end;
 
         return state;
     },
@@ -1071,7 +1149,7 @@ ReservationForm = React.createClass({
                 state.start = e.target.value;
                 break;
             case 'end':
-                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                state.end = e.target.value === '00:00' && '23:59' || e.target.value;
                 break;
             case 'count':
                 state.quota = parseInt(e.target.value, 10);
@@ -1164,11 +1242,11 @@ ReservationForm = React.createClass({
     },
     isValidStart: function(start) {
         var startdate = this.parseTime(this.props.start.clone(), start);
-        return startdate !== null && this.props.start <= startdate;
+        return startdate !== null && (this.props.internal || this.props.start <= startdate);
     },
     isValidEnd: function(end) {
         var enddate = this.parseTime(this.props.start.clone(), end);
-        return enddate !== null && enddate <= this.props.end;
+        return enddate !== null && (this.props.internal || enddate <= this.props.end);
     },
     isValidQuota: function(quota) {
         return quota > 0 && quota <= this.props.quotaLeft;
@@ -1293,6 +1371,25 @@ ReservationForm.render = function(element, event, previousReservationState, onSu
             end={moment(event.end)}
             wholeDay={event.extendedProps.wholeDay}
             fullyAvailable={fullyAvailable}
+            internal={false}
+            previousReservationState={previousReservationState}
+            onSubmit={onSubmit}
+        />,
+        element);
+};
+
+ReservationForm.renderInternal = function(element, start, end, previousReservationState, onSubmit) {
+
+    ReactDOM.render(
+        <ReservationForm
+            partlyAvailable
+            quota={1}
+            quotaLeft={1}
+            start={moment(start)}
+            end={moment(end)}
+            wholeDay
+            fullyAvailable={false}
+            internal
             previousReservationState={previousReservationState}
             onSubmit={onSubmit}
         />,

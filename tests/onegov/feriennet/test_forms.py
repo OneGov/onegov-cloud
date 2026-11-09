@@ -15,6 +15,7 @@ from onegov.feriennet.forms import NotificationTemplateSendForm, PeriodForm
 from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
 from webob.multidict import MultiDict
+from wtforms import SelectChoice
 
 
 from typing import Any, TYPE_CHECKING
@@ -174,8 +175,8 @@ def test_vacation_activity_form(session: Session, test_password: str) -> None:
 
     assert form.username.data == 'editor@example.org'
     assert form.username.choices == [
-        ('editor@example.org', 'editor@example.org'),
-        ('admin@example.org', 'Robert Baratheon')
+        SelectChoice('editor@example.org', 'editor@example.org'),
+        SelectChoice('admin@example.org', 'Robert Baratheon')
     ]
 
     form.request.is_admin = False
@@ -336,7 +337,7 @@ def test_notification_template_send_form(session: Session) -> None:
     form.on_request()
     assert len(form.occasion.choices) == 2
 
-    occasions = [c[0] for c in form.occasion.choices]
+    occasions = [c.value for c in form.occasion.choices]
     assert len(form.recipients_by_occasion(occasions, False)) == 2
     assert len(form.recipients_by_occasion(occasions, True)) == 2
 
@@ -351,7 +352,7 @@ def test_notification_template_send_form(session: Session) -> None:
     form.on_request()
     assert len(form.occasion.choices) == 2
 
-    occasions = [c[0] for c in form.occasion.choices]
+    occasions = [c.value for c in form.occasion.choices]
     assert len(form.recipients_by_occasion(occasions, False)) == 1
     assert len(form.recipients_by_occasion(occasions, True)) == 2
 
@@ -373,7 +374,7 @@ def test_notification_template_send_form(session: Session) -> None:
         username=admin.username).one().state = 'cancelled'
     transaction.commit()
 
-    occasions = [c[0] for c in form.occasion.choices]
+    occasions = [c.value for c in form.occasion.choices]
 
     # without organisers
     assert len(form.recipients_by_occasion(occasions, False)) == 1

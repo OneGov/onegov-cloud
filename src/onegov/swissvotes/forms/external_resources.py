@@ -1,6 +1,7 @@
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.swissvotes import _
+from wtforms import SelectChoice
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
@@ -19,9 +20,9 @@ class UpdateExternalResourcesForm(Form):
     resources = MultiCheckboxField(
         label=_('Resource'),
         choices=(
-            ('mfg', _('eMuseum.ch')),
-            ('bs', _('Plakatsammlung Basel')),
-            ('sa', _('Social Archives')),
+            SelectChoice('mfg', _('eMuseum.ch')),
+            SelectChoice('bs', _('Plakatsammlung Basel')),
+            SelectChoice('sa', _('Social Archives')),
         ),
         default=('mfg', 'bs', 'sa'),
         validators=[

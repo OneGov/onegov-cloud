@@ -27,6 +27,7 @@ from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FileField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import Length
 from wtforms.validators import Optional
@@ -176,8 +177,8 @@ def test_unicode() -> None:
         'Bürgerort')
     assert 'Persönliche Informationen' == form.fieldsets[0].label
     assert form['personliche_informationen_geschlecht'].choices == [
-        ('Männlich', 'Männlich'),
-        ('Weiblich', 'Weiblich')
+        SelectChoice('Männlich'),
+        SelectChoice('Weiblich')
     ]
 
 
@@ -417,8 +418,8 @@ def test_parse_radio() -> None:
     assert len(form._fields) == 1
     assert isinstance(form['gender'], RadioField)
     assert form['gender'].choices == [
-        ('Male', 'Male'),
-        ('Female', 'Female'),
+        SelectChoice('Male'),
+        SelectChoice('Female'),
     ]
     assert form['gender'].default == 'Female'
 
@@ -437,8 +438,8 @@ def test_parse_radio_escape() -> None:
     assert len(form._fields) == 1
     assert isinstance(form['for_sure_let_s_go'], RadioField)
     assert form['for_sure_let_s_go'].choices == [
-        ("Yeah, let's", "Yeah, let's"),
-        ("No, let's not", "No, let's not"),
+        SelectChoice("Yeah, let's"),
+        SelectChoice("No, let's not"),
     ]
     assert form['for_sure_let_s_go'].default == "No, let's not"
 
@@ -457,9 +458,9 @@ def test_parse_checkbox() -> None:
     assert len(form._fields) == 1
     assert isinstance(form['extras'], MultiCheckboxField)
     assert form['extras'].choices == [
-        ('Extra Luggage', 'Extra Luggage'),
-        ('Priority Seating', 'Priority Seating'),
-        ('Early Boarding', 'Early Boarding'),
+        SelectChoice('Extra Luggage'),
+        SelectChoice('Priority Seating'),
+        SelectChoice('Early Boarding'),
     ]
     assert form['extras'].default == ['Priority Seating', 'Early Boarding']
 

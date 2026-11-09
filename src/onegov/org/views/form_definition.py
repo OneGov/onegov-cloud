@@ -410,8 +410,8 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
         specification=request.app.formcode_specification
     )
     url = (
-        f'https://api.infomaniak.com/1/ai/{product_id}'
-        f'/openai/chat/completions'
+        f'https://api.infomaniak.com/2/ai/{product_id}'
+        f'/openai/v1/chat/completions'
     )
 
     try:

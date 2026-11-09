@@ -363,6 +363,27 @@ def test_convert_list_of_dicts_to_xlsx() -> None:
         assert rows[2][1].value == 'Rumsfeld'
 
 
+def test_convert_list_of_dicts_to_xlsx_invalid_urls() -> None:
+    urls = (
+        'https://example.ch',
+        'https://',
+        'https:// www.cje-steinhausen.ch',
+        'https://Keine Anmeldung erforderlich. Komme einfach vorbei.',
+        'https://kkg-cham-hünenberg.ch',
+        'https://www.info@ludorischrotkreuz.ch',
+    )
+    xlsx = convert_list_of_dicts_to_xlsx([{'url': url} for url in urls])
+    workbook = load_workbook(BytesIO(xlsx))
+    assert workbook.active is not None
+    cells = tuple(workbook.active.iter_cols(min_col=1, max_col=1))[0]
+
+    assert cells[1].hyperlink is not None
+    assert cells[1].hyperlink.target == urls[0]
+    for cell, url in zip(cells[2:], urls[1:]):
+        assert cell.value == url
+        assert cell.hyperlink is None
+
+
 def test_convert_irregular_list_of_dicts_to_csv() -> None:
     data = [
         {

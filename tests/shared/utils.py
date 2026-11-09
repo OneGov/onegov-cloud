@@ -2,6 +2,7 @@ import dectate
 import morepath
 import os
 import re
+import sedate
 import shutil
 import textwrap
 
@@ -291,25 +292,41 @@ def add_reservation[T: Resource](
     email: str | None = None,
     partly_available: bool = True,
     reserve: bool = True,
+    internal: bool = False,
     approve: bool = True,
     add_ticket: bool = True
 ) -> T:
     if not email:
         email = f'{resource.name}@example.org'
 
-    allocation = resource.scheduler.allocate(
+    if start.tzinfo is None:
+        start = sedate.replace_timezone(start, resource.timezone)
+        end = sedate.replace_timezone(end, resource.timezone)
+
+    allocation_range = (start, end)
+    if internal:
+        assert partly_available, 'internal requires partly available'
+        allocation_range = sedate.align_range_to_day(
+            *allocation_range,
+            resource.timezone
+        )
+        scheduler = resource.virtual_scheduler
+    else:
+        scheduler = resource.scheduler
+
+    allocation, = scheduler.allocate(
         (start, end),
         partly_available=partly_available,
-    )[0]
+    )
 
     if reserve:
-        resource_token = resource.scheduler.reserve(
+        resource_token = scheduler.reserve(
             email,
-            (allocation.start, allocation.end),
+            (start, end) if internal else (allocation.start, allocation.end),
         )
 
     if reserve and approve:
-        resource.scheduler.approve_reservations(resource_token)
+        scheduler.approve_reservations(resource_token)
         if add_ticket:
             with session.no_autoflush:
                 tickets = TicketCollection(session)

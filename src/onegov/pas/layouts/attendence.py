@@ -48,6 +48,13 @@ class AttendenceCollectionLayout(DefaultLayout):
                     ),
                     attrs={'class': 'new-attendence'},
                 ),
+                Link(
+                    text=_('File study (bulk)'),
+                    url=self.request.link(
+                        self.model, 'new-file-study-bulk'
+                    ),
+                    attrs={'class': 'new-attendence'},
+                ),
             ])
         elif self.request.has_commission_president_role:
             links.append(
@@ -92,7 +99,7 @@ class AttendenceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link] | None:
-        if not self.request.is_admin:
+        if not self.request.can_edit_attendence(self.model):
             return None
 
         if self.model.bulk_edit_id:
@@ -115,21 +122,26 @@ class AttendenceLayout(DefaultLayout):
                 url=self.request.link(self.model, 'edit'),
                 attrs={'class': 'edit-link'},
             ),
-            Link(
-                text=_('Delete'),
-                url=self.csrf_protected_url(self.request.link(self.model)),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to delete this meeting?'),
-                        _('This cannot be undone.'),
-                        _('Delete meeting'),
-                        _('Cancel'),
-                    ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=self.request.link(self.collection),
+        ] + (
+            [
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this meeting?'),
+                            _('This cannot be undone.'),
+                            _('Delete meeting'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection),
+                        ),
                     ),
                 ),
-            ),
-        ]
+            ]
+            if self.request.is_admin
+            else []
+        )

@@ -21,6 +21,7 @@
             data-highlights-max="${resource.highlights_max or ''}"
             data-resources-url="${resources_url|None}"
             data-resource-active="${resource.name}"
+            data-block-url="${block_url|None}"
             data-stats-url="${stats_url|None}"
             data-pdf-url="${pdf_url|None}"
             data-show-holidays="${(request.app.org.holidays or request.app.org.has_school_holidays) and 'true' or 'false'}"

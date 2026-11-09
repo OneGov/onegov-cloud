@@ -313,6 +313,10 @@ class ExtendedBrowser:
         self._spawned_contexts.append(instance.context)
         return instance
 
+    def close_contexts(self) -> None:
+        while self._spawned_contexts:
+            self._spawned_contexts.pop().close()
+
     @property
     def links(self) -> FindLinks:
         return self._links

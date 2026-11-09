@@ -17,7 +17,10 @@ FROM
     reservations
 
 JOIN resources
-ON reservations.resource = resources.id
+ON reservations.resource IN (
+    resources.id,
+    uuid_generate_v5(resources.id, 'virtual')
+)
 
 LEFT JOIN tickets
 ON reservations.token = tickets.handler_id::uuid

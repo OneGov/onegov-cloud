@@ -1,0 +1,95 @@
+@page {
+    size: A4;
+    margin: 3cm 0.75cm 2cm;
+
+    @bottom-right {
+        color: #707070;
+        content: "Seite " counter(page) " / " counter(pages);
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+    }
+}
+
+body {
+    color: #333;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.3;
+}
+
+.report-heading {
+    border-bottom: 1.5pt solid #333;
+    margin-bottom: 0.55cm;
+    padding-bottom: 0.3cm;
+}
+
+h1 {
+    font-size: 19pt;
+    line-height: 1.15;
+    margin: 0;
+}
+
+.report-subtitle {
+    color: #707070;
+    font-size: 10pt;
+    margin: 0.15cm 0 0;
+}
+
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.session-details {
+    margin-bottom: 0.5cm;
+}
+
+.session-details th,
+.session-details td {
+    padding: 5pt 7pt;
+    text-align: left;
+}
+
+.session-details th {
+    background-color: #d5d7d9;
+    font-weight: bold;
+    width: 18%;
+}
+
+.session-details td {
+    background-color: #f3f3f3;
+    width: 32%;
+}
+
+.attendee-count {
+    color: #707070;
+    margin: 0 0 0.2cm;
+}
+
+.attendances th,
+.attendances td {
+    border: 1pt solid #b7b7b7;
+    padding: 5pt 7pt;
+}
+
+.attendances th {
+    background-color: #d5d7d9;
+    color: #333;
+    font-weight: bold;
+    text-align: left;
+}
+
+.attendances th:last-child,
+.attendances td:last-child {
+    text-align: right;
+    width: 22%;
+}
+
+.attendances tr:nth-child(even) td {
+    background-color: #f3f3f3;
+}
+
+.attendances tr {
+    page-break-inside: avoid;
+}

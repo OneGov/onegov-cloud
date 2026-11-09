@@ -5,6 +5,7 @@ import morepath
 import sedate
 
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 from itertools import batched
 from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
@@ -270,6 +271,11 @@ def handle_edit_allocation(
 ) -> RenderData | Response:
     """ Handles edit allocation for differing form classes. """
 
+    # virtual allocations should not be edited
+    # since they're managed automatically
+    if self.is_virtual:
+        raise exc.HTTPNotFound()
+
     resources = ResourceCollection(request.app.libres_context)
     resource = resources.by_id(self.resource)
     assert resource is not None
@@ -335,6 +341,12 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
     reservations associated with it).
 
     """
+
+    # virtual allocations should not be edited
+    # since they're managed automatically
+    if self.is_virtual:
+        raise exc.HTTPNotFound()
+
     request.assert_valid_csrf_token()
 
     resource = request.app.libres_resources.by_allocation(self)
@@ -674,6 +686,13 @@ def handle_rules_cronjob(resource: Resource, request: OrgRequest) -> None:
             and tomorrow.month == 1
             and tomorrow.day == 1
         ):
+            return True
+
+        if (
+            rule['extend'] == 'yearly_scheduled'
+            and rule['extend_on'] == tomorrow
+        ):
+            rule['extend_on'] += relativedelta(years=1)
             return True
 
         return False

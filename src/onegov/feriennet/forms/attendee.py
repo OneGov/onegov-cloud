@@ -17,6 +17,7 @@ from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, NumberRange
@@ -114,8 +115,8 @@ class AttendeeForm(AttendeeBase):
     gender = RadioField(
         label=_('Gender'),
         choices=[
-            ('female', _('Girl')),
-            ('male', _('Boy')),
+            SelectChoice('female', _('Girl')),
+            SelectChoice('male', _('Boy')),
         ],
         validators=[InputRequired()]
     )
@@ -223,8 +224,8 @@ class AttendeeSignupForm(AttendeeBase):
     gender = RadioField(
         label=_('Gender'),
         choices=[
-            ('female', _('Girl')),
-            ('male', _('Boy')),
+            SelectChoice('female', _('Girl')),
+            SelectChoice('male', _('Boy')),
         ],
         validators=[InputRequired()],
         depends_on=('attendee', 'other')
@@ -345,12 +346,14 @@ class AttendeeSignupForm(AttendeeBase):
             .order_by(Attendee.name)
         )
 
-        self.attendee.choices = [(a.id.hex, a.name) for a in attendees]
-        self.attendee.choices.append(('other', _('Add a new attendee')))
+        self.attendee.choices = [
+            *(SelectChoice(a.id.hex, a.name) for a in attendees),
+            SelectChoice('other', _('Add a new attendee')),
+        ]
 
         # override the default
         if self.attendee.data == '0xdeadbeef':
-            self.attendee.data = self.attendee.choices[0][0]
+            self.attendee.data = self.attendee.choices[0].value
 
     def populate_tos(self) -> None:
         assert self.request.current_user is not None

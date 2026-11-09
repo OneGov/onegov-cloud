@@ -8,9 +8,9 @@ from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Private
-from onegov.org import _, OrgApp
+from onegov.org import _, log, OrgApp
 from onegov.org import utils
-from onegov.reservation import Allocation
+from onegov.reservation import Allocation, Resource
 from webob import exc, Response
 
 
@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Reservation
 
 
 def respond_with_success(request: OrgRequest) -> JSON_ro:
@@ -52,68 +51,93 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
 
 
 @OrgApp.json(
-    model=Allocation,
+    model=Resource,
     name='add-blocker',
     request_method='POST',
     permission=Private
 )
-def block_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
+def add_blocker(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Adds a single blocker to the given allocation. """
 
     request.assert_valid_csrf_token()
 
-    # the blocker is defined through query parameters
-    start_str = request.params.get('start') or f'{self.start:%H:%M}'
-    end_str = request.params.get('end') or f'{self.end:%H:%M}'
-    if not isinstance(start_str, str) or not isinstance(end_str, str):
+    if self.date is None:
         raise exc.HTTPBadRequest()
 
     reason = request.params.get('reason')
     if reason is not None and not isinstance(reason, str):
         raise exc.HTTPBadRequest()
 
+    date = sedate.replace_timezone(
+        sedate.as_datetime(self.date),
+        self.timezone
+    )
     whole_day = request.params.get('whole_day') == '1'
 
-    if self.partly_available:
-        if self.whole_day and whole_day:
-            start_time = time(0, 0)
-            end_time = time(23, 59)
-        else:
+    if whole_day:
+        start_time = time(0, 0)
+        end_time = time(23, 59)
+    else:
+        start_str = request.params.get('start')
+        end_str = request.params.get('end')
+        if not isinstance(start_str, str) or not isinstance(end_str, str):
+            raise exc.HTTPBadRequest()
+        try:
             start_time = sedate.parse_time(start_str)
             end_time = sedate.parse_time(end_str)
+        except ValueError:
+            raise exc.HTTPBadRequest() from None
 
-        try:
-            start, end = sedate.get_date_range(
-                self.display_start(),
-                start_time,
-                end_time,
-                raise_non_existent=True
-            )
-        except pytz.NonExistentTimeError:
-            err = request.translate(_(
-                'The selected time does not exist on this date due to '
-                'the switch from standard time to daylight saving time.'
-            ))
-            return respond_with_error(request, err)
-    else:
-        start, end = self.start, self.end
+    try:
+        start, end = sedate.get_date_range(
+            date,
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        err = request.translate(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return respond_with_error(request, err)
 
-    resource = request.app.libres_resources.by_allocation(self)
-    assert resource is not None
-
-    # if the allocation is in the past, disable it...
     if end < sedate.utcnow():
         err = request.translate(_('This date lies in the past'))
 
         return respond_with_error(request, err)
 
-    # ...otherwise, try to add a blocker
+    # does a virtual allocation already exist for this date?
+    scheduler = self.virtual_scheduler
+    allocation_range = sedate.get_date_range(
+        date,
+        time(0, 0),
+        time(23, 59)
+    )
+    if not request.session.query(
+        scheduler.allocations_in_range(*allocation_range).exists()
+    ).scalar():
+        savepoint = transaction.savepoint()
+        # if not create it
+        scheduler.allocate(
+            allocation_range,
+            partly_available=True,
+            whole_day=True,
+            quota=1,
+            quota_limit=1,
+        )
+    else:
+        savepoint = None
     try:
-        resource.scheduler.add_blocker(
+        self.virtual_scheduler.add_blocker(
             dates=(start, end),
             reason=reason
         )
     except LibresError as e:
+        # if we created an allocation and failed to reserve, then we
+        # don't want that allocation to stick around.
+        if savepoint is not None:
+            savepoint.rollback()
         return respond_with_error(request, utils.get_libres_error(e, request))
     else:
         return respond_with_success(request)
@@ -131,12 +155,42 @@ def delete_blocker(self: ReservationBlocker, request: OrgRequest) -> JSON_ro:
     resource = request.app.libres_resources.by_blocker(self)
     assert resource is not None
 
+    if self.resource.version == 5:
+        scheduler = resource.virtual_scheduler
+        virtual_allocation = self.target_allocations().first()
+    else:
+        # NOTE: Only legacy blockers should be on the real resource
+        #       eventually we can probably remove this check and do
+        #       a migration to remove all legacy blockers, once they
+        #       are all well in the past.
+        scheduler = resource.scheduler
+        virtual_allocation = None
+
     try:
-        resource.scheduler.remove_blocker(self.token, self.id)
+        scheduler.remove_blocker(self.token, self.id)
     except LibresError as e:
         return respond_with_error(request, utils.get_libres_error(e, request))
-    else:
-        return respond_with_success(request)
+
+    # try to delete the virtual allocation, if we no longer need it
+    if (
+        virtual_allocation
+        and len(virtual_allocation.reserved_slots) == 0
+        and virtual_allocation.pending_reservations.count() == 0
+    ):
+        savepoint = transaction.savepoint()
+        try:
+            scheduler.remove_allocation(virtual_allocation.id)
+        except LibresError:
+            # ignore the error, since it's not critical, if we're worried
+            # about polluting the table, we can run `remove_unused_allocations`
+            # inside a cronjob or add a CLI command for it
+            log.warning(
+                'Failed to clean up unused virtual allocation',
+                exc_info=True
+            )
+            savepoint.rollback()
+
+    return respond_with_success(request)
 
 
 @OrgApp.json(
@@ -146,7 +200,7 @@ def delete_blocker(self: ReservationBlocker, request: OrgRequest) -> JSON_ro:
     permission=Private
 )
 def adjust_blocker(
-    self: Reservation,
+    self: ReservationBlocker,
     request: OrgRequest
 ) -> JSON_ro:
 
@@ -160,7 +214,7 @@ def adjust_blocker(
     # NOTE: FullCalendar ends are exclusive but for us they're inclusive
     new_end -= timedelta(microseconds=1)
     token = self.token
-    resource = request.app.libres_resources.by_reservation(self)
+    resource = request.app.libres_resources.by_blocker(self)
     assert resource is not None
     blocker_id_str = request.params.get('blocker-id')
     if isinstance(blocker_id_str, str) and blocker_id_str.isdigit():
@@ -168,8 +222,17 @@ def adjust_blocker(
     else:
         raise exc.HTTPNotFound()
 
+    if self.resource.version == 5:
+        scheduler = resource.virtual_scheduler
+    else:
+        # NOTE: Only legacy blockers should be on the real resource
+        #       eventually we can probably remove this check and do
+        #       a migration to remove all legacy blockers, once they
+        #       are all well in the past.
+        scheduler = resource.scheduler
+
     blocker: ReservationBlocker | None = (
-        resource.scheduler.blockers_by_token(token)
+        scheduler.blockers_by_token(token)
         .filter(ReservationBlocker.id == blocker_id)
         .one_or_none()
     )
@@ -196,7 +259,7 @@ def adjust_blocker(
 
     savepoint = transaction.savepoint()
     try:
-        resource.scheduler.change_blocker(
+        scheduler.change_blocker(
             token,
             blocker.id,
             new_start,
@@ -218,7 +281,7 @@ def adjust_blocker(
     permission=Private
 )
 def set_reason(
-    self: Reservation,
+    self: ReservationBlocker,
     request: OrgRequest
 ) -> JSON_ro:
 
@@ -228,7 +291,7 @@ def set_reason(
         raise exc.HTTPBadRequest()
 
     token = self.token
-    resource = request.app.libres_resources.by_reservation(self)
+    resource = request.app.libres_resources.by_blocker(self)
     assert resource is not None
     blocker_id_str = request.params.get('blocker-id')
     if isinstance(blocker_id_str, str) and blocker_id_str.isdigit():
@@ -236,8 +299,17 @@ def set_reason(
     else:
         raise exc.HTTPNotFound()
 
+    if self.resource.version == 5:
+        scheduler = resource.virtual_scheduler
+    else:
+        # NOTE: Only legacy blockers should be on the real resource
+        #       eventually we can probably remove this check and do
+        #       a migration to remove all legacy blockers, once they
+        #       are all well in the past.
+        scheduler = resource.scheduler
+
     blocker: ReservationBlocker | None = (
-        resource.scheduler.blockers_by_token(token)
+        scheduler.blockers_by_token(token)
         .filter(ReservationBlocker.id == blocker_id)
         .one_or_none()
     )
@@ -247,5 +319,5 @@ def set_reason(
             _('Blocker no longer exists')
         )
 
-    resource.scheduler.change_blocker_reason(token, new_reason)
+    scheduler.change_blocker_reason(token, new_reason)
     return respond_with_success(request)

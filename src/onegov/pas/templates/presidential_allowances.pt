@@ -44,7 +44,7 @@
                         <tr tal:repeat="allowance allowances">
                             <td>${allowance.settlement_run.name}</td>
                             <td>${layout.request.translate(allowance.role_label)}</td>
-                            <td>${allowance.parliamentarian.first_name} ${allowance.parliamentarian.last_name}</td>
+                            <td>${allowance.parliamentarian.title}</td>
                             <td>${allowance.amount}</td>
                             <td>${layout.format_date(allowance.created, 'date')}</td>
                             <td>

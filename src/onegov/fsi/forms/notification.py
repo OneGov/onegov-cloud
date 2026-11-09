@@ -1,16 +1,15 @@
 from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.utils import coerce_uuid
 from onegov.fsi import _
-from wtforms.fields import StringField, TextAreaField
+from wtforms.fields import SelectChoice, StringField, TextAreaField
 from wtforms.validators import InputRequired
-from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.fsi.models import CourseAttendee, CourseNotificationTemplate
-    from wtforms.fields.choices import _Choice
 
 
 class NotificationForm(Form):
@@ -43,7 +42,7 @@ class NotificationTemplateSendForm(Form):
 
     recipients = MultiCheckboxField(
         label=_('Recipients'),
-        coerce=lambda x: x if isinstance(x, UUID) else UUID(x)
+        coerce=coerce_uuid
     )
 
     @property
@@ -55,10 +54,10 @@ class NotificationTemplateSendForm(Form):
         return [a for a in self.model.course_event.attendees if a.active]
 
     @cached_property
-    def recipients_choices(self) -> list[_Choice]:
-        return [(a.id, a.email) for a in self.attendees]
+    def recipients_choices(self) -> list[SelectChoice]:
+        return [SelectChoice(a.id.hex, a.email) for a in self.attendees]
 
     def on_request(self) -> None:
         choices = self.recipients_choices
         self.recipients.choices = choices
-        self.recipients.data = [c[0] for c in choices]
+        self.recipients.data = [coerce_uuid(c.value) for c in choices]
