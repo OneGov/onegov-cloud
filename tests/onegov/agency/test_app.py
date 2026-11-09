@@ -95,8 +95,8 @@ def test_app_custom(agency_app: AgencyApp) -> None:
     assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
-        {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
-                        'Invoices', 'Hidden contents']},
+        {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Videos',
+                        'Payments', 'Invoices', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]
@@ -114,6 +114,7 @@ def test_app_custom(agency_app: AgencyApp) -> None:
                 'Audit Trail',
                 'Files',
                 'Images',
+                'Videos',
                 'Payments',
                 'Invoices',
                 'Users',
