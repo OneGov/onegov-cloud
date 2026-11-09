@@ -23,6 +23,8 @@ from onegov.org.models.file import ImageFile
 from onegov.org.models.file import ImageFileCollection
 from onegov.org.models.file import ImageSet
 from onegov.org.models.file import ImageSetCollection
+from onegov.org.models.file import VideoFile
+from onegov.org.models.file import VideoFileCollection
 from onegov.org.models.form import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.legacy_file import LegacyFile
 from onegov.org.models.legacy_file import LegacyFileCollection
@@ -158,4 +160,6 @@ __all__ = (
     'Topic',
     'TraitInfo',
     'VisibleOnHomepageExtension',
+    'VideoFile',
+    'VideoFileCollection',
 )

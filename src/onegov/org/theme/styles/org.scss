@@ -341,6 +341,7 @@ $globals-height: 2.5rem;
     .docs::before { @include icon('\f02d');}
     .modules::before { @include icon('\f009');}
     .images::before { @include icon('\f03e'); }
+    .videos::before { @include icon('\f03d'); }
     .files::before { @include icon('\f016'); }
     .text-modules::before { @include icon('\f249'); }
     .settings::before { @include icon('\f1de'); }
@@ -7734,6 +7735,63 @@ p.full-text-width {
 
         > div {
             border: 2px solid $primary-color !important;
+        }
+    }
+}
+
+/*
+    videos
+*/
+
+// videos embedded in the text
+.page-text video,
+.redactor-editor video {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+
+.video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2%;
+    margin-bottom: 1rem;
+
+    .video-container {
+        position: relative;
+        width: 100%;
+
+        @media #{$medium-up} {
+            width: 49%;
+        }
+
+        @media #{$large-up} {
+            width: 32%;
+        }
+
+        video {
+            background: $black;
+            display: block;
+            width: 100%;
+        }
+
+        .video-name {
+            display: block;
+            font-size: .875rem;
+            margin-top: .25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .delete {
+            background: $white;
+            border-radius: 50%;
+            line-height: 1;
+            padding: .3rem .45rem;
+            position: absolute;
+            right: .5rem;
+            top: .5rem;
         }
     }
 }

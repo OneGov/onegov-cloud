@@ -52,6 +52,7 @@ from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import VideoFileCollection
 from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import News
@@ -355,6 +356,29 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         """ Adds the json url for image lists. """
         return self.request.link(
             ImageFileCollection(self.request.session), name='json'
+        )
+
+    @cached_property
+    def video_upload_url(self) -> str:
+        """ The URL to the video upload action. """
+        url = self.request.link(
+            VideoFileCollection(self.request.session), name='upload'
+        )
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def video_upload_json_url(self) -> str:
+        """ Adds the json url for video uploads. """
+        url = self.request.link(
+            VideoFileCollection(self.request.session), name='upload.json'
+        )
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def video_list_url(self) -> str:
+        """ Adds the json url for video lists. """
+        return self.request.link(
+            VideoFileCollection(self.request.session), name='json'
         )
 
     @cached_property
@@ -4132,6 +4156,14 @@ class ImageFileCollectionLayout(DefaultLayout):
         request.include('common')
         request.include('upload')
         request.include('editalttext')
+        super().__init__(model, request)
+
+
+class VideoFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model: Any, request: OrgRequest) -> None:
+        request.include('common')
+        request.include('upload')
         super().__init__(model, request)
 
 

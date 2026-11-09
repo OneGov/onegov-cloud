@@ -1478,19 +1478,19 @@ msgstr "Documents de l'élément d'agenda"
 msgid ""
 "This form can be used to report mutations to the data. You can either leave "
 "us a message or directly suggest changes to the corresponding fields."
-msgstr ""
+msgstr "Ce formulaire permet de signaler des mutations. Vous pouvez soit nous laisser un message, soit proposer directement des modifications dans les champs correspondants."
 
 msgid "Your contact details"
-msgstr ""
+msgstr "Vos coordonnées"
 
 msgid "Message"
 msgstr "Message"
 
 msgid "Please enter a message or suggest some changes using the fields below."
-msgstr ""
+msgstr "Veuillez saisir un message ou proposer au moins une modification dans les champs ci-dessous."
 
 msgid "Proposed changes"
-msgstr ""
+msgstr "Modifications proposées"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
@@ -1609,50 +1609,50 @@ msgid "The domain of the URL is not allowed for iFrames."
 msgstr "Le domaine de l'URL n'est pas autorisé pour les iFrames"
 
 msgid "Selected topic"
-msgstr ""
+msgstr "Sujet sélectionné"
 
 msgid "No topic selected yet"
-msgstr ""
+msgstr "Aucun sujet sélectionné"
 
 msgid "Select"
 msgstr "Sélectionner"
 
 msgid "Subpages"
-msgstr ""
+msgstr "Sous-pages"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Chargement..."
 
 msgid "No topics found"
-msgstr ""
+msgstr "Aucun sujet trouvé"
 
 msgid "Load more"
-msgstr ""
+msgstr "Charger plus"
 
 msgid "The topics could not be loaded"
-msgstr ""
+msgstr "Les sujets n'ont pas pu être chargés"
 
 msgid "Optional. If left empty, the title of the linked topic is used."
-msgstr ""
+msgstr "Facultatif. Si le champ reste vide, le titre du sujet lié est utilisé."
 
 msgid "Linked topic"
-msgstr ""
+msgstr "Sujet lié"
 
 msgid "No API of a source organisation is configured."
-msgstr ""
+msgstr "Aucune API d'une organisation source n'est configurée."
 
 msgid "Please select a topic."
-msgstr ""
+msgstr "Veuillez sélectionner un sujet."
 
 msgid "The API of the source organisation could not be reached."
-msgstr ""
+msgstr "L'API de l'organisation source n'a pas pu être atteinte."
 
 msgid "The selected topic is not publicly available."
-msgstr ""
+msgstr "Le sujet sélectionné n'est pas accessible au public."
 
 msgid ""
 "The source organisation does not allow this organisation to link its topics."
-msgstr ""
+msgstr "L'organisation source n'autorise pas cette organisation à lier ses sujets."
 
 msgid "- Root -"
 msgstr "- Page de base-"
@@ -3123,16 +3123,16 @@ msgid "Read only"
 msgstr "Lecture seule"
 
 msgid "Parent organisation"
-msgstr ""
+msgstr "Organisation parente"
 
 msgid "Child organisation"
-msgstr ""
+msgstr "Organisation subordonnée"
 
 msgid "API URL of the parent organisation"
-msgstr ""
+msgstr "URL de l'API de l'organisation parente"
 
 msgid "e.g. https://onegov.govikon.ch/api/"
-msgstr ""
+msgstr "p. ex. https://onegov.govikon.ch/api/"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
@@ -4580,13 +4580,13 @@ msgstr ""
 "N'envoyez ceci que si ce sont les états finaux des abonnements."
 
 msgid "Mutation"
-msgstr ""
+msgstr "Mutation"
 
 msgid "Edit Topic"
 msgstr "Modifier le sujet"
 
 msgid "Apply proposed changes"
-msgstr ""
+msgstr "Appliquer les modifications proposées"
 
 msgid "New Link"
 msgstr "Nouveau lien"
@@ -4671,29 +4671,29 @@ msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 
 msgid "API link"
-msgstr ""
+msgstr "Lien API"
 
 msgid "Add API link"
-msgstr ""
+msgstr "Ajouter un lien API"
 
 msgid "Added API link"
-msgstr ""
+msgstr "Lien API ajouté"
 
 msgid "Edit API link"
-msgstr ""
+msgstr "Modifier le lien API"
 
 msgid "Move API link"
-msgstr ""
+msgstr "Déplacer le lien API"
 
 msgid "The API link was deleted"
-msgstr ""
+msgstr "Le lien API a été supprimé"
 
 msgid "Delete API link"
-msgstr ""
+msgstr "Supprimer le lien API"
 
 #, python-format
 msgid "Do you really want to delete the API link \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer le lien API \"${title}\"?"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Une nouvelle ne peut pas être collée comme un sujet"
@@ -5586,7 +5586,7 @@ msgid "Number of participants"
 msgstr "Nombre de participants"
 
 msgid "Mutation report"
-msgstr ""
+msgstr "Annonce de mutation"
 
 msgid "Hello!"
 msgstr "Bonjour"
@@ -6796,7 +6796,7 @@ msgid "Archive selected"
 msgstr "Archiver la sélection"
 
 msgid "Report change"
-msgstr ""
+msgstr "Annoncer une mutation"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -7712,7 +7712,7 @@ msgid "New Photo Album"
 msgstr "Nouvel album photo"
 
 msgid "Proposed changes applied."
-msgstr ""
+msgstr "Modifications proposées appliquées."
 
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
@@ -7859,7 +7859,7 @@ msgid "Move"
 msgstr "Déplacer"
 
 msgid "Your ticket has been opened"
-msgstr ""
+msgstr "Votre ticket a été ouvert"
 
 msgid "Your payment has been received"
 msgstr "Votre paiement a été reçu"
@@ -8407,7 +8407,7 @@ msgstr ""
 "Fait migrer les liens du domaine donné vers le domaine actuel \"${domain}\"."
 
 msgid "Source organisation API link"
-msgstr ""
+msgstr "Lien API de l'organisation source"
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -9022,3 +9022,18 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ msgstr ""
 #~ "Toutes les allocations créées par la règle seront supprimées si elles "
 #~ "n'ont pas encore été réservées."
+
+msgid "Videos"
+msgstr "Vidéos"
+
+msgid "No videos uploaded yet"
+msgstr "Aucune vidéo téléchargée"
+
+msgid "Do you really want to delete the video?"
+msgstr "Voulez-vous vraiment supprimer la vidéo?"
+
+msgid "Delete Video"
+msgstr "Supprimer la vidéo"
+
+msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
+msgstr "Les formats pris en charge sont MP4, WebM et Ogg. Pour insérer une vidéo dans une page, utilisez le bouton vidéo de l'éditeur de texte."

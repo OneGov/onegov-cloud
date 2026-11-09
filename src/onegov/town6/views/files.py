@@ -3,13 +3,16 @@ from onegov.file import File
 from onegov.org.views.files import (
     view_file_details, view_get_image_collection, view_upload_general_file,
     view_upload_image_file, view_file_digest, view_file_links, handle_sign,
-    view_get_file_collection)
+    view_get_file_collection, view_get_video_collection,
+    view_upload_video_file)
 
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
-    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout)
+    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout,
+    VideoFileCollectionLayout)
 from onegov.org.models import (
-    GeneralFile, GeneralFileCollection, ImageFileCollection)
+    GeneralFile, GeneralFileCollection, ImageFileCollection,
+    VideoFileCollection)
 
 
 from typing import TYPE_CHECKING
@@ -79,6 +82,32 @@ def view_town_upload_image_file(
     request: TownRequest
 ) -> str:
     return view_upload_image_file(self, request, DefaultLayout(self, request))
+
+
+@TownApp.html(
+    model=VideoFileCollection,
+    template='videos.pt',
+    permission=Private
+)
+def view_town_video_collection(
+    self: VideoFileCollection,
+    request: TownRequest
+) -> RenderData:
+    return view_get_video_collection(
+        self, request, VideoFileCollectionLayout(self, request))
+
+
+@TownApp.html(
+    model=VideoFileCollection,
+    name='upload',
+    request_method='POST',
+    permission=Private
+)
+def view_town_upload_video_file(
+    self: VideoFileCollection,
+    request: TownRequest
+) -> str:
+    return view_upload_video_file(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=GeneralFileCollection, name='digest', permission=Public)

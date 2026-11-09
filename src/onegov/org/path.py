@@ -59,6 +59,7 @@ from onegov.org.models import ExtendedDirectory
 from onegov.org.models import FormPersonMove
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import VideoFileCollection
 from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import LegacyFile
@@ -309,6 +310,11 @@ def get_files(
 @OrgApp.path(model=ImageFileCollection, path='/images')
 def get_images(app: OrgApp) -> ImageFileCollection:
     return ImageFileCollection(app.session())
+
+
+@OrgApp.path(model=VideoFileCollection, path='/videos')
+def get_videos(app: OrgApp) -> VideoFileCollection:
+    return VideoFileCollection(app.session())
 
 
 @OrgApp.path(model=ExportCollection, path='/exports')

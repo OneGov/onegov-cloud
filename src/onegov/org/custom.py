@@ -16,6 +16,7 @@ from onegov.org.models import (
     GeneralFileCollection,
     ImageFileCollection,
     Organisation,
+    VideoFileCollection,
 )
 from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models.page import News
@@ -243,6 +244,13 @@ def get_global_tools(
             Link(
                 _('Images'), request.class_link(ImageFileCollection),
                 attrs={'class': 'images'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Videos'), request.class_link(VideoFileCollection),
+                attrs={'class': 'videos'}
             )
         )
 

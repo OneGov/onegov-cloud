@@ -254,6 +254,18 @@ class ImageFile(File):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
 
+class VideoFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'video'}
+
+
+#: The video formats which can be played by all current browsers
+VIDEO_MIME_TYPES = frozenset({
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+})
+
+
 class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
@@ -450,3 +462,18 @@ class ImageFileCollection(BaseImageFileCollection[ImageFile]):
     @property
     def model_class(self) -> type[ImageFile]:
         return ImageFile
+
+
+class VideoFileCollection(
+    FileCollection[VideoFile],
+    GroupFilesByDateMixin[VideoFile]
+):
+
+    supported_content_types = VIDEO_MIME_TYPES
+
+    def __init__(self, session: Session) -> None:
+        super().__init__(session, type='video', allow_duplicates=False)
+
+    @property
+    def model_class(self) -> type[VideoFile]:
+        return VideoFile

@@ -26,3 +26,31 @@ ol.alpha-list {
     font-weight: 900;
     line-height: inherit;
 }
+
+// videos can't be played in the editor, they are selected on click instead,
+// see videomanager.js
+.redactor-editor video {
+    pointer-events: none;
+}
+
+// selected video in the editor
+.redactor-video-overlay {
+    box-shadow: 0 0 0 3px $primary-color;
+    pointer-events: none;
+    position: absolute;
+    z-index: 10;
+
+    .redactor-video-remove {
+        background: $white;
+        border: 1px solid $primary-color;
+        border-radius: 3px;
+        color: $primary-color;
+        cursor: pointer;
+        font-size: .875rem;
+        padding: .25rem .5rem;
+        pointer-events: auto;
+        position: absolute;
+        right: .5rem;
+        top: .5rem;
+    }
+}

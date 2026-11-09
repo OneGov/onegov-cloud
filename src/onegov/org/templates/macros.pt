@@ -312,7 +312,7 @@
 </metal:panel>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-video-upload-url layout.video_upload_json_url; data-video-list-url layout.video_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="${fieldset.id}">
                 <legend>${fieldset.label}</legend>
@@ -2295,6 +2295,21 @@
            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
     </li>
 </metal:uploaded_image>
+
+<metal:uploaded_video define-macro="uploaded_video" i18n:domain="onegov.org">
+    <div id="video-${index}" class="video-container">
+        <video controls preload="metadata" src="${video.video}" title="${video.title}"></video>
+        <a class="video-name" href="${video.video}" target="_blank">${video.title}</a>
+        <a class="delete confirm"
+           ic-delete-from="${request.csrf_protected_url(video.video)}"
+           ic-target="#video-${index}"
+           ic-success-action="remove"
+           data-confirm="Do you really want to delete the video?"
+           data-confirm-yes="Delete Video"
+           data-confirm-no="Cancel"
+           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+    </div>
+</metal:uploaded_video>
 
 <metal:digest_result define-macro="digest_result" i18n:domain="onegov.org">
     <div class="digest-result digest-${is_known and 'is-known' or 'is-not-known'}" tal:switch="is_known">

@@ -45,6 +45,7 @@ SANE_HTML_TAGS = frozenset({
     'tr',
     'th',
     'td',
+    'video',
 })
 
 # html attributes allowed by our default sanitize policy
@@ -53,6 +54,7 @@ SANE_HTML_ATTRS = {
     'abbr': frozenset({'title', }),
     'acronym': frozenset({'title', }),
     'img': frozenset({'src', 'alt', 'title'}),
+    'video': frozenset({'src', 'title', 'controls', 'preload'}),
     'p': frozenset({'class'}),
     'ol': frozenset({'class'}),
 }

@@ -1445,7 +1445,7 @@ msgid "Total"
 msgstr "Totale"
 
 msgid "Mutation report"
-msgstr ""
+msgstr "Segnalazione di mutazione"
 
 msgid "Path"
 msgstr "Percorso"
@@ -1454,7 +1454,7 @@ msgid "Message"
 msgstr "Messaggio"
 
 msgid "Proposed changes"
-msgstr ""
+msgstr "Modifiche proposte"
 
 msgid "Hello!"
 msgstr "Ciao!"
@@ -2847,22 +2847,22 @@ msgstr "Archivio selezionato"
 msgid ""
 "The title, lead, text and sidebar of this page are taken from the API of "
 "another organisation (${source}) and are updated every time a page is viewed."
-msgstr ""
+msgstr "Il titolo, l'introduzione, il testo e la barra laterale di questa pagina provengono dall'API di un'altra organizzazione (${source}) e vengono aggiornati a ogni visualizzazione della pagina."
 
 msgid ""
 "The linked topic is currently not publicly available. This page is therefore "
 "hidden from the public and from the public search."
-msgstr ""
+msgstr "L'argomento collegato al momento non è accessibile al pubblico. Questa pagina è quindi nascosta al pubblico e nella ricerca pubblica."
 
 msgid ""
 "To change the content, please edit the linked topic of the source "
 "organisation:"
-msgstr ""
+msgstr "Per modificare il contenuto, modifichi l'argomento collegato dell'organizzazione di origine:"
 
 msgid ""
 "This page is linked by the following pages of other organisations via the "
 "API:"
-msgstr ""
+msgstr "Questa pagina è integrata tramite l'API dalle seguenti pagine di altre organizzazioni:"
 
 msgid "Internal Comments"
 msgstr "Commenti interni"
@@ -2874,7 +2874,7 @@ msgid "Changes"
 msgstr "Modifiche"
 
 msgid "Report change"
-msgstr ""
+msgstr "Segnalare una mutazione"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -3141,7 +3141,7 @@ msgid "Advanced Settings"
 msgstr "Impostazioni avanzate"
 
 msgid "Source organisation API link"
-msgstr ""
+msgstr "Collegamento API dell'organizzazione di origine"
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -3256,3 +3256,18 @@ msgstr "Nuova nota"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
+
+msgid "Videos"
+msgstr "Video"
+
+msgid "No videos uploaded yet"
+msgstr "Nessun video caricato"
+
+msgid "Do you really want to delete the video?"
+msgstr "Vuole davvero eliminare il video?"
+
+msgid "Delete Video"
+msgstr "Elimina video"
+
+msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
+msgstr "I formati supportati sono MP4, WebM e Ogg. Per inserire un video in una pagina, utilizzi il pulsante video nell'editor di testo."

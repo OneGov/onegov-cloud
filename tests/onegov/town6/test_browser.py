@@ -294,3 +294,70 @@ def monkey_patch_visit_to_ignore_console_errors(
     browser.visit = functools.partial(  # type: ignore[method-assign]
         original_visit, ignore_all_console_errors=True
     )
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_insert_video_in_editor(browser: ExtendedBrowser) -> None:
+    from playwright.sync_api import FilePayload
+    from tests.onegov.town6.test_views_videos import create_video
+
+    browser.login_admin()
+    browser.visit('/topics/themen')
+    page = browser.page
+    new_page_url = page.locator(
+        'a[href*="/editor/new/page/"]').first.get_attribute('href')
+    assert new_page_url is not None
+    browser.visit(new_page_url)
+    page.fill('input[name="title"]', 'Filme')
+
+    # upload a new video
+    page.click('.re-video')
+    page.set_input_files(
+        '#redactor-modal-video-droparea input[type="file"]',
+        files=FilePayload(
+            name='Film.mp4',
+            mimeType='video/mp4',
+            buffer=create_video()
+        )
+    )
+    page.wait_for_selector('.redactor-editor video')
+
+    # select the uploaded video again
+    page.click('.re-video')
+    page.click('#redactor-modal-tabber a[rel="tab2"]')
+    page.click('.redactor-video-manager-link:text("Film.mp4")')
+    page.wait_for_function(
+        'document.querySelectorAll(".redactor-editor video").length === 2')
+
+    page.click('.save-link')
+    page.wait_for_selector('.page-text video')
+
+    videos = page.locator('.page-text video')
+    assert videos.count() == 2
+    for index in range(2):
+        video = videos.nth(index)
+        assert '/storage/' in (video.get_attribute('src') or '')
+        assert video.get_attribute('controls') is not None
+
+    # remove the videos in the editor again
+    edit_url = page.locator(
+        'a[href*="/editor/edit/page/"]').first.get_attribute('href')
+    assert edit_url is not None
+    browser.visit(edit_url)
+    page.wait_for_selector('.redactor-editor video')
+
+    # with the keyboard (videos are selected on click, not played)
+    page.click('.redactor-editor video', force=True)
+    assert page.locator('.redactor-video-overlay').is_visible()
+    page.keyboard.press('Backspace')
+    assert page.locator('.redactor-editor video').count() == 1
+    assert not page.locator('.redactor-video-overlay').is_visible()
+
+    # with the button
+    page.click('.redactor-editor video', force=True)
+    page.click('.redactor-video-remove')
+    assert page.locator('.redactor-editor video').count() == 0
+
+    page.click('.save-link')
+    page.wait_for_url('**/topics/themen/filme')
+    assert page.locator('video').count() == 0

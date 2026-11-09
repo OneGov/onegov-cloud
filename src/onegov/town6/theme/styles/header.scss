@@ -198,6 +198,7 @@ $new-api-icon: '\f1e6';
     .chats::before { @include icon-bold('\f086'); }
     .chats-archive::before { @include icon-bold('\f4ad'); }
     .images::before { @include icon('\f03e'); }
+    .videos::before { @include icon('\f03d'); }
     .files::before { @include icon("\f15c"); }
     .settings::before { @include icon-bold('\f1de'); }
     .modules::before { @include icon-bold('\f009'); }

@@ -1,0 +1,44 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="small-12 columns" tal:define="upload_url layout.video_upload_url">
+                <h2 i18n:translate="">Upload</h2>
+
+                <div class="panel">
+                    <p i18n:translate="">
+                        Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor.
+                    </p>
+                </div>
+
+                <tal:b metal:use-macro="layout.macros.upload">
+                    <tal:b metal:fill-slot="upload-filelist">
+                        <div class="upload-filelist-header" style="display: none;">
+                            <h2 i18n:translate>Just Uploaded</h2>
+                            <div class="upload-filelist video-grid">
+
+                            </div>
+                        </div>
+                    </tal:b>
+                </tal:b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <tal:b tal:repeat="group videos">
+                    <h2 i18n:translate="">${group['group']}</h2>
+                    <div class="video-grid">
+                        <tal:b repeat="video group['videos']">
+                            <tal:b metal:use-macro="layout.macros.uploaded_video" define="index repeat.video.index" />
+                        </tal:b>
+                    </div>
+                </tal:b>
+                <tal:b condition="not:videos">
+                    <p i18n:translate="">No videos uploaded yet</p>
+                </tal:b>
+            </div>
+        </div>
+    </tal:b>
+</div>

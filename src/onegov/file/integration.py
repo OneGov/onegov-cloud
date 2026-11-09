@@ -36,7 +36,7 @@ from tempfile import SpooledTemporaryFile
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Generator, Iterator
     from depot.io.interfaces import FileStorage
     from functools import cached_property
     from onegov.core.orm import SessionManager
@@ -478,12 +478,81 @@ def configure_depot_tween_factory(
     return configure_depot_tween
 
 
+class RangeFileIter:
+    """ Iterates over a stored file, optionally only over a byte range.
+
+    WebOb uses :meth:`app_iter_range` to answer range requests, which are
+    required to seek in videos (and for playback on iOS/Safari at all).
+
+    Depot files can't seek, so we skip the bytes before the range instead.
+
+    """
+
+    block_size = 4096 * 16
+
+    def __init__(self, file: StoredFile) -> None:
+        self.file = file
+
+    def __iter__(self) -> Iterator[bytes]:
+        return self.app_iter_range()
+
+    def app_iter_range(
+        self,
+        seek: int | None = None,
+        limit: int | None = None,
+        block_size: int | None = None
+    ) -> Iterator[bytes]:
+
+        block_size = block_size or self.block_size
+        position = 0
+
+        try:
+            while seek and position < seek:
+                data = self.file.read(min(block_size, seek - position))
+                if not data:
+                    return
+                position += len(data)
+
+            while limit is None or position < limit:
+                size = block_size
+                if limit is not None:
+                    size = min(block_size, limit - position)
+
+                data = self.file.read(size)
+                if not data:
+                    return
+                position += len(data)
+                yield data
+        finally:
+            self.file.close()
+
+
+def supports_range_requests(content_type: str | None) -> bool:
+    if not content_type:
+        return False
+    return content_type.startswith(('video/', 'audio/'))
+
+
 def render_depot_file(
     file: StoredFile,
     request: CoreRequest
 ) -> Response:
-    return request.get_response(
+    response = request.get_response(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
+
+    if (
+        response.status_code == 200
+        and supports_range_requests(file.content_type)
+    ):
+        # NOTE: WebOb answers range requests with a partial response, it
+        #       needs the content length, which is reset with the app iter
+        content_length = response.content_length
+        response.app_iter = RangeFileIter(file)
+        response.content_length = content_length
+        response.accept_ranges = 'bytes'
+        response.conditional_response = True
+
+    return response
 
 
 def respond_with_content_disposition(file: File, request: CoreRequest) -> None:

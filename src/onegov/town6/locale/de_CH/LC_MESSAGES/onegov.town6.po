@@ -3302,3 +3302,18 @@ msgstr "Neue Notiz"
 
 #~ msgid "Party"
 #~ msgstr "Party"
+
+msgid "Videos"
+msgstr "Videos"
+
+msgid "No videos uploaded yet"
+msgstr "Noch keine Videos hochgeladen"
+
+msgid "Do you really want to delete the video?"
+msgstr "Möchten Sie das Video wirklich löschen?"
+
+msgid "Delete Video"
+msgstr "Video löschen"
+
+msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
+msgstr "Unterstützte Formate sind MP4, WebM und Ogg. Um ein Video in eine Seite einzufügen, verwenden Sie die Video-Schaltfläche im Texteditor."

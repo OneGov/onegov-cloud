@@ -1033,6 +1033,13 @@ class ImageFileCollectionLayout(DefaultLayout):
         request.include('editalttext')
 
 
+class VideoFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model: Any, request: TownRequest) -> None:
+        super().__init__(model, request)
+        request.include('upload')
+
+
 class ExternalLinkLayout(OrgExternalLinkLayout, DefaultLayout):
 
     app: TownApp
