@@ -2254,9 +2254,8 @@ def view_export_all(
     layout = layout or ResourcesLayout(self, request)
     layout.edit_mode = True
     layout.editmode_links[0].text = _('Export')  # type:ignore
-    layout.editmode_links[0].attrs = {'class': 'export-link',  # type:ignore
-                                      'form': 'main-form',
-                                      'type': 'submit'}
+    layout.editmode_links[0].attrs['class'].discard('save-link')  # type:ignore
+    layout.editmode_links[0].attrs['class'].add('export-link')  # type:ignore
 
     if form.submitted(request):
 
