@@ -1,5 +1,6 @@
 import datetime
 import json
+import pytest
 import transaction
 import zipfile
 from io import BytesIO
@@ -1570,8 +1571,17 @@ def test_parliamentarian_pdf_zip_download(
         assert actual.Contents.stream == expected.Contents.stream
 
 
+@pytest.mark.parametrize(
+    ('bulk_view', 'attendence_type'),
+    [
+        ('new-commission-bulk', 'commission'),
+        ('new-file-study-bulk', 'study'),
+    ],
+)
 def test_commission_bulk_edit_keeps_added_members_in_group(
     client: Client[TestPasApp],
+    bulk_view: str,
+    attendence_type: str,
 ) -> None:
     client.login_admin()
     client.get('/').follow()
@@ -1609,15 +1619,19 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     session.flush()
     transaction.commit()
 
-    page = client.get('/attendences/new-commission-bulk')
+    page = client.get(f'/attendences/{bulk_view}')
     page.form['date'] = '2024-06-15'
-    page.form['type'] = 'commission'
+    if attendence_type == 'study':
+        assert 'type' not in page.form.fields
+    else:
+        page.form['type'] = attendence_type
     page.form['duration'] = '2'
     page.form['commission_id'] = commission_id
     page.form['parliamentarian_id'] = [alice_id]
     page.form.submit().follow()
 
     attendance = session.query(Attendence).one()
+    assert attendance.type == attendence_type
     group_id = attendance.bulk_edit_id
     edit_url = f'/attendence/{attendance.id}/edit-commission-bulk-attendences'
     page = client.get(edit_url)
@@ -1627,6 +1641,8 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     records = session.query(Attendence).all()
     assert len(records) == 2
     assert {record.bulk_edit_id for record in records} == {group_id}
+    # Newly added members inherit the type of the bulk group
+    assert {record.type for record in records} == {attendence_type}
     assert {record.parliamentarian_id.hex for record in records} == {
         alice_id,
         bob_id,
@@ -1643,6 +1659,7 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     assert len(records) == 2
     assert {record.duration for record in records} == {180}
     assert {record.bulk_edit_id for record in records} == {group_id}
+    assert {record.type for record in records} == {attendence_type}
 
     page = client.get(edit_url)
     page.form['parliamentarian_id'] = [alice_id]
@@ -1650,3 +1667,4 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     remaining = client.app.session().query(Attendence).one()
     assert remaining.parliamentarian_id.hex == alice_id
     assert remaining.bulk_edit_id == group_id
+    assert remaining.type == attendence_type
