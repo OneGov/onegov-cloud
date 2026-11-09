@@ -44,6 +44,9 @@ if TYPE_CHECKING:
 _leading_space_re = re.compile(r'^(\s+)')
 _diff_split_re = re.compile(r'(\s+)')
 
+#: Elements without text, which are marked as added/removed with a class
+MEDIA_TAGS = frozenset({'audio', 'iframe', 'img', 'video'})
+
 
 def diff_genshi_stream(old_stream: Stream, new_stream: Stream) -> Stream:
     """Renders a creole diff for two texts."""
@@ -309,7 +312,15 @@ class StreamDiffer:
         for event in events:
             type, data, pos = event
             if type == START:
-                self.enter(pos, *data)
+                tag, attrs = data
+                # elements without text can't be marked with `<del>` or
+                # `<ins>`, so they get a class instead
+                if self._context is not None and tag.localname in MEDIA_TAGS:
+                    attrs = self.inject_class(attrs, (
+                        'tagdiff_removed' if self._context == 'del'
+                        else 'tagdiff_added'
+                    ))
+                self.enter(pos, tag, attrs)
             elif type == END:
                 self.leave(pos, data)
             elif type == TEXT:

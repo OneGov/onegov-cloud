@@ -1977,3 +1977,23 @@ ol li a:not(.button) {
         background-color: $green-light;
     }
 }
+
+// html diffs (e.g. proposed changes in tickets), see onegov.core.html_diff
+.diff {
+    img,
+    video,
+    audio,
+    iframe {
+        height: auto;
+        max-width: 100%;
+    }
+
+    .tagdiff_removed {
+        box-shadow: 0 0 0 4px $alert-color;
+        opacity: .5;
+    }
+
+    .tagdiff_added {
+        box-shadow: 0 0 0 4px $success-color;
+    }
+}

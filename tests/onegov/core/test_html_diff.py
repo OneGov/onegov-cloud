@@ -32,6 +32,24 @@ from onegov.core.html_diff import render_html_diff
         'Foo baz',
         '<div class="diff">Foo <ins>baz</ins><b><del>baz</del></b></div>',
     ),
+    # elements without text are marked with a class
+    (
+        '<p>Foo</p><p><video src="/a"></video></p>',
+        '<p>Foo</p>',
+        '<div class="diff"><p>Foo</p>'
+        '<p><video src="/a" class="tagdiff_removed"></video></p></div>',
+    ),
+    (
+        '<p>Foo</p>',
+        '<p>Foo</p><p><img src="/a" class="big"></p>',
+        '<div class="diff"><p>Foo</p>'
+        '<p><img src="/a" class="big tagdiff_added"></p></div>',
+    ),
+    (
+        '<p>Foo</p><p><video src="/a"></video></p>',
+        '<p>Foo</p><p><video src="/a"></video></p>',
+        '<div class="diff"><p>Foo</p><p><video src="/a"></video></p></div>',
+    ),
 ])
 def test_html_diff(a: str, b: str, expected: str) -> None:
     assert render_html_diff(a, b) == expected
