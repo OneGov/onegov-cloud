@@ -13,6 +13,7 @@ import sys
 import tempfile
 import textwrap
 import transaction
+import warnings
 import yaml
 
 from collections import defaultdict
@@ -92,7 +93,7 @@ from operator import add as add_op
 from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
-from sqlalchemy.exc import StatementError
+from sqlalchemy.exc import SAWarning, StatementError
 from uuid import uuid4
 from zipfile import BadZipFile, ZipFile
 
@@ -1528,7 +1529,8 @@ def import_resource_options_formcode(
 @click.argument('mapping_yaml', type=click.File('rb'))
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--test-run', is_flag=True, default=False,
-              help='Only import the first 4 reservations per resource.')
+              help='Only import the first 4 reservations per resource '
+                   '(and the first 4 dates per reservation).')
 def import_reservations(
     reservation_file: IO[bytes],
     option_file: IO[bytes],
@@ -1630,7 +1632,12 @@ def import_reservations(
                     dates.append(end_of_first_day + timedelta(days=day - 1))
                     dates.append(start + timedelta(days=day))
             dates.append(end)
-            reservation['dates'].extend(dates)
+            # In a test run, also limit the dates of recurring reservations
+            if (
+                not test_run
+                or len(reservation['dates']) < 2 * test_run_limit
+            ):
+                reservation['dates'].extend(dates)
         book.close()
 
         options_not_found = set()
@@ -1776,7 +1783,7 @@ def import_reservations(
                                 f'{resource.title} at {start}', fg='red')
                     except Exception as e:
                         click.secho(
-                            f'{id}: Error {e} reserving {resource.title} '
+                            f'{id}: Error {e!r} reserving {resource.title} '
                             f'at {start} - {end} outside of availability'
                             'period', fg='red')
 
@@ -1793,12 +1800,25 @@ def import_reservations(
                 }
                 form = resource.form_class(data=form_data)
 
-                if not form.validate():
-                    form_data_show = json.dumps(
-                        form_data, indent=4, default=str)
-                    click.secho(f'{id}: {form_data_show} failed the form '
-                        f'check with {form.errors}', fg='red')
-                    continue
+                form_is_valid = form.validate()
+                if not form_is_valid:
+                    has_other_errors = False
+                    for field_name, errors in form.errors.items():
+                        for error in errors:
+                            is_required = (
+                                isinstance(error, str)
+                                and error == 'This field is required.'
+                            )
+                            has_other_errors |= not is_required
+                            click.secho(
+                                f'{id}: {field_name}: {error} '
+                                f'(value: {form_data.get(field_name)!r})',
+                                fg='yellow' if is_required else 'red')
+                    if has_other_errors:
+                        form_data_show = json.dumps(
+                            form_data, indent=4, default=str)
+                        click.secho(f'{id}: form data: {form_data_show}',
+                                    fg='red')
 
                 submission = forms.submissions.add_external(
                     form=form,
@@ -1810,7 +1830,20 @@ def import_reservations(
                     session_id)
                 scheduler.approve_reservations(token_uuid)
 
-                forms.submissions.complete_submission(submission)
+                if form_is_valid:
+                    forms.submissions.complete_submission(submission)
+                else:
+                    # complete_submission re-validates and would raise
+                    # UnableToComplete, so we complete it manually
+                    submission.state = 'complete'
+                    with warnings.catch_warnings():
+                        warnings.filterwarnings(
+                            action='ignore',
+                            message=r'Flushing object',
+                            category=SAWarning
+                        )
+                        forms.session.flush()
+                    forms.session.expunge(submission)
 
                 with forms.session.no_autoflush:
                     ticket = tickets.open_ticket(
