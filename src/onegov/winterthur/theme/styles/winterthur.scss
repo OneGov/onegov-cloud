@@ -23,7 +23,6 @@ input[data-street-search] {
     border: 0 inset $gray-light;
     font-size: 1.1rem;
     height: 50px;
-    padding: 1rem 1rem;
 }
 
 form input[type="radio"] {
@@ -1300,4 +1299,20 @@ a.mission-nature-title,
 
 a.mission-nature-title {
     margin-bottom: 1rem;
+}
+
+.filter-panel .accordion .accordion-navigation {
+    &> a {
+        font-weight: bold;
+        background: transparent;
+        border: 0;
+        color: $body-font-color;
+        display: inline-block;
+        font-size: .8rem;
+        padding: .3rem .5rem;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
 }
