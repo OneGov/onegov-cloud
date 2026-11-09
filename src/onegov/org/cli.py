@@ -8,6 +8,7 @@ import locale
 import niquests
 import pytz
 import re
+import sedate
 import shutil
 import sys
 import tempfile
@@ -19,10 +20,9 @@ import yaml
 from collections import defaultdict
 from functools import partial
 from itertools import chain
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from io import BytesIO
-from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
-                                   TimerangeTooLong)
+from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -103,6 +103,7 @@ if TYPE_CHECKING:
     from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
+    from libres.db.scheduler import Scheduler
     from onegov.core.cli.core import GroupContext
     from onegov.core.csv import DefaultRow
     from onegov.core.upgrade import UpgradeContext
@@ -1539,8 +1540,8 @@ def import_reservations(
     test_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports reservations from a Excel file (needs to be .xlsx).
-    Creates no resources or allocations, so the availabilty periods need to
-    be set in the resource settings.
+    Creates no resources. Reservations are made as internal reservations,
+    so they ignore the regular allocations (availability periods).
     """
 
     test_run_limit = 4
@@ -1712,7 +1713,34 @@ def import_reservations(
             # Creating reservations
             assert resource.form_class is not None
             click.echo(f'Importing reservations for {resource.title}')
-            scheduler = resource.scheduler
+            # Reserve on the internal (virtual) layer, which ignores the
+            # regular allocations but still blocks against them
+            scheduler = resource.virtual_scheduler
+
+            def ensure_virtual_allocation(
+                day: date,
+                scheduler: Scheduler,
+                timezone: str
+            ) -> bool:
+                """ Creates a whole-day virtual allocation for the given day
+                if none exists yet. Returns True if one was created. """
+                allocation_range = sedate.get_date_range(
+                    sedate.replace_timezone(sedate.as_datetime(day), timezone),
+                    time(0, 0),
+                    time(23, 59)
+                )
+                if request.session.query(
+                    scheduler.allocations_in_range(*allocation_range).exists()
+                ).scalar():
+                    return False
+                scheduler.allocate(
+                    allocation_range,
+                    partly_available=True,
+                    whole_day=True,
+                    quota=1,
+                    quota_limit=1,
+                )
+                return True
 
             for id, reservation in resource_reservations.items():
                 if reservation['state'] == 'annulliert':
@@ -1736,56 +1764,27 @@ def import_reservations(
                 token_uuid: UUID | None = None
                 dates = reservation['dates']
                 for start, end in zip(dates[::2], dates[1::2]):
+                    savepoint = transaction.savepoint()
                     try:
+                        ensure_virtual_allocation(
+                            start.date(), scheduler, resource.timezone)
                         token_uuid = reserve(dates=(start, end))
                     except InvalidEmailAddress:
+                        savepoint.rollback()
                         click.secho(f'{id}: {email} is an invalid e-mail '
                                     'address')
                     except AlreadyReservedError:
+                        savepoint.rollback()
                         found_conflict = True
                         click.secho(
                             f'{id}: Booking conflict in {resource.title} '
-                            f'at {start} - {end}', fg='red')
-                    except TimerangeTooLong:
-                        click.secho(
-                            f'{id}: Timerange too long: {start} - {end}',
-                            fg='yellow')
-                        relevant_rules = [
-                            rule['options']
-                            for rule in resource.content['rules']
-                            if rule['options']['start'] <= start.date()
-                            and rule['options']['end'] >= end.date()
-                            and start.weekday()
-                            not in rule['options']['except_for']
-                            and start.time() <= rule['options']['start_time']
-                            and end.time() >= rule['options']['end_time']
-                        ]
-                        for i, rule in enumerate(relevant_rules):
-                            start = datetime.combine(
-                                start.date(), rule['start_time'])
-                            end = datetime.combine(
-                                end.date(), rule['end_time'])
-                            click.secho(
-                                f'{id}: Trying to reserve {resource.title}'
-                                f' at {start} - {end} with rule {i+1}',
-                                fg='cyan')
-                            try:
-                                token_uuid = reserve(dates=(start, end))
-                            except Exception as e:
-                                click.secho(
-                                    f'{id}: Error reserving '
-                                    f'{resource.title} at {start} - {end} '
-                                    f'- {e}', fg='red')
-                                found_conflict = True
-                        if not relevant_rules:
-                            click.secho(
-                                f'{id}: No rules found for '
-                                f'{resource.title} at {start}', fg='red')
+                            f'at {start} - {end}', fg='yellow')
                     except Exception as e:
+                        savepoint.rollback()
+                        found_conflict = True
                         click.secho(
                             f'{id}: Error {e!r} reserving {resource.title} '
-                            f'at {start} - {end} outside of availability'
-                            'period', fg='red')
+                            f'at {start} - {end}', fg='red')
 
                 if found_conflict or token_uuid is None:
                     continue
