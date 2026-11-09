@@ -16,6 +16,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
+from functools import partial
 from itertools import chain
 from datetime import date, datetime, timedelta
 from io import BytesIO
@@ -1313,23 +1314,235 @@ def get_resources_and_forms(
     return print_resources_and_forms
 
 
+@cli.command(name='get-resource-options')
+@click.argument('option_file', type=click.File('rb'))
+@click.option('--field-names', is_flag=True, default=False,
+              help='Map each option to its form field name.')
+@click.option('--formcode-output', type=click.File('w', encoding='utf-8'),
+              default=None,
+              help='Also write the formcode snippets to this file.')
+def get_resource_options(
+    option_file: IO[bytes],
+    field_names: bool,
+    formcode_output: IO[str] | None
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Prints the resource_options section of the mapping yaml used by
+    import-reservations, listing every resource of the option file with its
+    options. The name is filled in if a resource with the same title exists.
+
+    Each resource gets a formcode snippet with a field for each option.
+    Options with only "ja" and/or "nein" as answers become a ja/nein radio
+    defaulting to nein, options with numeric answers only become number
+    fields and all others become text fields.
+
+    With --field-names, every option is mapped to the id the formcode parser
+    generates for its field. Otherwise the options are listed commented out.
+
+    With --formcode-output, the snippets are written to the given file, to be
+    imported with import-resource-options-formcode.
+
+    onegov-org --select '/foo/bar' get-resource-options options.xlsx
+        --field-names --formcode-output out.txt
+    """
+    from onegov.form import parse_formcode
+
+    book = load_workbook(option_file, read_only=True)
+    options: dict[str, dict[str, dict[str, None]]] = {}
+    rows: Iterator[tuple[Any, ...]] = book['Reservationen'].iter_rows(
+        min_row=5, values_only=True)  # Skip the header rows
+    for row in rows:
+        if not row or row[0] is None:
+            continue
+
+        resource_name = str(row[0]).strip()
+        resource_options = options.setdefault(resource_name, {})
+        if len(row) <= 13 or row[13] is None:
+            continue
+
+        answers = resource_options.setdefault(str(row[13]).strip(), {})
+        answer = row[14] if len(row) > 14 else None
+        if isinstance(answer, float) and answer.is_integer():
+            answer = int(answer)
+        if answer is not None and str(answer).strip():
+            answers[str(answer).strip()] = None
+    book.close()
+
+    def formcode(resource_options: dict[str, dict[str, None]]) -> str:
+        lines = ['# Zubehör/Optionen']
+        for option_name, answers in resource_options.items():
+            if answers and {a.lower() for a in answers} <= {'ja', 'nein'}:
+                lines.append(f'{option_name} =')
+                lines.append('    ( ) ja')
+                lines.append('    (x) nein')
+            elif len(answers) > 1 and all(
+                re.match(r'^[0-9]+$', a) for a in answers
+            ):
+                lines.append(f'{option_name} = ___/^[0-9]+$')
+            else:
+                lines.append(f'{option_name} = ___')
+        return '\n'.join(lines)
+
+    snippets = {
+        resource_name: formcode(resource_options)
+        for resource_name, resource_options in options.items()
+        if resource_options
+    }
+
+    if formcode_output is not None:
+        for resource_name, snippet in snippets.items():
+            click.echo(f'# {resource_name}', file=formcode_output)
+            click.echo('```', file=formcode_output)
+            click.echo(snippet, file=formcode_output)
+            click.echo('```', file=formcode_output)
+            click.echo('', file=formcode_output)
+
+    def get_field_names(resource_name: str) -> dict[str, str]:
+        if resource_name not in snippets:
+            return {}
+        try:
+            fields = parse_formcode(snippets[resource_name])
+        except FormError as e:
+            click.secho(f'Invalid formcode for {resource_name}: {e!r}',
+                        fg='red', err=True)
+            return {}
+        return {field.label: field.id for field in fields}
+
+    def quote(value: str) -> str:
+        return "'{}'".format(value.replace("'", "''"))
+
+    def print_resource_options(request: OrgRequest, app: OrgApp) -> None:
+        names = {
+            res.title.strip(): res.name
+            for res in ResourceCollection(app.libres_context).query()
+        }
+
+        click.echo('resource_options:')
+        for resource_name, resource_options in options.items():
+            click.echo(f'  {quote(resource_name)}:')
+            click.echo(f'    name: {names.get(resource_name, "")}')
+            click.echo('')
+            if field_names:
+                ids = get_field_names(resource_name)
+                click.echo('    options:')
+                for option in resource_options:
+                    field_id = ids.get(option, '')
+                    click.echo(f'      {quote(option)}: {field_id}')
+            else:
+                click.echo('    # options:')
+                for option in resource_options:
+                    click.echo(f'    #   {quote(option)}:')
+            click.echo('')
+
+    return print_resource_options
+
+
+@cli.command(name='import-resource-options-formcode')
+@click.argument('formcode_file', type=click.File('r', encoding='utf-8'))
+@click.argument('mapping_yaml', type=click.File('rb'))
+@click.option('--dry-run', is_flag=True, help='Validate without saving.')
+def import_resource_options_formcode(
+    formcode_file: IO[str],
+    mapping_yaml: IO[bytes],
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Appends the formcode snippets generated by
+    get-resource-options --formcode-output to the form of the resource mapped
+    to the resource name in the resources section of the mapping yaml.
+    Resources whose form already contains the snippet are skipped.
+
+    onegov-org --select '/foo/bar' import-resource-options-formcode out.txt
+        mapping.yaml
+    """
+    from onegov.form import parse_formcode
+
+    mapping = yaml.safe_load(mapping_yaml) or {}
+    resource_names = {
+        str(title).strip(): entry['name']
+        for title, entry in (mapping.get('resources') or {}).items()
+        if entry and entry.get('name')
+    }
+
+    snippets: dict[str, str] = {}
+    resource_name: str | None = None
+    lines: list[str] | None = None
+    for line in formcode_file.read().splitlines():
+        if lines is None:
+            if line.startswith('# '):
+                resource_name = line[2:].strip()
+            elif line.strip() == '```' and resource_name is not None:
+                lines = []
+        elif line.strip() == '```':
+            assert resource_name is not None
+            snippets[resource_name] = '\n'.join(lines).strip()
+            resource_name = None
+            lines = None
+        else:
+            lines.append(line)
+
+    def import_formcode(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+
+        updated = 0
+        for title, snippet in snippets.items():
+            if not snippet:
+                continue
+
+            name = resource_names.get(title)
+            if name is None:
+                click.secho(f'Resource not in mapping: {title}', fg='yellow')
+                continue
+
+            resource = resources.by_name(name)
+            if resource is None:
+                click.secho(f'Resource not found: {title} ({name})',
+                            fg='yellow')
+                continue
+
+            definition = (resource.definition or '').rstrip()
+            if snippet in definition:
+                click.echo(f'Already imported: {title}')
+                continue
+
+            new_definition = f'{definition}\n\n{snippet}'.lstrip()
+            try:
+                parse_formcode(new_definition, enable_edit_checks=True)
+            except FormError as e:
+                click.secho(f'Invalid formcode for {title}: {e!r}', fg='red')
+                continue
+
+            resource.definition = new_definition
+            updated += 1
+            click.secho(f'Updated: {title}', fg='green')
+
+        click.echo(f'{updated} resource(s) updated')
+        if dry_run:
+            transaction.abort()
+            click.echo('Dry run complete. No changes saved.')
+
+    return import_formcode
+
+
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.argument('reservation_file', type=click.File('rb'))
 @click.argument('option_file', type=click.File('rb'))
 @click.argument('mapping_yaml', type=click.File('rb'))
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--masked', is_flag=True, default=False)
+@click.option('--test-run', is_flag=True, default=False,
+              help='Only import the first 4 reservations per resource.')
 def import_reservations(
     reservation_file: IO[bytes],
     option_file: IO[bytes],
     mapping_yaml: IO[bytes],
     dry_run: bool,
-    masked: bool
+    test_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports reservations from a Excel file (needs to be .xlsx).
     Creates no resources or allocations, so the availabilty periods need to
     be set in the resource settings.
     """
+
+    test_run_limit = 4
+    fixed_columns = {0, 3, 6, 8, 22, 37}
 
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
 
@@ -1339,121 +1552,122 @@ def import_reservations(
             fields: dict[str, Any]
             dates: list[Any]
 
-        yaml_file = mapping_yaml.read()
-        yaml_dict = yaml.safe_load(yaml_file)
-        shared_fields = yaml_dict.get('shared_fields', {})
-        resource_options = yaml_dict.get('resource_options', {})
+        yaml_dict = yaml.safe_load(mapping_yaml)
+        shared_fields = sorted(
+            (i, key) for i, key in yaml_dict.get('shared_fields', {}).items()
+            if i not in fixed_columns
+        )
+        resource_options = {
+            str(name).strip(): entry
+            for name, entry
+            in (yaml_dict.get('resource_options') or {}).items()
+        }
+        prefilled_fields = yaml_dict.get('prefilled_fields', {})
 
-        book = load_workbook(reservation_file)
-        sheet = book['Reservationsdaten']
-
-        book_options = load_workbook(option_file)
-        sheet_options = book_options['Reservationen']
-
-        reservations: dict[
-            str, dict[str, Reservation]] = {}
-        count = 0
-        last_reservation_id = ''
-        for index, row in enumerate(sheet.rows):
-            if index <= 3:  # Skip the first 3 rows, they are headers
+        # A reservation may span multiple consecutive rows with the same id
+        reservations: dict[str, dict[str, Reservation]] = {}
+        last_id = ''
+        book = load_workbook(reservation_file, read_only=True)
+        rows: Iterator[tuple[Any, ...]] = book['Reservationsdaten'].iter_rows(
+            min_row=5, values_only=True)
+        for row in rows:
+            if not row or row[0] is None:
                 continue
+            if len(row) < 38:
+                row = (*row, *(None,) * (38 - len(row)))
 
-            reservation: Reservation = {
-                'state': '',
-                'general': {},
-                'fields': {},
-                'dates': []
-            }
-            row_empty: bool = True
-            id = ''
-            resource_name = ''
+            resource_name = str(row[0]).strip()
+            id = str(row[3])
+            resource_reservations = reservations.setdefault(resource_name, {})
 
-            for i, cell in enumerate(row):
-                value = cell.value
-                if i == 0:
-                    if value is None:
-                        continue
-                    row_empty = False
-                    resource_name = str(value)
-                elif i == 3:
-                    id = str(value)
-                    if last_reservation_id == id:
-                        reservation = reservations[resource_name][id]
-                elif i == 6 or i == 8:
-                    reservation['dates'].append(value)
-                elif i == 22:
-                    if value is None:
-                        value = 'info@seantis.ch'
-                    reservation['general']['email'] = value
-                    reservation['fields']['email'] = value
-                elif i == 37:
-                    reservation['state'] = str(value)
-                elif i in shared_fields:
-                    value = str(value or '')
-                    key = shared_fields[i]
-                    if reservation['fields'].get(key) is None or '':
-                        reservation['fields'][key] = value
-                    elif value not in reservation['fields'][key]:
-                        if i == 17 or i == 18:
-                            reservation['fields'][key] += f' {value}'
-                        else:
-                            reservation['fields'][key] += f', {value}'
-
-            if not row_empty:
-                # Check if the dates spread across multiple days
-                start = reservation['dates'][-2]
-                end = reservation['dates'][-1]
-                if start.day != end.day:
-                    days = (end - start).days + 1
-                    for day in range(days):
-                        reservation['dates'].insert(
-                            -1, start + timedelta(days=day)
-                        ) if day != 0 else None
-                        end_of_day = datetime.combine(
-                            start, end.time()
-                        )
-                        reservation['dates'].insert(
-                            -1, end_of_day + timedelta(days=day)
-                        ) if day != days - 1 else None
-                count += 1
-                if resource_name not in reservations:
-                    reservations[resource_name] = {}
-
-                if id not in reservations[resource_name] and (
-                    id != last_reservation_id
-                ):
-                    reservations[resource_name][id] = reservation
-                last_reservation_id = id or ''
-
-        options_count = 0
-        options_not_found = set()
-        for index, row in enumerate(sheet_options.rows):
-            row_empty = True
-            if index <= 3:
-                continue
-            for i, cell in enumerate(row):
-                value = cell.value
-                if value is None:
+            if id == last_id:
+                found = resource_reservations.get(id)
+                if found is None:  # skipped in a test run
                     continue
-                row_empty = False
-                options_count += 1
-                if i == 0:
-                    resource_name = str(value)
-                elif i == 2:
-                    id = str(value)
-                elif resource_name in reservations:
-                    if id in reservations[resource_name]:
-                        if i == 13:  # Option name
-                            key = resource_options[resource_name][
-                                'options'].get(value)
-                            if key is None:
-                                options_not_found.add(
-                                    f'{resource_name}: {value}')
-                        if i == 14:  # Option answer
-                            if key is not None:
-                                reservation = reservations[resource_name][id]
-                                if reservation['fields'].get(key) is None:
-                                    reservation['fields'][key] = value
+                reservation = found
+            else:
+                last_id = id
+                if id in resource_reservations:
+                    continue
+                if test_run and len(resource_reservations) >= test_run_limit:
+                    continue
+                reservation = {
+                    'state': '',
+                    'general': {},
+                    'fields': {},
+                    'dates': []
+                }
+                resource_reservations[id] = reservation
+
+            fields = reservation['fields']
+            email = row[22] if row[22] is not None else 'info@seantis.ch'
+            reservation['general']['email'] = email
+            fields['kontaktangaben_e_mail'] = email
+            reservation['state'] = str(row[37])
+
+            for i, key in shared_fields:
+                if i >= len(row):
+                    continue
+                value = str(row[i] or '')
+                current = fields.get(key)
+                if not current:
+                    fields[key] = value
+                elif value not in current:
+                    separator = ' ' if i in (17, 18) else ', '
+                    fields[key] = f'{current}{separator}{value}'
+
+            for key, value in prefilled_fields.items():
+                if fields.get(key) is None:
+                    fields[key] = value
+
+            # Split reservations spreading across multiple days into one
+            # reservation per day
+            start, end = row[6], row[8]
+            dates = [start]
+            if start.date() != end.date():
+                end_of_first_day = datetime.combine(start.date(), end.time())
+                for day in range(1, (end - start).days + 1):
+                    dates.append(end_of_first_day + timedelta(days=day - 1))
+                    dates.append(start + timedelta(days=day))
+            dates.append(end)
+            reservation['dates'].extend(dates)
+        book.close()
+
+        options_not_found = set()
+        resource_name = id = ''
+        book = load_workbook(option_file, read_only=True)
+        option_rows: Iterator[tuple[Any, ...]] = book[
+            'Reservationen'].iter_rows(min_row=5, values_only=True)
+        for row in option_rows:
+            if len(row) <= 13:
+                continue
+            if row[0] is not None:
+                resource_name = str(row[0]).strip()
+            if row[2] is not None:
+                id = str(row[2])
+
+            option_reservation = reservations.get(resource_name, {}).get(id)
+            if row[13] is None or option_reservation is None:
+                continue
+            option_name = str(row[13]).strip()
+
+            options = (
+                resource_options.get(resource_name) or {}
+            ).get('options') or {}
+            key = options.get(option_name)
+            if key is None:
+                options_not_found.add(f'{resource_name}: {option_name}')
+                continue
+
+            answer = row[14] if len(row) > 14 else None
+            if answer is None:
+                continue
+            if answer in ('Ja', 'Nein'):
+                answer = answer.lower()
+            if option_reservation['fields'].get(key) is None:
+                option_reservation['fields'][key] = answer
+        book.close()
+
         for option in options_not_found:
             click.secho(f'Option not found in the mapping file: {option}',
                         fg='yellow')
@@ -1461,162 +1675,154 @@ def import_reservations(
         if dry_run:
             res_show = json.dumps(reservations, indent=4, default=str)
             click.secho(f'Reservations: {res_show}', fg='green')
+            return
 
-        # Create reservations
-        if not dry_run:
-            resources = ResourceCollection(app.libres_context)
-            for resource_name in reservations.keys():
+        user = UserCollection(request.session).by_username('info@seantis.ch')
+        if not user:
+            abort('info@seantis.ch not found in users')
 
-                real_resource_name = resource_options.get(resource_name, '')
-                if not real_resource_name:
-                    click.echo(
-                        f'Resource {resource_name} not found in the mapping '
-                        'file'
-                    )
-                    continue
-                real_resource_name = real_resource_name.get('name', '')
-                resource = resources.by_name(real_resource_name.lower())
+        resources = ResourceCollection(app.libres_context)
+        forms = FormCollection(request.session)
+        tickets = TicketCollection(request.session)
 
-                if not resource:
-                    click.echo(
-                        f'Resource {resource} not found in the database'
-                    )
-                    continue
-
+        for resource_name, resource_reservations in reservations.items():
+            real_resource_name = (
+                resource_options.get(resource_name) or {}
+            ).get('name')
+            if not real_resource_name:
                 click.echo(
-                    f'Importing reservations for {resource.title}'
+                    f'Resource {resource_name} not found in the mapping file'
                 )
-                scheduler = resource.scheduler
+                continue
 
-                for id, reservation in reservations[resource_name].items():
-                    if reservation['state'] == 'annulliert':
+            resource = resources.by_name(real_resource_name.lower())
+            if not resource:
+                click.echo(
+                    f'Resource {real_resource_name} not found in the database'
+                )
+                continue
+
+            # Creating reservations
+            assert resource.form_class is not None
+            click.echo(f'Importing reservations for {resource.title}')
+            scheduler = resource.scheduler
+
+            for id, reservation in resource_reservations.items():
+                if reservation['state'] == 'annulliert':
+                    click.secho(
+                        f'{id}: Reservation state is deleted, '
+                        f'skipping {resource.title}', fg='yellow')
+                    continue
+
+                email = str(reservation['general'].get('email'))
+                session_id = uuid4()
+                reserve = partial(
+                    scheduler.reserve,
+                    email=email,
+                    session_id=session_id,
+                    single_token_per_session=True,
+                    data={'accepted': True}
+                )
+
+                # Conflicts
+                found_conflict = False
+                token_uuid: UUID | None = None
+                dates = reservation['dates']
+                for start, end in zip(dates[::2], dates[1::2]):
+                    try:
+                        token_uuid = reserve(dates=(start, end))
+                    except InvalidEmailAddress:
+                        click.secho(f'{id}: {email} is an invalid e-mail '
+                                    'address')
+                    except AlreadyReservedError:
+                        found_conflict = True
                         click.secho(
-                            f'{id}: Reservation state is deleted, '
-                            f'skipping {resource.title}', fg='yellow')
-                        continue
-                    found_conflict = False
-                    session_id = uuid4()
-                    for n in range(int(len(reservation['dates'])/2)):
-                        email = reservation['general'].get('email')
-                        start = reservation['dates'][n*2]
-                        end = reservation['dates'][n*2+1]
-
-                        try:
-                            token_uuid = scheduler.reserve(
-                                email=str(email),
-                                dates=(start, end),
-                                session_id=session_id,
-                                single_token_per_session=True,
-                                data={'accepted': True}
-                            )
-                            token = token_uuid.hex
-                        except InvalidEmailAddress:
-                            click.secho(f'{id}: {email} is an invalid e-mail '
-                                        'address')
-                        except AlreadyReservedError:
-                            found_conflict = True
+                            f'{id}: Booking conflict in {resource.title} '
+                            f'at {start} - {end}', fg='red')
+                    except TimerangeTooLong:
+                        click.secho(
+                            f'{id}: Timerange too long: {start} - {end}',
+                            fg='yellow')
+                        relevant_rules = [
+                            rule['options']
+                            for rule in resource.content['rules']
+                            if rule['options']['start'] <= start.date()
+                            and rule['options']['end'] >= end.date()
+                            and start.weekday()
+                            not in rule['options']['except_for']
+                            and start.time() <= rule['options']['start_time']
+                            and end.time() >= rule['options']['end_time']
+                        ]
+                        for i, rule in enumerate(relevant_rules):
+                            start = datetime.combine(
+                                start.date(), rule['start_time'])
+                            end = datetime.combine(
+                                end.date(), rule['end_time'])
                             click.secho(
-                                f'{id}: Booking conflict in {resource.title} '
-                                f'at {start} - {end}', fg='red')
-                        except TimerangeTooLong:
-                            click.secho(
-                                f'{id}: Timerange too long: {start} - {end}',
-                                fg='yellow')
-                            rules = resource.content['rules']
-                            relevant_rules = []
-                            for rule in rules:
-                                rule = rule['options']
-                                if rule['start'] <= start.date(
-                                ) and rule['end'] >= end.date(
-                                ) and start.weekday(
-                                ) not in rule['except_for'] and start.time(
-                                ) <= rule['start_time'] and end.time(
-                                ) >= rule['end_time']:
-                                    relevant_rules.append(rule)
-                            for i, rule in enumerate(relevant_rules):
-                                start = datetime.combine(
-                                    start.date(), rule['start_time'])
-                                end = datetime.combine(
-                                    end.date(), rule['end_time'])
+                                f'{id}: Trying to reserve {resource.title}'
+                                f' at {start} - {end} with rule {i+1}',
+                                fg='cyan')
+                            try:
+                                token_uuid = reserve(dates=(start, end))
+                            except Exception as e:
                                 click.secho(
-                                    f'{id}: Trying to reserve {resource.title}'
-                                    f' at {start} - {end} with rule {i+1}',
-                                    fg='cyan')
-                                try:
-                                    token_uuid = scheduler.reserve(
-                                        email=str(email),
-                                        dates=(start, end),
-                                        session_id=session_id,
-                                        single_token_per_session=True,
-                                        data={'accepted': True}
-                                    )
-                                    token = token_uuid.hex
-                                except Exception as e:
-                                    click.secho(
-                                        f'{id}: Error reserving '
-                                        f'{resource.title} at {start} - {end} '
-                                        f'- {e}', fg='red')
-                                    found_conflict = True
-                            if not relevant_rules:
-                                click.secho(
-                                    f'{id}: No rules found for '
-                                    f'{resource.title} at {start}', fg='red')
-                        except Exception as e:
+                                    f'{id}: Error reserving '
+                                    f'{resource.title} at {start} - {end} '
+                                    f'- {e}', fg='red')
+                                found_conflict = True
+                        if not relevant_rules:
                             click.secho(
-                                f'{id}: Error {e} reserving {resource.title} '
-                                f'at {start} - {end} outside of availability'
-                                'period', fg='red')
-                            continue
+                                f'{id}: No rules found for '
+                                f'{resource.title} at {start}', fg='red')
+                    except Exception as e:
+                        click.secho(
+                            f'{id}: Error {e} reserving {resource.title} '
+                            f'at {start} - {end} outside of availability'
+                            'period', fg='red')
 
-                    if found_conflict:
-                        continue
+                if found_conflict or token_uuid is None:
+                    continue
 
-                    assert resource.form_class is not None
-                    forms = FormCollection(app.session())
-
-                    form_data = {}
-                    for key, value in reservation['fields'].items():
-                        form_data[key] = str(value)
-
-                    form = resource.form_class(data=form_data)
-
-                    if not form.validate():
-                        form_data_show = json.dumps(
-                            form_data, indent=4, default=str)
-                        click.secho(f'{id}: {form_data_show} failed the form '
-                            f'check with {form.errors}', fg='red')
-                        continue
-
-                    submission = forms.submissions.add_external(
-                        form=form,
-                        state='pending',
-                        id=token_uuid
+                # Filling the form
+                form_data = {
+                    key: (
+                        [str(v) for v in value]
+                        if isinstance(value, list) else str(value)
                     )
+                    for key, value in reservation['fields'].items()
+                }
+                form = resource.form_class(data=form_data)
 
-                    scheduler.queries.confirm_reservations_for_session(
-                        session_id)
-                    scheduler.approve_reservations(token_uuid)
+                if not form.validate():
+                    form_data_show = json.dumps(
+                        form_data, indent=4, default=str)
+                    click.secho(f'{id}: {form_data_show} failed the form '
+                        f'check with {form.errors}', fg='red')
+                    continue
 
-                    forms.submissions.complete_submission(submission)
+                submission = forms.submissions.add_external(
+                    form=form,
+                    state='pending',
+                    id=token_uuid
+                )
 
-                    users = UserCollection(app.session())
-                    user = users.query().filter(
-                        User.username == 'info@seantis.ch').first()
+                scheduler.queries.confirm_reservations_for_session(
+                    session_id)
+                scheduler.approve_reservations(token_uuid)
 
-                    if not user:
-                        abort('info@seantis.ch not found in users')
+                forms.submissions.complete_submission(submission)
 
-                    with forms.session.no_autoflush:
-                        ticket = TicketCollection(request.session).open_ticket(
-                            handler_code='RSV', handler_id=token
-                        )
-                        ticket.accept_ticket(user)
-                        if reservation['state'] != 'unbestätigt':
-                            ticket.close_ticket()
+                with forms.session.no_autoflush:
+                    ticket = tickets.open_ticket(
+                        handler_code='RSV', handler_id=token_uuid.hex
+                    )
+                    ticket.accept_ticket(user)
+                    if reservation['state'] != 'unbestätigt':
+                        ticket.close_ticket()
 
-                    click.secho(f'{id}: Sucessfully imported reservation '
-                                f'at {start} - {end}',
-                                fg='green')
+                click.secho(f'{id}: Sucessfully imported reservation '
+                            f'at {start} - {end}',
+                            fg='green')
 
     return import_reservations
 
@@ -3591,6 +3797,88 @@ def list_resources(
             click.secho(f'- {res.title}', fg='green')
 
     return list_all_resources
+
+
+def resource_field_ids(
+    app: OrgApp
+) -> tuple[list[tuple[str, str | None, list[str]]], list[str]]:
+    """
+    Returns the title, name and field ids of all resources with a form,
+    together with the field ids shared by at least 50% of them.
+
+    """
+    resources = ResourceCollection(app.libres_context)
+
+    entries = []
+    counts: dict[str, int] = defaultdict(int)
+    for res in resources.query():
+        if res.parsed is None or not res.parsed.fields:
+            continue
+
+        fields = res.parsed.flattened_fields
+        ids = list(dict.fromkeys(field.id for field in fields))
+        entries.append((res.title, res.name, ids))
+        for id in ids:
+            counts[id] += 1
+
+    total = len(entries)
+    shared = [id for id, count in counts.items() if count * 2 >= total]
+    return entries, shared
+
+
+@cli.command(name='get-shared-fields')
+def get_shared_fields(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Lists the form fields shared by at least 50% of the resources with a
+    form. Resources without a form are ignored.
+
+    onegov-org --select '/foo/bar' get-shared-fields
+    """
+
+    def list_shared_fields(request: OrgRequest, app: OrgApp) -> None:
+        _, shared = resource_field_ids(app)
+
+        if not shared:
+            click.secho('No shared fields found', fg='yellow')
+            return
+
+        for id in shared:
+            click.echo(f'  : {id}')
+
+    return list_shared_fields
+
+
+@cli.command(name='get-unique-fields')
+def get_unique_fields(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Lists all resources with a form, together with their form fields which
+    are not shared by at least 50% of the resources with a form (see
+    get-shared-fields). Resources without a form are ignored.
+
+    onegov-org --select '/foo/bar' get-unique-fields
+    """
+
+    def list_unique_fields(request: OrgRequest, app: OrgApp) -> None:
+        entries, shared = resource_field_ids(app)
+        shared_ids = set(shared)
+
+        if not entries:
+            click.secho('No resources with a form found', fg='yellow')
+            return
+
+        for title, name, ids in entries:
+            click.echo(f"  '{title}':")
+            click.echo(f'    name: {name}')
+
+            unique = [id for id in ids if id not in shared_ids]
+            if unique:
+                click.echo('    fields:')
+                for id in unique:
+                    click.echo(f'      : {id}')
+
+    return list_unique_fields
 
 
 @cli.command(name='check-formcode')
