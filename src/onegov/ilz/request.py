@@ -41,4 +41,6 @@ class ILZRequest(TownRequest):
                 if page.locale is None or page.locale == self.locale
             )
 
-        return in_locale(super().pages_tree)
+        # The overridden parent cache is not registered for invalidation.
+        # Build the tree directly so only this request's cache is used.
+        return in_locale(TownRequest.pages_tree.create(self))
