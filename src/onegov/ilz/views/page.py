@@ -117,28 +117,42 @@ def ilz_view_topic(
     if self.locale and len(request.app.locales) > 1:
         if request.is_manager:
             assert isinstance(layout.editbar_links, list)
-            layout.editbar_links.insert(-1, LinkGroup(
-                title=_('Translations'),
-                links=[
-                    Link(
-                        text=(Locale.parse(locale).get_language_name(
-                            request.locale) or locale).capitalize(),
-                        url=request.class_link(
-                            Editor,
-                            {
-                                'action': 'new',
-                                'trait': 'page',
-                                'page_id': self.id,
-                            },
-                            'translate',
-                            query_params={'locale': locale}
-                        ),
-                        attrs={'class': 'edit-link'}
-                    )
-                    for locale in sorted(request.app.locales)
-                    if locale != self.locale
-                ]
-            ))
+            translation_links = [
+                Link(
+                    text=_('Translation: ${language}', mapping={
+                        'language': (Locale.parse(locale).get_language_name(
+                            request.locale) or locale).capitalize()
+                    }),
+                    url=request.class_link(
+                        Editor,
+                        {
+                            'action': 'new',
+                            'trait': 'page',
+                            'page_id': self.id,
+                        },
+                        'translate',
+                        query_params={'locale': locale}
+                    ),
+                    attrs={'class': 'translate-link'}
+                )
+                for locale in sorted(request.app.locales)
+                if locale != self.locale
+            ]
+
+            # NOTE: A translation is a new page, so we add the links to the
+            #       existing 'Add' menu, a separate menu wouldn't fit into
+            #       a single line of the edit bar
+            add_group = next((
+                link for link in layout.editbar_links
+                if isinstance(link, LinkGroup) and link.title == 'Add'
+            ), None)
+            if add_group is not None:
+                add_group.links = [*add_group.links, *translation_links]
+            else:
+                layout.editbar_links.insert(-1, LinkGroup(
+                    title=_('Translations'),
+                    links=translation_links
+                ))
         elif (
             self.locale != request.locale
             and request.locale in self.alt_locale_ids

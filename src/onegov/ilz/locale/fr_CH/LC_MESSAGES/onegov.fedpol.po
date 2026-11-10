@@ -67,3 +67,7 @@ msgstr "Traduction par IA"
 
 msgid "The AI translation failed, please try again."
 msgstr "La traduction par IA a échoué, veuillez réessayer."
+
+#, python-format
+msgid "Translation: ${language}"
+msgstr "Traduction: ${language}"
