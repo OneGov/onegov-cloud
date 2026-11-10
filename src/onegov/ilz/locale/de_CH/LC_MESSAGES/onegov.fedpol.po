@@ -63,7 +63,7 @@ msgid "Translate to ${language}"
 msgstr "In ${language} übersetzen"
 
 msgid "AI Translate"
-msgstr "AI Übersetzung"
+msgstr "KI Übersetzung"
 
 msgid "The AI translation failed, please try again."
 msgstr "Die KI-Übersetzung ist fehlgeschlagen, bitte versuchen Sie es erneut."
