@@ -1011,6 +1011,7 @@ class GeneralFileLinkExtension(ContentExtension):
             show_file_links_in_sidebar = BooleanField(
                 label=_('Show file links in sidebar'),
                 fieldset=_('Documents'),
+                default=True,
                 description=_(
                     'Files linked in text and uploaded files are no '
                     'longer displayed in the sidebar if this option is '
