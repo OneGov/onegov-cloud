@@ -48,7 +48,7 @@ def get_i18n_localedirs() -> list[str]:
 
 @ILZApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH', 'it_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH', 'en_US'}
 
 
 @ILZApp.setting(section='i18n', name='default_locale')
