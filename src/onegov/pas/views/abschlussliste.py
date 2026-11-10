@@ -103,8 +103,8 @@ def generate_abschlussliste_xlsx(
     overview_ws = workbook.add_worksheet('Übersicht')
     overview_headers = [
         'Name', 'Vorname', 'Partei', 'Fraktion',
-        'Plenum Zeit', 'Plenum Entschädigung',
-        'Kommissionen Zeit', 'Kommissionen Entschädigung',
+        'Plenum Zeit (Industrieminuten)', 'Plenum Entschädigung',
+        'Kommissionen Zeit (Industrieminuten)', 'Kommissionen Entschädigung',
         'Präsidialzulage',
         'Spesen',
     ]
