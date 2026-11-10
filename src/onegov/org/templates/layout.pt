@@ -230,11 +230,6 @@
       </div>
     </div>
 
-    <!--! Outside the off-canvas wrapper so position: fixed works; shown by sidebar_mobile.js -->
-    <button type="button" class="sidebar-toggler" aria-controls="offCanvasSidebar" aria-label="Sidebar" i18n:attributes="aria-label">
-        <i class="fa fa-filter" aria-hidden="true"></i>
-        <span class="text show-for-sr" i18n:translate>Sidebar</span>
-    </button>
 </body>
 
 </html>

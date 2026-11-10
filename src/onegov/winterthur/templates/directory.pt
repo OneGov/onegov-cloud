@@ -16,6 +16,11 @@
             </div>
         </div>
 
+        <button type="button" class="sidebar-toggler" aria-controls="offCanvasSidebar" aria-label="Sidebar" i18n:attributes="aria-label">
+            <i class="fa fa-filter" aria-hidden="true"></i>
+            <span class="text show-for-sr" i18n:translate>Sidebar</span>
+        </button>
+
         <p tal:condition="directory.lead" tal:content="layout.linkify(directory.lead)" />
         <div class="sidebar-wrapper">
             <div class="row search-widget" tal:condition="search_widget">
