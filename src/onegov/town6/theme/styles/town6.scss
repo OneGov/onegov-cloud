@@ -1997,3 +1997,11 @@ ol li a:not(.button) {
         box-shadow: 0 0 0 4px $success-color;
     }
 }
+
+// call to action buttons in the text, see linkstyle.js
+.page-text a.cta,
+.redactor-editor a.cta {
+    margin: 0 .5rem .5rem 0;
+    // links in the page text are always underlined
+    text-decoration: none !important;
+}

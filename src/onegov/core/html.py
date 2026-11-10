@@ -50,7 +50,7 @@ SANE_HTML_TAGS = frozenset({
 
 # html attributes allowed by our default sanitize policy
 SANE_HTML_ATTRS = {
-    'a': frozenset({'href', 'title'}),
+    'a': frozenset({'href', 'title', 'class'}),
     'abbr': frozenset({'title', }),
     'acronym': frozenset({'title', }),
     'img': frozenset({'src', 'alt', 'title'}),
@@ -82,9 +82,22 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
+# the classes links may have (call to action buttons), other classes might
+# trigger javascript behaviour (e.g. 'confirm'), so we only allow these
+SANE_LINK_CLASSES = frozenset({'button', 'cta', 'secondary'})
+
+
+def filter_attribute(tag: str, name: str, value: str) -> str | None:
+    if tag == 'a' and name == 'class':
+        classes = [cls for cls in value.split() if cls in SANE_LINK_CLASSES]
+        return ' '.join(dict.fromkeys(classes)) or None
+    return value
+
+
 sanitize_policy = Policy(
     tags=SANE_HTML_TAGS,
-    attributes=SANE_HTML_ATTRS
+    attributes=SANE_HTML_ATTRS,
+    attribute_filter=filter_attribute,
 )
 
 

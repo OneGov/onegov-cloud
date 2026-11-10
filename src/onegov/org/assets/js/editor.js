@@ -52,7 +52,7 @@ $(function() {
                 videoManagerJson: form.data('video-list-url'),
                 imageCropperInitialAspectRatio: '16:9',
                 definedLinks: form.data('sitecollection-url'),
-                plugins: ['alphalist', 'bufferbuttons', 'filemanager', 'imagemanager', 'videomanager', 'imagecropper', 'definedlinks', 'table', 'superscript', 'subscript'],
+                plugins: ['alphalist', 'bufferbuttons', 'filemanager', 'imagemanager', 'videomanager', 'imagecropper', 'definedlinks', 'linkstyle', 'table', 'superscript', 'subscript'],
                 lang: language,
                 convertVideoLinks: false,
                 imageResizable: false,

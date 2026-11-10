@@ -361,3 +361,69 @@ def test_insert_video_in_editor(browser: ExtendedBrowser) -> None:
     page.click('.save-link')
     page.wait_for_url('**/topics/themen/filme')
     assert page.locator('video').count() == 0
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_call_to_action_button_in_editor(browser: ExtendedBrowser) -> None:
+    browser.login_admin()
+    browser.visit('/topics/themen')
+    page = browser.page
+    new_page_url = page.locator(
+        'a[href*="/editor/new/page/"]').first.get_attribute('href')
+    assert new_page_url is not None
+    browser.visit(new_page_url)
+    page.fill('input[name="title"]', 'Dienstleistungen')
+
+    # insert a link to an internal page, shown as a button
+    page.click('.redactor-editor')
+    page.click('.re-link')
+    page.click('.redactor-dropdown-link')
+    page.wait_for_selector('#redactor-link-style')
+    page.click('#redactor_defined_links_chosen')
+    page.keyboard.type('Kontakt')
+    page.keyboard.press('Enter')
+    assert page.input_value('#redactor-link-url').endswith('/topics/kontakt')
+    page.fill('#redactor-link-url-text', 'Jetzt Kontakt aufnehmen')
+    page.select_option('#redactor-link-style', 'secondary')
+    page.click('.redactor-modal-action-btn')
+
+    cta = page.locator('.redactor-editor a')
+    assert cta.inner_text() == 'Jetzt Kontakt aufnehmen'
+    assert cta.get_attribute('class') == 'button cta secondary'
+
+    page.click('.save-link')
+    page.wait_for_selector('.page-text a.cta')
+    cta = page.locator('.page-text a.cta')
+    assert cta.get_attribute('class') == 'button cta secondary'
+    assert (cta.get_attribute('href') or '').endswith('/topics/kontakt')
+
+    # change the style of the existing link
+    edit_url = page.locator(
+        'a[href*="/editor/edit/page/"]').first.get_attribute('href')
+    assert edit_url is not None
+    browser.visit(edit_url)
+
+    def edit_link() -> None:
+        page.click('.redactor-editor a')
+        page.click('.redactor-link-tooltip-action:has-text("Bearbeiten")')
+        page.wait_for_selector('#redactor-link-style')
+
+    edit_link()
+    assert page.input_value('#redactor-link-style') == 'secondary'
+    page.select_option('#redactor-link-style', 'primary')
+    page.click('.redactor-modal-action-btn')
+    assert page.locator('.redactor-editor a').get_attribute(
+        'class') == 'button cta'
+
+    # and back to a normal text link
+    edit_link()
+    assert page.input_value('#redactor-link-style') == 'primary'
+    page.select_option('#redactor-link-style', '')
+    page.click('.redactor-modal-action-btn')
+    assert page.locator('.redactor-editor a').get_attribute('class') is None
+
+    page.click('.save-link')
+    page.wait_for_selector('.page-text a')
+    assert page.locator('.page-text a.cta').count() == 0
+    assert page.locator('.page-text a').inner_text() == (
+        'Jetzt Kontakt aufnehmen')

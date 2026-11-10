@@ -878,6 +878,7 @@ def get_code_editor_asset() -> Iterator[str]:
 def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
+    yield 'linkstyle.js'
     yield 'filemanager.js'
     yield 'imagecropper.js'
     yield 'imagemanager.js'
