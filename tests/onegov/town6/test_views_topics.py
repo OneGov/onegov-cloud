@@ -342,3 +342,26 @@ def test_page_templates(client: Client) -> None:
     # templates are not filled in by url manipulation either
     url = new_page.request.url + '?template=999999'
     assert 'Kurze Beschreibung' not in client.get(url)
+
+
+def test_report_change_prefills_email(client: Client) -> None:
+    client.login_admin()
+    topic = client.get('/topics/themen')
+    report_url = topic.pyquery('a[href$="report-change"]').attr('href')
+    assert report_url
+
+    # the e-mail address of the logged in user is filled in
+    form = client.get(report_url).form
+    assert form['submitter_email'].value == 'admin@example.org'
+
+    # but can be changed
+    form['submitter_email'] = 'someone@example.org'
+    form['submitter_message'] = 'Bitte aktualisieren'
+    ticket = form.submit().follow()
+    assert 'someone@example.org' in client.get(
+        ticket.request.url.replace('/status', ''))
+
+    # anonymous users have to enter their address
+    anonymous = client.spawn()
+    form = anonymous.get(report_url).form
+    assert form['submitter_email'].value == ''

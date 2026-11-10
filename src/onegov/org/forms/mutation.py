@@ -16,10 +16,14 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from onegov.org.request import OrgRequest
     from wtforms import Field
 
 
 class MutationForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     callout = _(
         'This form can be used to report mutations to the data. '
@@ -76,7 +80,19 @@ class MutationForm(Form):
         return None
 
     def on_request(self) -> None:
-        if self.model is None or self.request.POST:
+        if self.request.POST:
+            return
+
+        # the username of logged in users is their e-mail address, citizens
+        # who logged in have an authenticated e-mail address
+        email = (
+            self.request.current_username
+            or self.request.authenticated_email
+        )
+        if email and not self.submitter_email.data:
+            self.submitter_email.data = email
+
+        if self.model is None:
             return
 
         for name, field in self.proposal_fields.items():
