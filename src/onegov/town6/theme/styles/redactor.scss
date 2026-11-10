@@ -54,3 +54,48 @@ ol.alpha-list {
         top: .5rem;
     }
 }
+
+// video previews in the video dialog of the editor
+#redactor-video-manager-box {
+    max-height: 360px;
+    overflow: auto;
+}
+
+.redactor-video-manager-group {
+    margin: 1rem 0 .5rem;
+}
+
+.redactor-video-manager-grid {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+
+    .redactor-video-manager-link {
+        border: 2px solid transparent;
+        border-radius: 3px;
+        display: block;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            border-color: $primary-color;
+        }
+    }
+
+    video {
+        aspect-ratio: 16 / 9;
+        background: $black;
+        display: block;
+        object-fit: contain;
+        width: 100%;
+    }
+
+    .redactor-video-manager-title {
+        display: block;
+        font-size: .8rem;
+        overflow: hidden;
+        padding: .25rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

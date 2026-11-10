@@ -215,23 +215,51 @@
                         $.each(data, $.proxy(function(_key, group) {
                             $box.append($('<p class="redactor-video-manager-group">').text(group.group));
 
-                            var $list = $('<ul id="redactor-modal-list">');
+                            var $grid = $('<div class="redactor-video-manager-grid">');
                             $.each(group.videos, $.proxy(function(_index, video) {
-                                var $link = $('<a href="#" class="redactor-video-manager-link">')
-                                    .text(video.title)
-                                    .attr('data-video', video.video)
-                                    .attr('data-title', video.title);
-
-                                $link.on('click', $.proxy(this.videomanager.select, this));
-                                $list.append($('<li>').append($link));
+                                $grid.append(this.videomanager.preview(video));
                             }, this));
-                            $box.append($list);
+                            $box.append($grid);
                         }, this));
                     }, this)
                 });
 
                 this.selection.save();
                 this.modal.show();
+            },
+            /*
+                A tile with the first frame of the video, which plays the
+                video (muted) while hovering it. A click inserts the video.
+            */
+            preview: function(video) {
+                var $link = $('<a href="#" class="redactor-video-manager-link">')
+                    .attr('data-video', video.video)
+                    .attr('data-title', video.title)
+                    .attr('title', video.title);
+
+                // the media fragment shows a frame shortly after the start,
+                // the very first frame is often black
+                var $video = $('<video muted playsinline loop preload="metadata">')
+                    .attr('src', video.video + '#t=0.5');
+                var player = $video[0];
+                player.muted = true;
+
+                $link.append($video);
+                $link.append($('<span class="redactor-video-manager-title">').text(video.title));
+
+                $link.on('mouseenter focus', function() {
+                    var playing = player.play();
+                    if (playing && playing.catch) {
+                        playing.catch(function() {});
+                    }
+                });
+                $link.on('mouseleave blur', function() {
+                    player.pause();
+                    player.currentTime = 0.5;
+                });
+                $link.on('click', $.proxy(this.videomanager.select, this));
+
+                return $link;
             },
             select: function(e) {
                 e.preventDefault();

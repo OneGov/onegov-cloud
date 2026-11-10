@@ -325,7 +325,7 @@ def test_insert_video_in_editor(browser: ExtendedBrowser) -> None:
     # select the uploaded video again
     page.click('.re-video')
     page.click('#redactor-modal-tabber a[rel="tab2"]')
-    page.click('.redactor-video-manager-link:text("Film.mp4")')
+    page.click('.redactor-video-manager-link:has-text("Film.mp4")')
     page.wait_for_function(
         'document.querySelectorAll(".redactor-editor video").length === 2')
 
