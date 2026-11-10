@@ -22,7 +22,8 @@ from functools import partial
 from itertools import chain
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
-from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
+                                   TimerangeTooLong)
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -81,7 +82,7 @@ from onegov.org.models import (
 )
 from onegov.page.collection import PageCollection
 from onegov.page.restore import PageRestore
-from onegov.reservation import ResourceCollection
+from onegov.reservation import Allocation, ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.org.horw_laws import import_records as import_horw_law_records
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -1524,6 +1525,36 @@ def import_resource_options_formcode(
     return import_formcode
 
 
+class ReservationImportLog:
+    """ Echoes messages to the console and writes them to log files:
+    successful imports go to one file, warnings and errors to another.
+    """
+
+    def __init__(self, success_fh: IO[str], error_fh: IO[str]) -> None:
+        self.success_fh = success_fh
+        self.error_fh = error_fh
+
+    @staticmethod
+    def _write(fh: IO[str], message: str) -> None:
+        fh.write(message + '\n')
+        fh.flush()
+
+    def success(self, message: str) -> None:
+        click.secho(message, fg='green')
+        self._write(self.success_fh, message)
+
+    def problem(self, message: str, fg: str = 'red') -> None:
+        """ Warnings (pass fg='yellow') and errors. """
+        click.secho(message, fg=fg)
+        self._write(self.error_fh, message)
+
+    def info(self, message: str) -> None:
+        """ Section headers, written to both files for context. """
+        click.echo(message)
+        self._write(self.success_fh, message)
+        self._write(self.error_fh, message)
+
+
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.argument('reservation_file', type=click.File('rb'))
 @click.argument('option_file', type=click.File('rb'))
@@ -1532,22 +1563,62 @@ def import_resource_options_formcode(
 @click.option('--test-run', is_flag=True, default=False,
               help='Only import the first 4 reservations per resource '
                    '(and the first 4 dates per reservation).')
+@click.option('--success-log', default='import_reservations_success.log',
+              type=click.Path(dir_okay=False),
+              help='Log file for successfully imported reservations.')
+@click.option('--error-log', default='import_reservations_errors.log',
+              type=click.Path(dir_okay=False),
+              help='Log file for warnings and errors.')
 def import_reservations(
     reservation_file: IO[bytes],
     option_file: IO[bytes],
     mapping_yaml: IO[bytes],
     dry_run: bool,
     test_run: bool,
+    success_log: str,
+    error_log: str,
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports reservations from a Excel file (needs to be .xlsx).
     Creates no resources. Reservations are made as internal reservations,
     so they ignore the regular allocations (availability periods).
+
+    Output is printed and additionally written to two log files, one for
+    successful imports and one for warnings and errors.
     """
 
     test_run_limit = 4
     fixed_columns = {0, 3, 6, 8, 22, 37}
 
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+        success_path = Path(success_log)
+        error_path = Path(error_log)
+        for path in (success_path, error_path):
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+        with (
+            success_path.open('w', encoding='utf-8') as success_fh,
+            error_path.open('w', encoding='utf-8') as error_fh,
+        ):
+            log = ReservationImportLog(success_fh, error_fh)
+            log.info(f'Reservation import started at '
+                     f'{datetime.now():%Y-%m-%d %H:%M:%S}')
+            try:
+                run_import(request, app, log)
+            except BaseException as e:
+                log.problem(f'Import aborted with {e!r}. Reservations '
+                            f'committed before this point are kept.')
+                raise
+
+        click.secho(f'Success log written to {success_path.resolve()}',
+                    fg='cyan')
+        click.secho(f'Error log written to {error_path.resolve()}',
+                    fg='cyan')
+
+    def run_import(
+        request: OrgRequest,
+        app: OrgApp,
+        log: ReservationImportLog
+    ) -> None:
 
         class Reservation(TypedDict):
             state: str
@@ -1624,15 +1695,20 @@ def import_reservations(
                     fields[key] = value
 
             # Split reservations spreading across multiple days into one
-            # reservation per day
+            # reservation per day, e.g. 1.1. 08:00 - 3.1. 10:00 becomes
+            # 1.1. 08:00 - 23:59, 2.1. 00:00 - 23:59, 3.1. 00:00 - 10:00
             start, end = row[6], row[8]
-            dates = [start]
-            if start.date() != end.date():
-                end_of_first_day = datetime.combine(start.date(), end.time())
-                for day in range(1, (end - start).days + 1):
-                    dates.append(end_of_first_day + timedelta(days=day - 1))
-                    dates.append(start + timedelta(days=day))
-            dates.append(end)
+            dates = []
+            day_start = start
+            while day_start.date() < end.date():
+                dates.append(day_start)
+                dates.append(datetime.combine(day_start.date(), time(23, 59)))
+                day_start = datetime.combine(
+                    day_start.date() + timedelta(days=1), time(0, 0))
+            # Skip an empty last day if the reservation ends at midnight
+            if day_start < end or not dates:
+                dates.append(day_start)
+                dates.append(end)
             # In a test run, also limit the dates of recurring reservations
             if (
                 not test_run
@@ -1677,8 +1753,8 @@ def import_reservations(
         book.close()
 
         for option in options_not_found:
-            click.secho(f'Option not found in the mapping file: {option}',
-                        fg='yellow')
+            log.problem(f'Option not found in the mapping file: {option}',
+                      fg='yellow')
 
         if dry_run:
             res_show = json.dumps(reservations, indent=4, default=str)
@@ -1693,26 +1769,31 @@ def import_reservations(
         forms = FormCollection(request.session)
         tickets = TicketCollection(request.session)
 
+        # Commit in batches, so a late failure doesn't lose everything
+        commit_interval = 500
+        imported_count = 0
+
         for resource_name, resource_reservations in reservations.items():
             real_resource_name = (
                 resource_options.get(resource_name) or {}
             ).get('name')
             if not real_resource_name:
-                click.echo(
+                log.problem(
                     f'Resource {resource_name} not found in the mapping file'
                 )
                 continue
 
             resource = resources.by_name(real_resource_name.lower())
             if not resource:
-                click.echo(
+                log.problem(
                     f'Resource {real_resource_name} not found in the database'
                 )
                 continue
 
             # Creating reservations
             assert resource.form_class is not None
-            click.echo(f'Importing reservations for {resource.title}')
+            resource_id = resource.id
+            log.info(f'Importing reservations for {resource.title}')
             # Reserve on the internal (virtual) layer, which ignores the
             # regular allocations but still blocks against them
             scheduler = resource.virtual_scheduler
@@ -1744,7 +1825,7 @@ def import_reservations(
 
             for id, reservation in resource_reservations.items():
                 if reservation['state'] == 'annulliert':
-                    click.secho(
+                    log.problem(
                         f'{id}: Reservation state is deleted, '
                         f'skipping {resource.title}', fg='yellow')
                     continue
@@ -1771,18 +1852,24 @@ def import_reservations(
                         token_uuid = reserve(dates=(start, end))
                     except InvalidEmailAddress:
                         savepoint.rollback()
-                        click.secho(f'{id}: {email} is an invalid e-mail '
-                                    'address')
+                        log.problem(f'{id}: {email} is an invalid e-mail '
+                                  'address')
                     except AlreadyReservedError:
                         savepoint.rollback()
                         found_conflict = True
-                        click.secho(
+                        log.problem(
                             f'{id}: Booking conflict in {resource.title} '
                             f'at {start} - {end}', fg='yellow')
+                    except TimerangeTooLong:
+                        savepoint.rollback()
+                        found_conflict = True
+                        log.problem(
+                            f'{id}: Timerange too long in {resource.title} '
+                            f'at {start} - {end}')
                     except Exception as e:
                         savepoint.rollback()
                         found_conflict = True
-                        click.secho(
+                        log.problem(
                             f'{id}: Error {e!r} reserving {resource.title} '
                             f'at {start} - {end}', fg='red')
 
@@ -1809,15 +1896,14 @@ def import_reservations(
                                 and error == 'This field is required.'
                             )
                             has_other_errors |= not is_required
-                            click.secho(
+                            log.problem(
                                 f'{id}: {field_name}: {error} '
                                 f'(value: {form_data.get(field_name)!r})',
                                 fg='yellow' if is_required else 'red')
                     if has_other_errors:
                         form_data_show = json.dumps(
                             form_data, indent=4, default=str)
-                        click.secho(f'{id}: form data: {form_data_show}',
-                                    fg='red')
+                        log.problem(f'{id}: form data: {form_data_show}')
 
                 submission = forms.submissions.add_external(
                     form=form,
@@ -1852,9 +1938,33 @@ def import_reservations(
                     if reservation['state'] != 'unbestätigt':
                         ticket.close_ticket()
 
-                click.secho(f'{id}: Sucessfully imported reservation '
-                            f'at {start} - {end}',
-                            fg='green')
+                log.success(f'{id}: Successfully imported reservation '
+                            f'for {resource.title} at {dates[0]} - '
+                            f'{dates[-1]}')
+                imported_count += 1
+
+                if imported_count % commit_interval == 0:
+                    transaction.commit()
+                    log.info(f'Committed {imported_count} reservations')
+
+                    # The session is closed on commit, so we need to
+                    # re-fetch the objects we keep using
+                    user = UserCollection(request.session).by_username(
+                        'info@seantis.ch')
+                    assert user is not None
+                    refetched = resources.by_id(resource_id)
+                    if refetched is None:
+                        log.problem(f'Failed to re-fetch resource '
+                                    f'{real_resource_name}, skipping the '
+                                    f'rest of its reservations')
+                        break
+                    resource = refetched
+                    assert resource.form_class is not None
+                    scheduler = resource.virtual_scheduler
+
+            transaction.commit()
+            log.info(f'Committed reservations for {real_resource_name} '
+                     f'({imported_count} in total)')
 
     return import_reservations
 
@@ -3805,6 +3915,203 @@ def wil_rename_imported_meeting_files(
         click.secho(f'Renamed {rename_counter} files', fg='green')
 
     return rename_imported_meeting_files
+
+
+RESOURCE_EXPORT_VERSION = 1
+
+
+@cli.command(name='export-resources', context_settings={'singular': True})
+@click.argument('output_file', type=click.File('w', encoding='utf-8'))
+@click.option('--resource', 'resource_names', multiple=True,
+              help='Only export the resource with this name (url name), '
+                   'may be passed multiple times.')
+def export_resources(
+    output_file: IO[str],
+    resource_names: tuple[str, ...]
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Exports resources with their settings, descriptions, forms,
+    availability period rules and allocations to a JSON file, to be imported
+    with import-resources. Reservations are not exported.
+
+    The JSON is written with the onegov JSON serializer, so dates and
+    datetimes inside the resource content (e.g. the rules) survive the
+    round trip unchanged.
+
+    Not exported: attached files, photo albums and the links to people,
+    since those reference objects that don't exist on the target.
+
+    onegov-org --select '/foo/bar' export-resources resources.json
+    """
+
+    def export(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+        query = resources.ordered_by_type()
+        if resource_names:
+            query = query.filter(Resource.name.in_(resource_names))
+            found = {name for name, in query.with_entities(Resource.name)}
+            for name in sorted(set(resource_names) - found):
+                click.secho(f'Resource not found: {name}', fg='yellow')
+
+        exported = []
+        for resource in query:
+            # Only the master allocations of the regular layer. Mirrors
+            # and virtual allocations are created by libres on demand.
+            allocations = (
+                request.session.query(Allocation)
+                .filter(Allocation.resource == resource.id)
+                .filter(Allocation.mirror_of == resource.id)
+                .order_by(Allocation._start)
+            )
+            exported_allocations = [
+                {
+                    'type': allocation.type,
+                    'group': str(allocation.group),
+                    'start': allocation._start,
+                    'end': allocation._end,
+                    'raster': allocation._raster,
+                    'timezone': allocation.timezone,
+                    'quota': allocation.quota,
+                    'quota_limit': allocation.quota_limit,
+                    'partly_available': allocation.partly_available,
+                    'approve_manually': allocation.approve_manually,
+                    'data': allocation.data,
+                }
+                for allocation in allocations
+            ]
+            exported.append({
+                'name': resource.name,
+                'title': resource.title,
+                'type': resource.type,
+                'timezone': resource.timezone,
+                'group': resource.group,
+                'subgroup': resource.subgroup,
+                'definition': resource.definition,
+                'meta': resource.meta,
+                'content': resource.content,
+                'blocking_parents': sorted(
+                    parent.name for parent in resource.parents
+                    if parent.name
+                ),
+                'allocations': exported_allocations,
+            })
+            click.echo(
+                f'{resource.title} ({resource.name}): '
+                f'{len(resource.content.get("rules", ()))} rule(s), '
+                f'{len(exported_allocations)} allocation(s)'
+            )
+
+        output_file.write(custom_json.dumps(
+            {'version': RESOURCE_EXPORT_VERSION, 'resources': exported},
+            indent=2
+        ))
+        click.secho(f'Exported {len(exported)} resource(s)', fg='green')
+
+    return export
+
+
+@cli.command(name='import-resources', context_settings={'singular': True})
+@click.argument('input_file', type=click.File('rb'))
+@click.option('--replace', is_flag=True, default=False,
+              help='Delete and recreate resources that already exist with '
+                   'the same name (only works if they have no reservations).')
+@click.option('--dry-run', is_flag=True, default=False,
+              help='Run the import, but do not save anything.')
+def import_resources(
+    input_file: IO[bytes],
+    replace: bool,
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports the resources exported with export-resources, including
+    their forms, rules and allocations.
+
+    Resources are matched by name. Existing resources are skipped, unless
+    --replace is passed. New resources get new ids, allocations are linked
+    to them and keep their rule references.
+
+    onegov-org --select '/foo/bar' import-resources resources.json --dry-run
+    """
+
+    export = custom_json.loads(input_file.read())
+    if export.get('version') != RESOURCE_EXPORT_VERSION:
+        abort(f'Unsupported export version: {export.get("version")!r}')
+
+    def run_import(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+        imported: dict[str, Resource] = {}
+
+        for data in export['resources']:
+            name = data['name']
+            existing = resources.by_name(name)
+            if existing is not None:
+                if not replace:
+                    click.secho(f'Skipping {name}, it already exists',
+                                fg='yellow')
+                    continue
+                try:
+                    resources.delete(existing)
+                except AssertionError:
+                    click.secho(f'Skipping {name}, the existing resource '
+                                f'has reservations', fg='red')
+                    continue
+                click.echo(f'Deleted existing {name}')
+
+            resource = resources.add(
+                title=data['title'],
+                timezone=data['timezone'],
+                type=data['type'],
+                name=name,
+                meta=data['meta'],
+                content=data['content'],
+                definition=data['definition'],
+                group=data['group'],
+                subgroup=data['subgroup'],
+            )
+
+            groups: dict[str, UUID] = defaultdict(uuid4)
+            for entry in data['allocations']:
+                allocation = Allocation()
+                allocation.type = entry['type']
+                allocation.resource = resource.id
+                allocation.mirror_of = resource.id
+                allocation.group = groups[entry['group']]
+                allocation._start = entry['start']
+                allocation._end = entry['end']
+                allocation._raster = entry['raster']
+                allocation.timezone = entry['timezone']
+                allocation.quota = entry['quota']
+                allocation.quota_limit = entry['quota_limit']
+                allocation.partly_available = entry['partly_available']
+                allocation.approve_manually = entry['approve_manually']
+                allocation.data = entry['data']
+                request.session.add(allocation)
+            request.session.flush()
+
+            imported[name] = resource
+            click.secho(
+                f'Imported {resource.title} ({name}): '
+                f'{len(resource.content.get("rules", ()))} rule(s), '
+                f'{len(data["allocations"])} allocation(s)', fg='green'
+            )
+
+        # Link blocking resources once all resources exist
+        for data in export['resources']:
+            child = imported.get(data['name'])
+            if child is None:
+                continue
+            for parent_name in data.get('blocking_parents', ()):
+                parent = resources.by_name(parent_name)
+                if parent is None:
+                    click.secho(f'{data["name"]}: blocking resource '
+                                f'{parent_name} not found', fg='yellow')
+                elif parent not in child.parents:
+                    child.parents.append(parent)
+
+        click.echo(f'{len(imported)} resource(s) imported')
+        if dry_run:
+            transaction.abort()
+            click.echo('Dry run complete. No changes saved.')
+
+    return run_import
 
 
 @cli.command(name='list-resources')
