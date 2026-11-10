@@ -265,6 +265,8 @@ def get_common_asset() -> Iterator[str]:
     yield 'jquery.popupoverlay.js'
     yield 'jquery.load.js'
     yield 'videoframe.js'
+    yield 'video-preview.js'
+    yield 'video-preview.css'
     yield 'datetimepicker.js'
     yield 'many.jsx'
     yield 'url.js'
