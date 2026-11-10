@@ -3,6 +3,7 @@ import uuid
 from datetime import date, datetime
 
 from sqlalchemy import false
+from sqlalchemy.orm import contains_eager
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -32,6 +33,7 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
+from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import PresidentialAllowance
 from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
@@ -303,11 +305,16 @@ def view_bulk_attendence_pdf(
 
     attendances = (
         request.session.query(Attendence)
+        .join(Attendence.parliamentarian)
+        .options(contains_eager(Attendence.parliamentarian))
         .filter(
             Attendence.bulk_edit_id == self.bulk_edit_id,
             Attendence.type == self.type,
         )
-        .order_by(Attendence.parliamentarian_id)
+        .order_by(
+            PASParliamentarian.last_name,
+            PASParliamentarian.first_name,
+        )
         .all()
     )
     date_label = self.date.strftime('%d.%m.%Y')
