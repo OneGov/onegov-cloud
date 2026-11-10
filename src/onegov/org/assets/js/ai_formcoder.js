@@ -8,7 +8,10 @@
 
     // FIXME: form.action is used as a URL string variable for fetch().
     function setFormAction(form) {
-        form.action = '/forms/formcoder';
+        var source = document.querySelector('[data-formcoder-url]');
+        form.action = (
+            source && source.getAttribute('data-formcoder-url')
+        ) || '/forms/formcoder';
     }
 
     function trySetTextAreaValue(aceEl, text) {

@@ -1,5 +1,6 @@
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
+from onegov.form import FormCollection
 from onegov.form.fields import FormcodeField, URLPanelField
 from onegov.form.parser import ParsedForm
 from onegov.form.validators import ValidSurveyDefinition
@@ -106,6 +107,12 @@ class FormDefinitionBaseForm(Form):
     def on_request(self) -> None:
         if not self.request.app.org.vat_rate:
             self.delete_field('show_vat')
+
+        self.parsed.render_kw = {
+            **(self.parsed.render_kw or {}),
+            'data-formcoder-url': self.request.link(
+                FormCollection(self.request.session), name='formcoder'),
+        }
 
 
 if TYPE_CHECKING:
