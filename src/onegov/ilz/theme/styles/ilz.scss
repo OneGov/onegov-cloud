@@ -6,11 +6,42 @@
 }
 
 // search results shown directly below the search field
+.searchbox .input-group {
+    position: relative;
+
+    > .typeahead {
+        left: 0;
+        margin-top: 0;
+        right: 0;
+        top: 100%;
+
+        ul {
+            width: 100%;
+        }
+    }
+}
+
+.homepage-searchbox-wrapper .input-group > .typeahead {
+    // Include the search field's 5px border in the suggestion list's width.
+    left: -5px;
+    right: -5px;
+
+    ul {
+        margin-top: .5rem;
+    }
+}
+
 .typeahead .typeahead-result a {
     align-items: baseline;
     display: flex;
     gap: 1rem;
     justify-content: space-between;
+}
+
+.typeahead .typeahead-result-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .typeahead .typeahead-result-type {
