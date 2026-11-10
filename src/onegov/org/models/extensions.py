@@ -1377,3 +1377,30 @@ class LocalizeableExtension(ContentExtension):
                     obj.locale = request.locale
 
         return LocalizeableForm
+
+
+class PageTemplateExtension(ContentExtension):
+    """ Lets a page be used as template for new pages, see
+    :func:`onegov.org.forms.page.with_page_templates`.
+
+    """
+
+    is_page_template: dict_property[bool] = meta_property(default=False)
+
+    def extend_form[T: Form](
+        self,
+        form_class: type[T],
+        request: OrgRequest
+    ) -> type[T]:
+
+        class PageTemplateForm(form_class):  # type:ignore
+            is_page_template = BooleanField(
+                label=_('Use as template'),
+                description=_(
+                    'The page can be selected as template when adding new '
+                    'pages. Templates should usually not be public.'
+                ),
+                fieldset=_('Template'),
+            )
+
+        return PageTemplateForm

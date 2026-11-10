@@ -9004,3 +9004,18 @@ msgstr "Elimina video"
 
 msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
 msgstr "I formati supportati sono MP4, WebM e Ogg. Per inserire un video in una pagina, utilizzi il pulsante video nell'editor di testo."
+
+msgid "Use as template"
+msgstr "Utilizza come modello"
+
+msgid "The page can be selected as template when adding new pages. Templates should usually not be public."
+msgstr "La pagina può essere selezionata come modello quando si aggiungono nuove pagine. Di regola i modelli non dovrebbero essere pubblici."
+
+msgid "Template"
+msgstr "Modello"
+
+msgid "Without template"
+msgstr "Senza modello"
+
+msgid "Create the page from a template:"
+msgstr "Creare la pagina da un modello:"

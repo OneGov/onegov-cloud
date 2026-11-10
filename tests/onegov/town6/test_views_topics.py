@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webtest.forms import Select
     from .conftest import Client
+    from tests.shared.client import ExtendedResponse
 
 
 def test_sort_topics(client: Client) -> None:
@@ -270,3 +271,74 @@ def test_view_page_as_member(client: Client) -> None:
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_page_templates(client: Client) -> None:
+    from webtest.forms import Checkbox
+
+    def mark_as_template(page: ExtendedResponse) -> None:
+        # WebTest doesn't parse the fields at the end of the page form,
+        # so we add the checkbox ourselves (see test_views_pages.py)
+        field = Checkbox(page.form, 'input', 'is_page_template', 0, 'y')
+        page.form.fields['is_page_template'] = [field]
+        page.form.field_order.append(('is_page_template', field))
+        field.checked = True
+
+    client.login_admin()
+
+    # without templates, there's nothing to select
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'page-templates' not in new_page
+
+    # create a template
+    new_page.form['title'] = "Vorlage Dienstleistung"
+    new_page.form['lead'] = "Kurze Beschreibung der Dienstleistung"
+    new_page.form['text'] = (
+        '<h2>Voraussetzungen</h2><p>…</p>'
+        '<h2>Kosten</h2><p>…</p>'
+        '<p><a href="/forms" class="button cta">Online beantragen</a></p>'
+    )
+    mark_as_template(new_page)
+    new_page.form['access'] = 'private'
+    template = new_page.form.submit().follow()
+    assert 'Diese Seite ist eine Vorlage' in template
+
+    # the template can be selected when adding a page
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'Seite aus einer Vorlage erstellen' in new_page
+    new_page = new_page.click(href='template=')
+    assert new_page.form['title'].value == ''
+    assert new_page.form['lead'].value == (
+        'Kurze Beschreibung der Dienstleistung')
+    assert '<h2>Kosten</h2>' in new_page.form['text'].value
+    assert new_page.pyquery('#is_page_template').attr('checked') is None
+    assert 'Ohne Vorlage' in new_page
+
+    new_page.form['title'] = "Parkkarte"
+    page = new_page.form.submit().follow()
+    assert 'Kurze Beschreibung der Dienstleistung' in page
+    assert 'Online beantragen' in page
+    assert page.pyquery('.page-text a.cta').attr('href') == '/forms'
+    assert 'Diese Seite ist eine Vorlage' not in page
+
+    # also for pages on the top level
+    root_page = client.get('/topics/themen').click('Thema')
+    root_url = root_page.request.url.replace(
+        '/editor/new/', '/editor/new-root/')
+    root_url = root_url.rsplit('/', 1)[0] + '/1'
+    root_page = client.get(root_url)
+    assert 'Seite aus einer Vorlage erstellen' in root_page
+    root_page = root_page.click(href='template=')
+    assert '<h2>Kosten</h2>' in root_page.form['text'].value
+
+    # a page which is no template anymore isn't offered
+    # (the checkbox isn't submitted, since WebTest doesn't know it)
+    edit = template.click('Bearbeiten')
+    assert edit.pyquery('#is_page_template').attr('checked') is not None
+    edit.form.submit()
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'page-templates' not in new_page
+
+    # templates are not filled in by url manipulation either
+    url = new_page.request.url + '?template=999999'
+    assert 'Kurze Beschreibung' not in client.get(url)

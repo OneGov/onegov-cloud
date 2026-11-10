@@ -7823,3 +7823,22 @@ p.full-text-width {
     // links in the page text are always underlined
     text-decoration: none !important;
 }
+
+// selection of a page template when adding a page, see with_page_templates
+.page-templates {
+    p {
+        margin-bottom: .5rem;
+    }
+
+    .page-template-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem 1.5rem;
+        list-style: none;
+        margin: 0;
+
+        .active {
+            font-weight: bold;
+        }
+    }
+}

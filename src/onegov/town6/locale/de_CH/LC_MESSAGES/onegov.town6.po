@@ -3317,3 +3317,6 @@ msgstr "Video löschen"
 
 msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
 msgstr "Unterstützte Formate sind MP4, WebM und Ogg. Um ein Video in eine Seite einzufügen, verwenden Sie die Video-Schaltfläche im Texteditor."
+
+msgid "This page is a template. It can be selected when adding new pages."
+msgstr "Diese Seite ist eine Vorlage. Sie kann beim Hinzufügen neuer Seiten ausgewählt werden."

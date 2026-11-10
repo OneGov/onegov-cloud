@@ -18,6 +18,12 @@
             <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
         </tal:b>
 
+        <div class="panel callout page-template-hint" tal:condition="request.is_manager and page.is_page_template|False">
+            <p i18n:translate>
+                This page is a template. It can be selected when adding new pages.
+            </p>
+        </div>
+
         <div class="panel callout api-source-hint" tal:condition="api_source and request.is_manager">
             <p i18n:translate>
                 The title, lead, text and sidebar of this page are taken from the

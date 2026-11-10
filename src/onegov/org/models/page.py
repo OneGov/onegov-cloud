@@ -14,7 +14,7 @@ from onegov.org.models.extensions import (
     PublicationExtension, DeletableContentExtension,
     InlinePhotoAlbumExtension, InternalNotesExtension,
     SidebarContactLinkExtension, PushNotificationExtension,
-    LocalizeableExtension
+    LocalizeableExtension, PageTemplateExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.org.models import PushNotification
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Query, Session
     from typing import Self
 
 
@@ -49,7 +49,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension, SidebarLinksExtension,
             SidebarContactLinkExtension, InlinePhotoAlbumExtension,
-            InternalNotesExtension, LocalizeableExtension):
+            InternalNotesExtension, LocalizeableExtension,
+            PageTemplateExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -179,6 +180,17 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 ])
 
         raise NotImplementedError
+
+
+def page_templates(session: Session) -> list[Topic]:
+    """ The pages which can be used as template for new pages. """
+    return (
+        session.query(Topic)
+        .filter(Topic.meta['trait'].astext == 'page')
+        .filter(Topic.meta['is_page_template'].as_boolean())
+        .order_by(Topic.title)
+        .all()
+    )
 
 
 class TopicProxy:

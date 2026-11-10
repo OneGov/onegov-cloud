@@ -4,13 +4,14 @@ from fnmatch import fnmatch
 from markupsafe import Markup
 from urllib.parse import urlparse
 
-from onegov.form import Form
+from onegov.form import Form, move_fields
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TagsField
 from onegov.form.fields import URLField
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.form.fields import PanelField
+from onegov.form.widgets import PanelWidget
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
@@ -455,3 +456,87 @@ class MovePageForm(Form):
 
         model.name = pages.get_unique_child_name(model.title, new_parent)
         model.parent_id = new_parent_id
+
+
+class PageTemplatesWidget(PanelWidget):
+    """ Renders links to create the new page from one of the templates. """
+
+    def __call__(  # type:ignore[override]
+        self,
+        field: PageTemplatesField,
+        **kwargs: Any
+    ) -> Markup:
+        translate = field.meta.request.translate
+        links = Markup('').join(
+            Markup('<li><a href="{}" class="{}">{}</a></li>').format(
+                url, 'active' if active else '', title
+            )
+            for title, url, active in field.links
+        )
+        if field.active:
+            links += Markup('<li><a href="{}">{}</a></li>').format(
+                field.base_url, translate(_('Without template'))
+            )
+        return Markup(
+            '<div class="panel page-templates">'
+            '<p>{}</p><ul class="page-template-links">{}</ul></div>'
+        ).format(translate(_('Create the page from a template:')), links)
+
+
+class PageTemplatesField(PanelField):
+    """ Lists the page templates, it has no data of its own. """
+
+    widget = PageTemplatesWidget()
+
+    links: Sequence[tuple[str, str, bool]]
+    base_url: str
+    active: bool
+
+
+def with_page_templates[T: Form](
+    form_class: type[T],
+    request: OrgRequest,
+    base_url: str
+) -> type[T]:
+    """ Adds the selection of a template to the form for new pages, if
+    there are any templates, see
+    :class:`onegov.org.models.extensions.PageTemplateExtension`.
+
+    The selected template is passed as 'template' query parameter, the form
+    is then filled in with its content, see
+    :func:`onegov.org.views.editor.fill_in_page_template`.
+
+    """
+    from onegov.core.utils import append_query_param
+    from onegov.org.models.page import page_templates
+
+    templates = page_templates(request.session)
+    if not templates:
+        return form_class
+
+    selected = request.GET.get('template')
+    links = [
+        (
+            template.title,
+            append_query_param(base_url, 'template', str(template.id)),
+            str(template.id) == selected
+        )
+        for template in templates
+    ]
+
+    class PageTemplatesForm(form_class):  # type:ignore
+        page_template = PageTemplatesField(
+            text='',
+            kind='panel',
+            label=_('Template'),
+        )
+
+        def on_request(self) -> None:
+            if hasattr(super(), 'on_request'):
+                super().on_request()
+            self.page_template.links = links
+            self.page_template.base_url = base_url
+            self.page_template.active = any(active for *_, active in links)
+
+    return move_fields(
+        PageTemplatesForm, ('page_template', ), before='title')
