@@ -28,8 +28,7 @@ $person-email-icon: '\f0e0';
     padding: .5rem 0;
 
     .person-card-portrait {
-        @include circle;
-
+        border-radius: .7rem;
         background: $gainsboro;
         height: 12rem;
         overflow: hidden;
