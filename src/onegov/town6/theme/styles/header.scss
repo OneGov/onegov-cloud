@@ -74,6 +74,7 @@ $qr-code-icon: '\f029';
 $results-icon: '\f682';
 $trash-restore-icon: '\f829';
 $settings-icon: '\f1de';
+$new-api-icon: '\f1e6';
 
 #header {
     background: $smoke;
@@ -197,6 +198,7 @@ $settings-icon: '\f1de';
     .chats::before { @include icon-bold('\f086'); }
     .chats-archive::before { @include icon-bold('\f4ad'); }
     .images::before { @include icon('\f03e'); }
+    .videos::before { @include icon-bold('\f03d'); }
     .files::before { @include icon("\f15c"); }
     .settings::before { @include icon-bold('\f1de'); }
     .modules::before { @include icon-bold('\f009'); }
@@ -613,6 +615,7 @@ $editbar-fg-color-active: $white;
     .results-link::before { @include icon-bold($results-icon); }
     .undo-link::before { @include icon-bold($trash-restore-icon); }
     .settings-link::before { @include icon-bold($settings-icon); }
+    .new-api::before { @include icon-bold($new-api-icon); }
 }
 
 

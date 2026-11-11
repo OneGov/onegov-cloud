@@ -1,6 +1,8 @@
 from onegov.core.security import Public
+from onegov.org.forms.mutation import TopicMutationForm
 from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.views.page import view_topic, view_news, view_news_collection
+from onegov.org.views.page import report_topic_change
 from onegov.town6 import TownApp
 from onegov.town6.layout import PageLayout, NewsLayout
 
@@ -32,3 +34,18 @@ def town_view_news(
     self: News, request: TownRequest
 ) -> RenderData | Response:
     return view_news(self, request, NewsLayout(self, request))
+
+
+@TownApp.form(
+    model=Topic,
+    name='report-change',
+    template='form.pt',
+    permission=Public,
+    form=TopicMutationForm
+)
+def report_topic_change_town(
+    self: Topic,
+    request: TownRequest,
+    form: TopicMutationForm
+) -> RenderData | Response:
+    return report_topic_change(self, request, form, PageLayout(self, request))

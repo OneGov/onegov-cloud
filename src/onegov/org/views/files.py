@@ -26,7 +26,8 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link
 from onegov.org.layout import (
-    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout)
+    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout,
+    VideoFileCollectionLayout)
 from onegov.org.models import (
     GeneralFile,
     GeneralFileCollection,
@@ -35,6 +36,8 @@ from onegov.org.models import (
     ImageSetCollection,
     LegacyFile,
     LegacyImage,
+    VideoFile,
+    VideoFileCollection,
 )
 from onegov.org import utils
 from sedate import to_timezone, utcnow, standardize_date
@@ -384,6 +387,59 @@ def view_get_image_collection(
     }
 
 
+@OrgApp.html(model=VideoFileCollection, template='videos.pt',
+             permission=Private)
+def view_get_video_collection(
+    self: VideoFileCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    layout = layout or VideoFileCollectionLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Videos'), request.link(self))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Videos'),
+        'videos': view_get_video_collection_json(self, request),
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload')
+        )
+    }
+
+
+@OrgApp.json(
+    model=VideoFileCollection,
+    permission=Private,
+    name='json',
+    open_data=False
+)
+def view_get_video_collection_json(
+    self: VideoFileCollection,
+    request: OrgRequest
+) -> list[dict[str, Any]]:
+    return [
+        {
+            'group': request.translate(group),
+            'videos': tuple(
+                video_data(video, request) for group, video in items
+            )
+        } for group, items in self.grouped_by_date(id_only=False)
+    ]
+
+
+def video_data(video: VideoFile, request: OrgRequest) -> dict[str, Any]:
+    return {
+        'id': video.id,
+        'title': video.note or video.name,
+        'name': video.name,
+        'video': request.class_link(File, {'id': video.id}),
+    }
+
+
 @OrgApp.json(
     model=GeneralFileCollection,
     permission=Private,
@@ -542,6 +598,23 @@ def view_upload_image_file(
 
     return render_macro(layout.macros['uploaded_image'], request, {
         'image': Img.from_image(layout, uploaded_file),
+        'index': int(time() * 1000),
+        'layout': layout
+    })
+
+
+@OrgApp.html(model=VideoFileCollection, name='upload',
+             request_method='POST', permission=Private)
+def view_upload_video_file(
+    self: VideoFileCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> str:
+
+    uploaded_file = view_upload_file(self, request, return_file=True)
+    layout = layout or DefaultLayout(self, request)
+    return render_macro(layout.macros['uploaded_video'], request, {
+        'video': video_data(uploaded_file, request),
         'index': int(time() * 1000),
         'layout': layout
     })

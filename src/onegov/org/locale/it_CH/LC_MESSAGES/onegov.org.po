@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-10-29 16:05+0100\n"
+"POT-Creation-Date: 2026-11-04 13:32+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1476,6 +1476,23 @@ msgstr "Documenti della riunione"
 msgid "Agenda item documents"
 msgstr "Documenti dell'elemento dell'agenda"
 
+msgid ""
+"This form can be used to report mutations to the data. You can either leave "
+"us a message or directly suggest changes to the corresponding fields."
+msgstr "Con questo modulo è possibile segnalare delle mutazioni. Può lasciarci un messaggio oppure proporre direttamente delle modifiche nei campi corrispondenti."
+
+msgid "Your contact details"
+msgstr "I suoi dati di contatto"
+
+msgid "Message"
+msgstr "Messaggio"
+
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr "Inserisca un messaggio o proponga almeno una modifica nei campi sottostanti."
+
+msgid "Proposed changes"
+msgstr "Modifiche proposte"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1545,6 +1562,9 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
 
+msgid "Expand sections"
+msgstr "Espandere le sezioni"
+
 msgid "Keywords"
 msgstr "Parole chiave"
 
@@ -1592,11 +1612,57 @@ msgstr ""
 msgid "The domain of the URL is not allowed for iFrames."
 msgstr "Il dominio dell'URL non è consentito per gli iFrames."
 
-msgid "Destination"
-msgstr "Destinazione"
+msgid "Selected topic"
+msgstr "Argomento selezionato"
+
+msgid "No topic selected yet"
+msgstr "Nessun argomento selezionato"
+
+msgid "Select"
+msgstr "Seleziona"
+
+msgid "Subpages"
+msgstr "Sottopagine"
+
+msgid "Loading..."
+msgstr "Caricamento..."
+
+msgid "No topics found"
+msgstr "Nessun argomento trovato"
+
+msgid "Load more"
+msgstr "Carica altro"
+
+msgid "The topics could not be loaded"
+msgstr "Non è stato possibile caricare gli argomenti"
+
+msgid "Optional. If left empty, the title of the linked topic is used."
+msgstr "Facoltativo. Se il campo resta vuoto, viene utilizzato il titolo dell'argomento collegato."
+
+msgid "Linked topic"
+msgstr "Argomento collegato"
+
+msgid "No API of a source organisation is configured."
+msgstr "Non è configurata alcuna API di un'organizzazione di origine."
+
+msgid "Please select a topic."
+msgstr "Selezioni un argomento."
+
+msgid "The API of the source organisation could not be reached."
+msgstr "Non è stato possibile raggiungere l'API dell'organizzazione di origine."
+
+msgid "The selected topic is not publicly available."
+msgstr "L'argomento selezionato non è accessibile al pubblico."
+
+msgid ""
+"The source organisation does not allow this organisation to link its topics."
+msgstr "L'organizzazione di origine non consente a questa organizzazione di collegare i suoi argomenti."
 
 msgid "- Root -"
 msgstr "- Principale -"
+
+msgid "Destination"
+msgstr "Destinazione"
 
 msgid "Invalid destination selected"
 msgstr "Destinazione non valida selezionata"
@@ -1803,12 +1869,11 @@ msgstr "Cronologia"
 msgid "Parliamentary Group(s)"
 msgstr "Gruppo/i parlamentare/i"
 
-msgid "Participations"
-msgstr "Partecipanti"
-
-#. type:ignore[union-attr]
 msgid "No active parliamentary groups"
 msgstr "Nessun gruppo parlamentare attivo"
+
+msgid "Participations"
+msgstr "Partecipanti"
 
 msgid "Tag"
 msgstr "Tag"
@@ -3058,6 +3123,18 @@ msgstr "Chiave API"
 msgid "Read only"
 msgstr "Sola lettura"
 
+msgid "Parent organisation"
+msgstr "Organizzazione madre"
+
+msgid "Child organisation"
+msgstr "Organizzazione subordinata"
+
+msgid "API URL of the parent organisation"
+msgstr "URL dell'API dell'organizzazione madre"
+
+msgid "e.g. https://onegov.govikon.ch/api/"
+msgstr "p. es. https://onegov.govikon.ch/api/"
+
 msgid "Submit your event"
 msgstr "Invia il tuo evento"
 
@@ -3311,9 +3388,6 @@ msgstr "La tua nota su questo biglietto"
 
 msgid "Attachment"
 msgstr "Allegato"
-
-msgid "Message"
-msgstr "Messaggio"
 
 msgid "PDF"
 msgstr "PDF"
@@ -4495,6 +4569,15 @@ msgstr ""
 "Una mail sarà inviata al volontario contenente lo stato delle sue "
 "iscrizioni. Inviare solo se questi sono gli stati finali delle iscrizioni."
 
+msgid "Mutation"
+msgstr "Mutazione"
+
+msgid "Edit Topic"
+msgstr "Modifica argomento"
+
+msgid "Apply proposed changes"
+msgstr "Applicare le modifiche proposte"
+
 msgid "New Link"
 msgstr "Nuovo collegamento"
 
@@ -4519,9 +4602,6 @@ msgstr "Nuovo argomento"
 
 msgid "Added a new topic"
 msgstr "Aggiunto un nuovo argomento"
-
-msgid "Edit Topic"
-msgstr "Modifica argomento"
 
 msgid "Move Topic"
 msgstr "Spostare argomento"
@@ -4579,6 +4659,31 @@ msgstr "Eliminare iFrame"
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
 msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
+
+msgid "API link"
+msgstr "Collegamento API"
+
+msgid "Add API link"
+msgstr "Aggiungi collegamento API"
+
+msgid "Added API link"
+msgstr "Collegamento API aggiunto"
+
+msgid "Edit API link"
+msgstr "Modifica collegamento API"
+
+msgid "Move API link"
+msgstr "Sposta collegamento API"
+
+msgid "The API link was deleted"
+msgstr "Il collegamento API è stato eliminato"
+
+msgid "Delete API link"
+msgstr "Elimina collegamento API"
+
+#, python-format
+msgid "Do you really want to delete the API link \"${title}\"?"
+msgstr "Vuole davvero eliminare il collegamento API \"${title}\"?"
 
 msgid "A News cannot be pasted as Topic"
 msgstr "Una notizia non può essere incollata come argomento"
@@ -5459,6 +5564,9 @@ msgstr "Ancora nessuna iscrizione."
 
 msgid "Number of participants"
 msgstr "Numero di partecipanti"
+
+msgid "Mutation report"
+msgstr "Segnalazione di mutazione"
 
 msgid "Hello!"
 msgstr "Ciao!"
@@ -6656,6 +6764,9 @@ msgstr "Archivia"
 msgid "Archive selected"
 msgstr "Archivio selezionato"
 
+msgid "Report change"
+msgstr "Segnalare una mutazione"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -7552,9 +7663,6 @@ msgstr "La registrazione è stata annullata"
 msgid "The registration could not be cancelled"
 msgstr "La registrazione non può essere annullata"
 
-msgid "Select"
-msgstr "Seleziona"
-
 msgid "Select images"
 msgstr "Seleziona immagini"
 
@@ -7563,6 +7671,9 @@ msgstr "Aggiunto un nuovo album fotografico"
 
 msgid "New Photo Album"
 msgstr "Nuovo album fotografico"
+
+msgid "Proposed changes applied."
+msgstr "Modifiche proposte applicate."
 
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
@@ -7707,6 +7818,9 @@ msgstr "${conteggio} eventi sono stati importati"
 
 msgid "Move"
 msgstr "Spostare"
+
+msgid "Your ticket has been opened"
+msgstr "Il suo ticket è stato aperto"
 
 msgid "Your payment has been received"
 msgstr "Abbiamo ricevuto il tuo pagamento"
@@ -8253,6 +8367,9 @@ msgid ""
 msgstr ""
 "Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
 "\"."
+
+msgid "Source organisation API link"
+msgstr "Collegamento API dell'organizzazione di origine"
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -8875,3 +8992,33 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
+
+msgid "Videos"
+msgstr "Video"
+
+msgid "No videos uploaded yet"
+msgstr "Nessun video caricato"
+
+msgid "Do you really want to delete the video?"
+msgstr "Vuole davvero eliminare il video?"
+
+msgid "Delete Video"
+msgstr "Elimina video"
+
+msgid "Supported formats are MP4, WebM and Ogg. To insert a video into a page, use the video button in the text editor."
+msgstr "I formati supportati sono MP4, WebM e Ogg. Per inserire un video in una pagina, utilizzi il pulsante video nell'editor di testo."
+
+msgid "Use as template"
+msgstr "Utilizza come modello"
+
+msgid "The page can be selected as template when adding new pages. Templates should usually not be public."
+msgstr "La pagina può essere selezionata come modello quando si aggiungono nuove pagine. Di regola i modelli non dovrebbero essere pubblici."
+
+msgid "Template"
+msgstr "Modello"
+
+msgid "Without template"
+msgstr "Senza modello"
+
+msgid "Create the page from a template:"
+msgstr "Creare la pagina da un modello:"

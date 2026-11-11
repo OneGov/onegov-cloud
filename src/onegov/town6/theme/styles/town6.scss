@@ -257,6 +257,127 @@ footer {
 .page-text {
     margin-bottom: 2rem;
 
+    .page-section {
+        background: $white;
+        border: 1px solid rgba($body-font-color, .16);
+        border-radius: $global-radius;
+        margin-bottom: .875rem;
+        padding: 0 1.25rem;
+        transition: border-color 160ms ease;
+
+        > summary {
+            align-items: center;
+            border-radius: inherit;
+            box-sizing: border-box;
+            cursor: pointer;
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            margin: 0 -1.25rem;
+            min-height: 3.75rem;
+            padding: .875rem 1.25rem;
+            scroll-margin-top: 8rem;
+            transition: background-color 160ms ease;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+
+            &::after {
+                background:
+                    linear-gradient(currentcolor, currentcolor) center / .75rem 2px no-repeat,
+                    linear-gradient(currentcolor, currentcolor) center / 2px .75rem no-repeat,
+                    $white-smoke;
+                border-radius: 50%;
+                color: $steel;
+                content: '';
+                flex: 0 0 2rem;
+                height: 2rem;
+            }
+
+            &:hover {
+                background-color: $white-smoke;
+            }
+
+            &:focus-visible {
+                outline: 3px solid $anchor-font-color;
+                outline-offset: 3px;
+            }
+
+            > h2 {
+                flex: 1;
+                font-size: 1.375rem;
+                line-height: 1.4;
+                margin: 0;
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        h3 { font-size: 1.25rem; }
+        h4 { font-size: 1.125rem; }
+        h5 { font-size: 1rem; }
+
+        &[open] {
+            border-color: $gainsboro;
+            padding-bottom: 1.25rem;
+
+            > summary {
+                background-color: $white-smoke;
+                border-bottom: 1px solid $gainsboro;
+                border-radius: $global-radius $global-radius 0 0;
+                margin-bottom: 1.25rem;
+
+                &::after {
+                    background-color: $smoke;
+                    background-size: .75rem 2px, 2px 0;
+                }
+            }
+
+            > :last-child:not(summary) {
+                margin-bottom: 0;
+            }
+        }
+
+        @media #{$small-only} {
+            padding-inline: 1rem;
+
+            > summary {
+                gap: .75rem;
+                margin-inline: -1rem;
+                padding-inline: 1rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &,
+            > summary {
+                transition: none;
+            }
+        }
+
+        @media (forced-colors: active) {
+            > summary::after {
+                background-color: ButtonFace;
+                color: ButtonText;
+                forced-color-adjust: none;
+                outline: 1px solid ButtonText;
+            }
+        }
+
+        @media print {
+            &,
+            &[open] > summary {
+                background: none;
+                border-color: $gray;
+            }
+
+            > summary::after {
+                display: none;
+            }
+        }
+    }
+
     a {
         display: inline-block;
         text-decoration: underline !important;
@@ -334,6 +455,50 @@ footer {
     border-radius: .7rem;
     box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
     padding: 1rem;
+}
+
+/*
+    API topic picker
+*/
+.api-topic-picker {
+    border: 1px solid $gray;
+    border-radius: .3rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    .api-topic-picker-path {
+        margin-bottom: .5rem;
+    }
+
+    .api-topic-picker-list {
+        list-style: none;
+        margin: 0 0 .5rem;
+
+        li {
+            align-items: center;
+            border-bottom: 1px solid $light-gray;
+            display: flex;
+            gap: .5rem;
+            justify-content: space-between;
+            padding: .25rem .5rem;
+
+            &.is-selected {
+                background-color: $light-gray;
+                font-weight: bold;
+            }
+        }
+
+        .api-topic-picker-actions {
+            align-items: center;
+            display: flex;
+            flex-shrink: 0;
+            gap: 1rem;
+        }
+
+        .button.button-select{
+            margin: 0;
+        }
+    }
 }
 
 /*
@@ -1918,4 +2083,65 @@ a.category-anchor {
 
 ol li a:not(.button) {
   display: inline !important;
+}
+
+.topic-mutation {
+    del {
+        border-radius: 3px;
+        text-decoration: line-through;
+        background-color: $red-light;
+    }
+
+    ins {
+        border-radius: 3px;
+        text-decoration: inherit !important;
+        background-color: $green-light;
+    }
+}
+
+// html diffs (e.g. proposed changes in tickets), see onegov.core.html_diff
+.diff {
+    img,
+    video,
+    audio,
+    iframe {
+        height: auto;
+        max-width: 100%;
+    }
+
+    .tagdiff_removed {
+        box-shadow: 0 0 0 4px $alert-color;
+        opacity: .5;
+    }
+
+    .tagdiff_added {
+        box-shadow: 0 0 0 4px $success-color;
+    }
+}
+
+// call to action buttons in the text, see linkstyle.js
+.page-text a.cta,
+.redactor-editor a.cta {
+    margin: 0 .5rem .5rem 0;
+    // links in the page text are always underlined
+    text-decoration: none !important;
+}
+
+// selection of a page template when adding a page, see with_page_templates
+.page-templates {
+    p {
+        margin-bottom: .5rem;
+    }
+
+    .page-template-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem 1.5rem;
+        list-style: none;
+        margin: 0;
+
+        .active {
+            font-weight: bold;
+        }
+    }
 }

@@ -1,0 +1,99 @@
+.video-preview {
+    background: #101820;
+    border-radius: 1rem;
+    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .12);
+    display: block;
+    margin: 1rem 0;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.video-preview > video {
+    display: block;
+    height: auto;
+    width: 100%;
+}
+
+.video-preview-play {
+    background: linear-gradient(transparent 45%, rgba(0, 0, 0, .7));
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    height: 100%;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    text-align: left;
+    width: 100%;
+}
+
+.video-preview-play[hidden] {
+    display: none;
+}
+
+.video-preview-icon {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .2);
+    height: 4.5rem;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform .16s ease, box-shadow .16s ease;
+    width: 4.5rem;
+}
+
+.video-preview-icon::before {
+    border-bottom: .75rem solid transparent;
+    border-left: 1.1rem solid #101820;
+    border-top: .75rem solid transparent;
+    content: '';
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-40%, -50%);
+}
+
+.video-preview-play:hover .video-preview-icon,
+.video-preview-play:focus-visible .video-preview-icon {
+    box-shadow: 0 .35rem 1.25rem rgba(0, 0, 0, .3);
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.video-preview-play:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: -6px;
+}
+
+.video-preview-label {
+    bottom: 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    left: 1.25rem;
+    line-height: 1.4;
+    position: absolute;
+    right: 5.5rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+}
+
+.video-preview-duration {
+    background: rgba(0, 0, 0, .45);
+    border-radius: .3rem;
+    bottom: 1.25rem;
+    font-size: .875rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    padding: .15rem .4rem;
+    position: absolute;
+    right: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .video-preview-icon {
+        transition: none;
+    }
+}

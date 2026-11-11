@@ -59,6 +59,7 @@ LEVELS = (
         'onegov.feriennet',
         'onegov.foundation6',
         'onegov.fsi',
+        'onegov.ilz',
         'onegov.intranet',
         'onegov.landsgemeinde',
         'onegov.onboarding',

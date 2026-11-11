@@ -52,6 +52,7 @@ from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import VideoFileCollection
 from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import News
@@ -358,6 +359,29 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @cached_property
+    def video_upload_url(self) -> str:
+        """ The URL to the video upload action. """
+        url = self.request.link(
+            VideoFileCollection(self.request.session), name='upload'
+        )
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def video_upload_json_url(self) -> str:
+        """ Adds the json url for video uploads. """
+        url = self.request.link(
+            VideoFileCollection(self.request.session), name='upload.json'
+        )
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def video_list_url(self) -> str:
+        """ Adds the json url for video lists. """
+        return self.request.link(
+            VideoFileCollection(self.request.session), name='json'
+        )
+
+    @cached_property
     def sitecollection_url(self) -> str:
         """ Adds the json url for internal links lists. """
         return self.request.link(SiteCollection(self.request.session))
@@ -374,8 +398,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def suggestions_url(self) -> str:
-        """ The URL to the suggestions JSON view. """
-        return self.request.class_link(Search, name='suggest')
+        """ The URL to the suggestions JSON view (or to the instant results,
+        if the app shows those instead). """
+        return self.request.class_link(Search, name=self.suggestions_view)
+
+    @cached_property
+    def suggestions_view(self) -> str:
+        if getattr(self.app, 'search_instant_results', False):
+            return 'instant'
+        return 'suggest'
 
     @cached_property
     def events_url(self) -> str:
@@ -728,6 +759,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def format_phone_number(self, phone_number: str) -> str:
         return utils.format_phone_number(phone_number)
+
+    def collapsible_sections(self, text: Markup | None) -> Markup | None:
+        return utils.collapsible_sections(text)
 
     def password_reset_url(self, user: User | None) -> str | None:
         if not user:
@@ -4125,6 +4159,14 @@ class ImageFileCollectionLayout(DefaultLayout):
         request.include('common')
         request.include('upload')
         request.include('editalttext')
+        super().__init__(model, request)
+
+
+class VideoFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model: Any, request: OrgRequest) -> None:
+        request.include('common')
+        request.include('upload')
         super().__init__(model, request)
 
 

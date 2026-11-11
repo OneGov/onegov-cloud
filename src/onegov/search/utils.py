@@ -32,10 +32,10 @@ LANGUAGE_MAP = {
 }
 
 
-def language_from_locale(locale: str | None) -> str:
+def language_from_locale(locale: str | None, fallback: str = 'simple') -> str:
     if locale is None:
-        return 'simple'
-    return LANGUAGE_MAP.get(locale, 'simple')
+        return fallback
+    return LANGUAGE_MAP.get(locale, fallback)
 
 
 def searchable_sqlalchemy_models[T](

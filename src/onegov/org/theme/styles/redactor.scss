@@ -26,3 +26,76 @@ ol.alpha-list {
     font-weight: 900;
     line-height: inherit;
 }
+
+// videos can't be played in the editor, they are selected on click instead,
+// see videomanager.js
+.redactor-editor video {
+    pointer-events: none;
+}
+
+// selected video in the editor
+.redactor-video-overlay {
+    box-shadow: 0 0 0 3px $primary-color;
+    pointer-events: none;
+    position: absolute;
+    z-index: 10;
+
+    .redactor-video-remove {
+        background: $white;
+        border: 1px solid $primary-color;
+        border-radius: 3px;
+        color: $primary-color;
+        cursor: pointer;
+        font-size: .875rem;
+        padding: .25rem .5rem;
+        pointer-events: auto;
+        position: absolute;
+        right: .5rem;
+        top: .5rem;
+    }
+}
+
+// video previews in the video dialog of the editor
+#redactor-video-manager-box {
+    max-height: 360px;
+    overflow: auto;
+}
+
+.redactor-video-manager-group {
+    margin: 1rem 0 .5rem;
+}
+
+.redactor-video-manager-grid {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+
+    .redactor-video-manager-link {
+        border: 2px solid transparent;
+        border-radius: 3px;
+        display: block;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            border-color: $primary-color;
+        }
+    }
+
+    video {
+        aspect-ratio: 16 / 9;
+        background: $black;
+        display: block;
+        object-fit: contain;
+        width: 100%;
+    }
+
+    .redactor-video-manager-title {
+        display: block;
+        font-size: .8rem;
+        overflow: hidden;
+        padding: .25rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

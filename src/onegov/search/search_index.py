@@ -47,6 +47,9 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: Access level of entry (AccessExtension::access)
     access: Mapped[str] = mapped_column(String, default='public', index=True)
 
+    #: The language this entry is intended for, if any
+    language: Mapped[str | None] = mapped_column(String, index=True)
+
     # FIXME: This might be a bit of a misnomer now, or we want to split this
     #        into two separate columns. This is more of a reference date for
     #        when this entry is relevant. So it affectes time-based search

@@ -9,11 +9,18 @@ from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
+from onegov.org.api_source import api_source_base_url, api_topic_edit_url
+from onegov.org.api_source import unregister_api_link
 from onegov.org.elements import Link
+from onegov.org.forms.mutation import TopicMutationForm
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
-from onegov.org.models import News, NewsCollection, Topic
+from onegov.org.mail import send_ticket_mail
+from onegov.org.models import News, NewsCollection, TicketMessage, Topic
 from onegov.org.models.editor import Editor
+from onegov.org.utils import emails_for_new_ticket
+from onegov.ticket import TicketCollection
+from uuid import uuid4
 from webob import exc, Response
 
 
@@ -34,11 +41,31 @@ def delete_page(self: Topic | News, request: OrgRequest) -> None:
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
+    if isinstance(self, Topic):
+        unregister_api_topics(self, request)
+
     request.session.delete(self)
     self.files = []
     request.session.flush()
     assert self.trait is not None
     request.success(self.trait_messages[self.trait]['delete_message'])
+
+
+def unregister_api_topics(page: Topic, request: OrgRequest) -> None:
+    """ Tells the source organisation that the 'api' topics of the given
+    page (and of its children, which are deleted as well) are gone. """
+
+    api_url = request.app.org.api_source_url
+    if not api_url:
+        return
+
+    pages = [page]
+    while pages:
+        topic = pages.pop()
+        pages.extend(topic.children)  # type:ignore[arg-type]
+        if topic.trait == 'api' and topic.api_topic_id:
+            unregister_api_link(
+                api_url, topic.api_topic_id, request.link(topic))
 
 
 @OrgApp.html(model=Topic, template='topic.pt', permission=Public)
@@ -48,7 +75,7 @@ def view_topic(
     layout: PageLayout | None = None
 ) -> RenderData | Response:
 
-    assert self.trait in {'link', 'page', 'iframe'}
+    assert self.trait in {'link', 'page', 'iframe', 'api'}
 
     if not request.is_manager:
 
@@ -118,7 +145,25 @@ def view_topic(
             and child.show_preview_image
             for child in children
         ),
-        'iframe': self.content['url'] if self.trait == 'link' else None
+        'iframe': self.content['url'] if self.trait == 'link' else None,
+        'api_source': api_source_info(self, request),
+    }
+
+
+def api_source_info(
+    page: Topic,
+    request: OrgRequest
+) -> dict[str, str | bool] | None:
+    """ The source of 'api' topics shown to editors. """
+    api_url = request.app.org.api_source_url
+    if page.trait != 'api' or not page.api_topic_id or not api_url:
+        return None
+
+    return {
+        'source_url': api_source_base_url(api_url),
+        'edit_url': api_topic_edit_url(api_url, page.api_topic_id),
+        'view_url': page.meta.get('api_html_url') or '',
+        'unavailable': page.api_unavailable,
     }
 
 
@@ -316,3 +361,79 @@ def generate_rss_feed(
             feed_entry.published(published_date)
 
     return fg.rss_str(pretty=True)
+
+
+@OrgApp.form(
+    model=Topic,
+    name='report-change',
+    template='form.pt',
+    permission=Public,
+    form=TopicMutationForm
+)
+def report_topic_change(
+    self: Topic,
+    request: OrgRequest,
+    form: TopicMutationForm,
+    layout: PageLayout | None = None
+) -> RenderData | Response:
+
+    if form.submitted(request):
+        assert form.submitter_email.data is not None
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TOP',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'id': str(self.id),
+                    'submitter_email': form.submitter_email.data,
+                    'submitter_message': form.submitter_message.data,
+                    'proposed_changes': form.proposed_changes
+                }
+            )
+            TicketMessage.create(ticket, request, 'opened', 'external')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_('Your ticket has been opened'),
+            receivers=(form.submitter_email.data, ),
+            ticket=ticket
+        )
+
+        for email in emails_for_new_ticket(request, ticket):
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_('New ticket'),
+                ticket=ticket,
+                receivers=(email, ),
+                content={
+                    'model': ticket
+                }
+            )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat()
+            }
+        )
+
+        request.success(_('Thank you for your submission!'))
+        return morepath.redirect(request.link(ticket, 'status'))
+
+    layout = layout or PageLayout(self, request)
+    layout.breadcrumbs = list(layout.breadcrumbs)
+    layout.breadcrumbs.append(Link(_('Report change'), '#'))
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': _('Report change'),
+        'lead': self.title,
+        'form': form
+    }

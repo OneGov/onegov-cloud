@@ -23,7 +23,8 @@ from onegov.org.forms.mtan import PublicRequestMTANForm
 from onegov.org.forms.newsletter import NewsletterForm
 from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
-from onegov.org.forms.page import LinkForm, PageForm, IframeForm
+from onegov.org.forms.page import (
+    ApiTopicForm, LinkForm, PageForm, IframeForm)
 from onegov.org.forms.parliamentarian import ParliamentarianForm
 from onegov.org.forms.parliamentarian_role import ParliamentarianRoleForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
@@ -69,6 +70,7 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'ApiTopicForm',
     'AccessSettingsForm',
     'AddReservationForm',
     'AllocationRuleForm',

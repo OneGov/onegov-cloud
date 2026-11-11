@@ -107,3 +107,21 @@ def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
         return self.suggestions()
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception
+
+
+@OrgApp.json(
+    model=Search,
+    name='instant',
+    permission=Public,
+    open_data=False
+)
+def instant_results(self: Search, request: OrgRequest) -> JSON_ro:
+    try:
+        return self.instant_results()
+    except SearchOfflineError as exception:
+        raise exc.HTTPNotFound() from exception
+    except InternalError:
+        # probably some malicious search term, see the search view
+        transaction.abort()
+        transaction.begin()
+        return []

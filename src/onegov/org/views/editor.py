@@ -6,19 +6,20 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm, LinkForm
+from onegov.org.forms.page import with_page_templates
 from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
-from onegov.org.models import Clipboard, Editor
+from onegov.org.models import Clipboard, Editor, Topic
 from onegov.org.models.organisation import Organisation
 from onegov.org.models import News
 from onegov.page import PageCollection
 
 
-from typing import cast, TYPE_CHECKING
+from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.form import Form
-    from onegov.org.models import Topic
     from onegov.org.request import OrgRequest
     from onegov.page import Page
     from webob import Response
@@ -57,13 +58,42 @@ def get_form_class(
     if editor.action == 'new-root':
         if editor.trait == 'page':
             # this is the case when adding a new 'root' page (parent = None)
-            return PageForm
+            return with_page_templates(
+                PageForm, request, request.link(editor))
         if editor.trait == 'link':
             # this is the case when adding a new 'root' link (parent = None)
             return LinkForm
 
     assert editor.page is not None
-    return editor.page.get_form_class(editor.trait, editor.action, request)
+    form_class = editor.page.get_form_class(
+        editor.trait, editor.action, request)
+    if editor.action == 'new' and editor.trait == 'page':
+        return with_page_templates(form_class, request, request.link(editor))
+    return form_class
+
+
+def fill_in_page_template(form: Form, request: OrgRequest) -> None:
+    """ Fills in the form for a new page with the content of the selected
+    template (see :func:`onegov.org.forms.page.with_page_templates`).
+
+    """
+    if request.POST or 'page_template' not in form:
+        return
+
+    template_id = request.GET.get('template', '')
+    if not template_id.isdigit():
+        return
+
+    template = request.session.get(Topic, int(template_id))
+    if template is None or not template.is_page_template:
+        return
+
+    form.process(obj=template)
+
+    # the new page gets its own title and is not a template itself
+    form['title'].data = None
+    if 'is_page_template' in form:
+        form['is_page_template'].data = False
 
 
 @OrgApp.form(model=Editor, template='form.pt', permission=Private,
@@ -101,30 +131,41 @@ def handle_new_page(
     request: OrgRequest,
     form: Form,
     src: object | None = None,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | PageLayout | None = None,
+    added_page_callback: Callable[[Any], None] | None = None,
+    get_parent: Callable[[], Topic | News | None] | None = None,
 ) -> RenderData | Response:
     assert self.page is not None
     page = cast('Topic | News', self.page)
     site_title = page.trait_messages[self.trait]['new_page_title']
 
     if layout:
-        layout.site_title = site_title  # type:ignore[union-attr]
+        if layout_site_title := getattr(layout, 'site_title', None):
+            site_title = layout_site_title
+        else:
+            layout.site_title = site_title  # type:ignore[union-attr]
 
     if form.submitted(request):
         pages = PageCollection(request.session)
+        # NOTE: The parent needs to be set when adding the page, moving
+        #       it to the root afterwards would delete it as an orphan
         added = cast('Topic | News', pages.add(
-            parent=page,
+            parent=get_parent() if get_parent is not None else page,
             title=form['title'].data,
             type=page.type,
             meta={'trait': self.trait}
         ))
         form.populate_obj(added)
+        if added_page_callback is not None:
+            added_page_callback(added)
 
         request.success(added.trait_messages[self.trait]['new_page_added'])
         return morepath.redirect(request.link(added))
 
     if src:
         form.process(obj=src)
+    else:
+        fill_in_page_template(form, request)
 
     layout = layout or EditorLayout(self, request, site_title)
     layout.editmode_links[1] = Link(
@@ -162,6 +203,13 @@ def handle_new_root_page(
         )
         form.populate_obj(page)
 
+        if (
+            request.app.localizeable
+            and self.trait == 'page'
+            and getattr(page, 'locale', '') is None
+        ):
+            page.locale = request.locale  # type:ignore[attr-defined]
+
         if self.trait == 'link':
             request.success(_('Added a new link'))
         else:
@@ -170,6 +218,7 @@ def handle_new_root_page(
 
     if not request.POST:
         form.process(obj=self.page)
+        fill_in_page_template(form, request)
     layout = layout or EditorLayout(self, request, site_title)
     layout.edit_mode = True
     layout.editmode_links[1] = Link(

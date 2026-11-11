@@ -321,8 +321,10 @@ class SessionManager:
         # and the core would install the extensions the modules require
         self.required_extensions = {
             'btree_gist',
+            'fuzzystrmatch',
             'hstore',
             'intarray',
+            'pg_trgm',
             'unaccent',
             'uuid-ossp',
         }

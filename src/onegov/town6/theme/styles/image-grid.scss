@@ -129,3 +129,60 @@ $image-padding: 1px;
     }
 
 }
+
+/*
+    videos
+*/
+
+// videos embedded in the text
+.page-text video,
+.redactor-editor video {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+
+.video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2%;
+    margin-bottom: 1rem;
+
+    .video-container {
+        position: relative;
+        width: 100%;
+
+        @include breakpoint(medium) {
+            width: 49%;
+        }
+
+        @include breakpoint(large) {
+            width: 32%;
+        }
+
+        video {
+            background: $black;
+            display: block;
+            width: 100%;
+        }
+
+        .video-name {
+            display: block;
+            font-size: .875rem;
+            margin-top: .25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .delete {
+            background: $white;
+            border-radius: 50%;
+            line-height: 1;
+            padding: .3rem .45rem;
+            position: absolute;
+            right: .5rem;
+            top: .5rem;
+        }
+    }
+}

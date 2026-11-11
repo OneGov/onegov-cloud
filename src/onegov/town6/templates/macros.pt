@@ -436,7 +436,7 @@
 </metal:directory>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-video-upload-url layout.video_upload_json_url; data-video-list-url layout.video_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="${fieldset.id}">
                 <legend>${fieldset.label}</legend>
@@ -857,7 +857,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}"
+                 tal:define="collapse_sections page.collapse_sections|False"
+                 tal:condition="not collapse_sections">
                 <h3 i18n:translate>Content</h3>
                 <ul class="more-list"></ul>
             </div>
@@ -867,7 +869,9 @@
     </div>
 </metal:page_content>
 
-<metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
+<metal:page_content define-macro="page_content" i18n:domain="onegov.town6"
+                    tal:define="collapse_sections page.collapse_sections|False;
+                                text layout.collapsible_sections(text) if collapse_sections else text">
     <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
@@ -2923,6 +2927,21 @@
     </div>
 </metal:uploaded_image>
 
+<metal:uploaded_video define-macro="uploaded_video" i18n:domain="onegov.town6">
+    <div id="video-${index}" class="video-container">
+        <video controls preload="metadata" src="${video.video}" title="${video.title}"></video>
+        <a class="video-name" href="${video.video}" target="_blank">${video.title}</a>
+        <a class="delete confirm"
+           ic-delete-from="${request.csrf_protected_url(video.video)}"
+           ic-target="#video-${index}"
+           ic-success-action="remove"
+           data-confirm="Do you really want to delete the video?"
+           data-confirm-yes="Delete Video"
+           data-confirm-no="Cancel"
+           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+    </div>
+</metal:uploaded_video>
+
 <metal:digest_result define-macro="digest_result" i18n:domain="onegov.town6">
     <div class="digest-result digest-${is_known and 'is-known' or 'is-not-known'}" tal:switch="is_known">
         <tal:b case="True">
@@ -3097,7 +3116,7 @@
     <tal:b tal:repeat="step steps">
         <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position"
                 tal:attributes="data-step step.position if show_number else ''" class="${'is-current' if current else '' + 'is-complete' if complete else ''}">
-            <span tal:condition="show_title">${request.translate(step.title)}</span>
+            <span class="show-for-large" tal:condition="show_title">${request.translate(step.title)}</span>
         </li>
     </tal:b>
 </ol>
@@ -3527,3 +3546,24 @@
         </div>
     </form>
 </metal:inline_search>
+
+<metal:display_topic_mutation define-macro="display_topic_mutation" i18n:domain="onegov.town6">
+    <h2 i18n:translate>Mutation report</h2>
+    <dl class="topic-mutation">
+        <dt i18n:translate>Topic</dt>
+        <dd><a href="${request.link(topic)}">${topic.title}</a></dd>
+
+        <dt i18n:translate>Path</dt>
+        <dd><span tal:repeat="ancestor topic.ancestors">${ancestor.title}</span> <span>${topic.title}</span></dd>
+
+        <dt tal:condition="message" i18n:translate>Message</dt>
+        <dd tal:condition="message" tal:content="message"></dd>
+    </dl>
+    <h2 tal:condition="proposed_changes" i18n:translate>Proposed changes</h2>
+    <dl class="topic-mutation" tal:condition="proposed_changes">
+        <tal:b tal:repeat="change proposed_changes">
+            <dt>${labels.get(change, change)}</dt>
+            <dd>${proposed_changes[change]}</dd>
+        </tal:b>
+    </dl>
+</metal:display_topic_mutation>

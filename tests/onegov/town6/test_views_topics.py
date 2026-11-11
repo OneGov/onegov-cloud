@@ -1,7 +1,78 @@
+import pytest
+
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webtest.forms import Select
     from .conftest import Client
+    from tests.shared.client import ExtendedResponse
+
+
+@pytest.mark.parametrize(('parent_url', 'add_label'), [
+    ('/topics/themen', 'Thema'),
+    ('/news', 'Nachricht'),
+])
+def test_collapsible_page_sections(
+    client: Client,
+    parent_url: str,
+    add_label: str
+) -> None:
+    client.login_admin()
+    new_page = client.get(parent_url).click(add_label)
+
+    fields = list(new_page.form.fields)
+    assert fields[fields.index('text') + 1] == 'collapse_sections'
+    assert not new_page.form['collapse_sections'].checked
+    assert new_page.pyquery('#collapse_sections').closest('label').find(
+        '.label-text').text() == 'Ausklappen von Abschnitten'
+
+    text = (
+        '<p>Einleitung</p>'
+        '<h2>Erster <em>Abschnitt</em></h2>'
+        '<p>Erster Inhalt</p>'
+        '<h3>Untertitel</h3><ul><li>Weiterer Inhalt</li></ul>'
+        '<h2>Zweiter Abschnitt</h2><p>Zweiter Inhalt</p>'
+    )
+    new_page.form['title'] = 'Ausklappbare Abschnitte'
+    new_page.form['text'] = text
+    page = new_page.form.submit().follow()
+    assert not page.pyquery('.page-text details')
+    assert len(page.pyquery('.page-text > h2')) == 2
+
+    edit_page = page.click('Bearbeiten')
+    assert not edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
+    edit_page.form['collapse_sections'] = True
+    page = edit_page.form.submit().follow()
+
+    # Public rendering groups each editor title into a closed section.
+    public_page = client.spawn().get(page.request.url)
+    sections = public_page.pyquery('.page-text details.page-section')
+    assert len(sections) == 2
+    assert not sections.filter('[open]')
+    assert public_page.pyquery('.page-text > p').text() == 'Einleitung'
+    assert sections.eq(0).find('summary > h2').text() == 'Erster Abschnitt'
+    assert sections.eq(0).find('summary em').text() == 'Abschnitt'
+    assert sections.eq(0).find('p').text() == 'Erster Inhalt'
+    assert sections.eq(0).find('h3').text() == 'Untertitel'
+    assert sections.eq(0).find('li').text() == 'Weiterer Inhalt'
+    assert sections.eq(1).find('summary > h2').text() == 'Zweiter Abschnitt'
+    assert sections.eq(1).find('p').text() == 'Zweiter Inhalt'
+
+    # Editing retains the complete HTML and the saved checkbox state.
+    edit_page = page.click('Bearbeiten')
+    assert edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
+    assert not edit_page.pyquery('details.page-section')
+
+    edit_page.form['collapse_sections'] = False
+    page = edit_page.form.submit().follow()
+    assert not page.pyquery('.page-text details')
+    assert len(page.pyquery('.page-text > h2')) == 2
+    assert page.pyquery('.page-text > h3').text() == 'Untertitel'
+    edit_page = page.click('Bearbeiten')
+    assert not edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
 
 
 def test_sort_topics(client: Client) -> None:
@@ -270,3 +341,97 @@ def test_view_page_as_member(client: Client) -> None:
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_page_templates(client: Client) -> None:
+    from webtest.forms import Checkbox
+
+    def mark_as_template(page: ExtendedResponse) -> None:
+        # WebTest doesn't parse the fields at the end of the page form,
+        # so we add the checkbox ourselves (see test_views_pages.py)
+        field = Checkbox(page.form, 'input', 'is_page_template', 0, 'y')
+        page.form.fields['is_page_template'] = [field]
+        page.form.field_order.append(('is_page_template', field))
+        field.checked = True
+
+    client.login_admin()
+
+    # without templates, there's nothing to select
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'page-templates' not in new_page
+
+    # create a template
+    new_page.form['title'] = "Vorlage Dienstleistung"
+    new_page.form['lead'] = "Kurze Beschreibung der Dienstleistung"
+    new_page.form['text'] = (
+        '<h2>Voraussetzungen</h2><p>…</p>'
+        '<h2>Kosten</h2><p>…</p>'
+        '<p><a href="/forms" class="button cta">Online beantragen</a></p>'
+    )
+    mark_as_template(new_page)
+    new_page.form['access'] = 'private'
+    template = new_page.form.submit().follow()
+    assert 'Diese Seite ist eine Vorlage' in template
+
+    # the template can be selected when adding a page
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'Seite aus einer Vorlage erstellen' in new_page
+    new_page = new_page.click(href='template=')
+    assert new_page.form['title'].value == ''
+    assert new_page.form['lead'].value == (
+        'Kurze Beschreibung der Dienstleistung')
+    assert '<h2>Kosten</h2>' in new_page.form['text'].value
+    assert new_page.pyquery('#is_page_template').attr('checked') is None
+    assert 'Ohne Vorlage' in new_page
+
+    new_page.form['title'] = "Parkkarte"
+    page = new_page.form.submit().follow()
+    assert 'Kurze Beschreibung der Dienstleistung' in page
+    assert 'Online beantragen' in page
+    assert page.pyquery('.page-text a.cta').attr('href') == '/forms'
+    assert 'Diese Seite ist eine Vorlage' not in page
+
+    # also for pages on the top level
+    root_page = client.get('/topics/themen').click('Thema')
+    root_url = root_page.request.url.replace(
+        '/editor/new/', '/editor/new-root/')
+    root_url = root_url.rsplit('/', 1)[0] + '/1'
+    root_page = client.get(root_url)
+    assert 'Seite aus einer Vorlage erstellen' in root_page
+    root_page = root_page.click(href='template=')
+    assert '<h2>Kosten</h2>' in root_page.form['text'].value
+
+    # a page which is no template anymore isn't offered
+    # (the checkbox isn't submitted, since WebTest doesn't know it)
+    edit = template.click('Bearbeiten')
+    assert edit.pyquery('#is_page_template').attr('checked') is not None
+    edit.form.submit()
+    new_page = client.get('/topics/themen').click('Thema')
+    assert 'page-templates' not in new_page
+
+    # templates are not filled in by url manipulation either
+    url = new_page.request.url + '?template=999999'
+    assert 'Kurze Beschreibung' not in client.get(url)
+
+
+def test_report_change_prefills_email(client: Client) -> None:
+    client.login_admin()
+    topic = client.get('/topics/themen')
+    report_url = topic.pyquery('a[href$="report-change"]').attr('href')
+    assert report_url
+
+    # the e-mail address of the logged in user is filled in
+    form = client.get(report_url).form
+    assert form['submitter_email'].value == 'admin@example.org'
+
+    # but can be changed
+    form['submitter_email'] = 'someone@example.org'
+    form['submitter_message'] = 'Bitte aktualisieren'
+    ticket = form.submit().follow()
+    assert 'someone@example.org' in client.get(
+        ticket.request.url.replace('/status', ''))
+
+    # anonymous users have to enter their address
+    anonymous = client.spawn()
+    form = anonymous.get(report_url).form
+    assert form['submitter_email'].value == ''
