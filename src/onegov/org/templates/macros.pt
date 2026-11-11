@@ -545,7 +545,9 @@
     </tal:b>
 </metal:empty_lead_hint>
 
-<metal:page_content define-macro="page_content" i18n:domain="onegov.org">
+<metal:page_content define-macro="page_content" i18n:domain="onegov.org"
+                    tal:define="collapse_sections page.collapse_sections|False;
+                                text layout.collapsible_sections(text) if collapse_sections else text">
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False; files files|None">
         <tal:b condition="not: people or contact or coordinates or location or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 columns page-content-main">

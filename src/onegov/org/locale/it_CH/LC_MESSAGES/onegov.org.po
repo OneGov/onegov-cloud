@@ -1562,6 +1562,9 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
 
+msgid "Expand sections"
+msgstr "Espandere le sezioni"
+
 msgid "Keywords"
 msgstr "Parole chiave"
 

@@ -71,6 +71,11 @@ class PageForm(PageBaseForm):
     text = HtmlField(
         label=_('Text'))
 
+    collapse_sections = BooleanField(
+        label=_('Expand sections'),
+        default=False,
+    )
+
     keywords = TagsField(
         label=_('Keywords'),
         description=_(

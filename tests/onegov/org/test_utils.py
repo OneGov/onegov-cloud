@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from lxml.html import fragment_fromstring
 from markupsafe import Markup
 from onegov.core.utils import Bunch, generate_fts_phonenumbers
 from onegov.org import utils
@@ -11,6 +12,61 @@ from onegov.user import UserGroup, User
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
+
+
+def test_collapsible_sections() -> None:
+    html = Markup(
+        'Introduction &amp; overview<p>Before the first title</p>'
+        '<h2 id="first">First <em>section</em></h2>Plain text &amp; more'
+        '<p><a href="/files/example.pdf">Download</a></p>'
+        '<h3>Subtitle</h3><ul><li>Nested content</li></ul>'
+        '<h2 id="second">Second section</h2>'
+        '<p><img src="/images/example.png" alt="Example"></p>'
+        '<h2>Empty section</h2>'
+    )
+    rendered = utils.collapsible_sections(html)
+    assert isinstance(rendered, Markup)
+    root = fragment_fromstring(rendered, create_parent='div')
+    sections = root.findall('details')
+    assert len(sections) == 3
+    assert all(section.get('class') == 'page-section' for section in sections)
+    assert all('open' not in section.attrib for section in sections)
+    assert root.text == 'Introduction & overview'
+    assert root.find('p').text == 'Before the first title'
+    assert sections[0].find('summary/h2').get('id') == 'first'
+    assert sections[0].find('summary/h2/em').text == 'section'
+    assert sections[0].find('summary').tail == 'Plain text & more'
+    assert sections[0].find('p/a').get('href') == '/files/example.pdf'
+    assert sections[0].find('h3').text == 'Subtitle'
+    assert sections[0].find('ul/li').text == 'Nested content'
+    assert sections[1].find('p/img').get('alt') == 'Example'
+    assert len(sections[2]) == 1
+    assert '<details' not in html
+
+
+def test_collapsible_sections_without_titles() -> None:
+    for html in (
+        None, Markup(''), Markup('Plain text'),
+        Markup('<p>Text</p><h3>Subtitle</h3><p>More text</p>'),
+        Markup('<h1>Page title</h1><p>Text</p>'),
+    ):
+        assert utils.collapsible_sections(html) == html
+
+
+def test_collapsible_sections_pasted_containers() -> None:
+    html = Markup(
+        '<div>Introduction<div><h2>First section</h2>'
+        '<p>First content</p></div><div><h2>Second section</h2>'
+        '<p>Second content</p></div>Trailing text</div>'
+    )
+    rendered = utils.collapsible_sections(html)
+    root = fragment_fromstring(rendered, create_parent='div')
+    sections = root.findall('details')
+    assert len(sections) == 2
+    assert root.text == 'Introduction'
+    assert sections[0].find('p').text == 'First content'
+    assert sections[1].find('p').text == 'Second content'
+    assert sections[1].find('p').tail == 'Trailing text'
 
 
 def test_annotate_html() -> None:

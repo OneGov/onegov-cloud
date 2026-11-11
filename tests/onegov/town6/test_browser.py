@@ -21,7 +21,71 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.ticket.handler import HandlerRegistry
     from tests.shared.browser import ExtendedBrowser
-    from .conftest import TestTownApp
+    from .conftest import Client, TestTownApp
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_collapsible_page_sections(
+    browser: ExtendedBrowser,
+    client: Client
+) -> None:
+    client.login_admin()
+    form = client.get('/topics/themen').click('Thema').form
+    form['title'] = 'Ausklappbare Abschnitte'
+    form['text'] = (
+        '<p>Einleitung</p><h2>Erster Abschnitt</h2>'
+        '<p>Erster Inhalt</p>'
+        '<h3>Untertitel</h3><p>Weiterer Inhalt</p>'
+        '<h2>Zweiter Abschnitt</h2>'
+        '<h3>Zweiter Untertitel</h3><p>Zweiter Inhalt</p>'
+    )
+    form['contact'] = 'Kontaktinformationen'
+    form['collapse_sections'] = True
+    page = form.submit().follow()
+    browser.visit(page.request.path)
+    assert not browser.page.locator('.sidebar .content-panel').count()
+
+    sections = browser.page.locator('.page-text details.page-section')
+    first_summary = sections.nth(0).locator('summary')
+    second_summary = sections.nth(1).locator('summary')
+    first_content = sections.nth(0).locator('p').first
+    second_content = sections.nth(1).locator('p').first
+    assert first_summary.is_visible()
+    assert second_summary.is_visible()
+    assert not first_content.is_visible()
+    assert not second_content.is_visible()
+
+    first_summary.click()
+    assert first_content.is_visible()
+    assert not second_content.is_visible()
+    first_summary.press('Space')
+    assert not first_content.is_visible()
+    first_summary.press('Enter')
+    assert first_content.is_visible()
+
+    # A link into a closed section makes its target visible.
+    browser.page.evaluate("location.hash = 'zweiter-untertitel'")
+    second_content.wait_for(state='visible')
+    second_summary.click()
+    assert not second_content.is_visible()
+
+    # Printing includes all content and then restores the user's choices.
+    browser.page.evaluate("dispatchEvent(new Event('beforeprint'))")
+    assert first_content.is_visible()
+    assert second_content.is_visible()
+    browser.page.evaluate("dispatchEvent(new Event('afterprint'))")
+    assert first_content.is_visible()
+    assert not second_content.is_visible()
+
+    browser.visit('/')
+    browser.visit(page.request.path + '#zweiter-untertitel')
+    second_content.wait_for(state='visible')
+
+    edit_form = page.click('Bearbeiten').form
+    edit_form['collapse_sections'] = False
+    page = edit_form.submit().follow()
+    browser.visit(page.request.path)
+    assert browser.page.locator('.sidebar .content-panel').is_visible()
 
 
 @pytest.mark.xdist_group(name='browser')

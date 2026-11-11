@@ -994,6 +994,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'lazysizes.js'
     yield 'toggle.js'
     yield 'common.js'
+    yield 'collapsible_sections.js'
     yield '_blank.js'
     yield 'forms.js'
     yield 'internal_link_check.js'

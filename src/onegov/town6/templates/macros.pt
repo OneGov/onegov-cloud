@@ -857,7 +857,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}"
+                 tal:define="collapse_sections page.collapse_sections|False"
+                 tal:condition="not collapse_sections">
                 <h3 i18n:translate>Content</h3>
                 <ul class="more-list"></ul>
             </div>
@@ -867,7 +869,9 @@
     </div>
 </metal:page_content>
 
-<metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
+<metal:page_content define-macro="page_content" i18n:domain="onegov.town6"
+                    tal:define="collapse_sections page.collapse_sections|False;
+                                text layout.collapsible_sections(text) if collapse_sections else text">
     <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">

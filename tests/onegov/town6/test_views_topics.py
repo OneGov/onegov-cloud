@@ -1,8 +1,78 @@
+import pytest
+
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webtest.forms import Select
     from .conftest import Client
     from tests.shared.client import ExtendedResponse
+
+
+@pytest.mark.parametrize(('parent_url', 'add_label'), [
+    ('/topics/themen', 'Thema'),
+    ('/news', 'Nachricht'),
+])
+def test_collapsible_page_sections(
+    client: Client,
+    parent_url: str,
+    add_label: str
+) -> None:
+    client.login_admin()
+    new_page = client.get(parent_url).click(add_label)
+
+    fields = list(new_page.form.fields)
+    assert fields[fields.index('text') + 1] == 'collapse_sections'
+    assert not new_page.form['collapse_sections'].checked
+    assert new_page.pyquery('#collapse_sections').closest('label').find(
+        '.label-text').text() == 'Ausklappen von Abschnitten'
+
+    text = (
+        '<p>Einleitung</p>'
+        '<h2>Erster <em>Abschnitt</em></h2>'
+        '<p>Erster Inhalt</p>'
+        '<h3>Untertitel</h3><ul><li>Weiterer Inhalt</li></ul>'
+        '<h2>Zweiter Abschnitt</h2><p>Zweiter Inhalt</p>'
+    )
+    new_page.form['title'] = 'Ausklappbare Abschnitte'
+    new_page.form['text'] = text
+    page = new_page.form.submit().follow()
+    assert not page.pyquery('.page-text details')
+    assert len(page.pyquery('.page-text > h2')) == 2
+
+    edit_page = page.click('Bearbeiten')
+    assert not edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
+    edit_page.form['collapse_sections'] = True
+    page = edit_page.form.submit().follow()
+
+    # Public rendering groups each editor title into a closed section.
+    public_page = client.spawn().get(page.request.url)
+    sections = public_page.pyquery('.page-text details.page-section')
+    assert len(sections) == 2
+    assert not sections.filter('[open]')
+    assert public_page.pyquery('.page-text > p').text() == 'Einleitung'
+    assert sections.eq(0).find('summary > h2').text() == 'Erster Abschnitt'
+    assert sections.eq(0).find('summary em').text() == 'Abschnitt'
+    assert sections.eq(0).find('p').text() == 'Erster Inhalt'
+    assert sections.eq(0).find('h3').text() == 'Untertitel'
+    assert sections.eq(0).find('li').text() == 'Weiterer Inhalt'
+    assert sections.eq(1).find('summary > h2').text() == 'Zweiter Abschnitt'
+    assert sections.eq(1).find('p').text() == 'Zweiter Inhalt'
+
+    # Editing retains the complete HTML and the saved checkbox state.
+    edit_page = page.click('Bearbeiten')
+    assert edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
+    assert not edit_page.pyquery('details.page-section')
+
+    edit_page.form['collapse_sections'] = False
+    page = edit_page.form.submit().follow()
+    assert not page.pyquery('.page-text details')
+    assert len(page.pyquery('.page-text > h2')) == 2
+    assert page.pyquery('.page-text > h3').text() == 'Untertitel'
+    edit_page = page.click('Bearbeiten')
+    assert not edit_page.form['collapse_sections'].checked
+    assert edit_page.form['text'].value == text
 
 
 def test_sort_topics(client: Client) -> None:

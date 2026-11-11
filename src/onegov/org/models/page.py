@@ -76,6 +76,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
+    collapse_sections: dict_property[bool] = content_property(default=False)
     url: dict_property[str | None] = content_property()
     as_card: dict_property[str | None] = content_property()
     height: dict_property[str | None] = content_property()
@@ -223,6 +224,7 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
+    collapse_sections: dict_property[bool] = content_property(default=False)
     url: dict_property[str | None] = content_property()
 
     hashtags: dict_property[list[str]] = meta_property(default=list)

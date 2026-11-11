@@ -257,6 +257,127 @@ footer {
 .page-text {
     margin-bottom: 2rem;
 
+    .page-section {
+        background: $white;
+        border: 1px solid rgba($body-font-color, .16);
+        border-radius: $global-radius;
+        margin-bottom: .875rem;
+        padding: 0 1.25rem;
+        transition: border-color 160ms ease;
+
+        > summary {
+            align-items: center;
+            border-radius: inherit;
+            box-sizing: border-box;
+            cursor: pointer;
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            margin: 0 -1.25rem;
+            min-height: 3.75rem;
+            padding: .875rem 1.25rem;
+            scroll-margin-top: 8rem;
+            transition: background-color 160ms ease;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+
+            &::after {
+                background:
+                    linear-gradient(currentcolor, currentcolor) center / .75rem 2px no-repeat,
+                    linear-gradient(currentcolor, currentcolor) center / 2px .75rem no-repeat,
+                    $white-smoke;
+                border-radius: 50%;
+                color: $steel;
+                content: '';
+                flex: 0 0 2rem;
+                height: 2rem;
+            }
+
+            &:hover {
+                background-color: $white-smoke;
+            }
+
+            &:focus-visible {
+                outline: 3px solid $anchor-font-color;
+                outline-offset: 3px;
+            }
+
+            > h2 {
+                flex: 1;
+                font-size: 1.375rem;
+                line-height: 1.4;
+                margin: 0;
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        h3 { font-size: 1.25rem; }
+        h4 { font-size: 1.125rem; }
+        h5 { font-size: 1rem; }
+
+        &[open] {
+            border-color: $gainsboro;
+            padding-bottom: 1.25rem;
+
+            > summary {
+                background-color: $white-smoke;
+                border-bottom: 1px solid $gainsboro;
+                border-radius: $global-radius $global-radius 0 0;
+                margin-bottom: 1.25rem;
+
+                &::after {
+                    background-color: $smoke;
+                    background-size: .75rem 2px, 2px 0;
+                }
+            }
+
+            > :last-child:not(summary) {
+                margin-bottom: 0;
+            }
+        }
+
+        @media #{$small-only} {
+            padding-inline: 1rem;
+
+            > summary {
+                gap: .75rem;
+                margin-inline: -1rem;
+                padding-inline: 1rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &,
+            > summary {
+                transition: none;
+            }
+        }
+
+        @media (forced-colors: active) {
+            > summary::after {
+                background-color: ButtonFace;
+                color: ButtonText;
+                forced-color-adjust: none;
+                outline: 1px solid ButtonText;
+            }
+        }
+
+        @media print {
+            &,
+            &[open] > summary {
+                background: none;
+                border-color: $gray;
+            }
+
+            > summary::after {
+                display: none;
+            }
+        }
+    }
+
     a {
         display: inline-block;
         text-decoration: underline !important;

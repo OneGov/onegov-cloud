@@ -760,6 +760,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_phone_number(self, phone_number: str) -> str:
         return utils.format_phone_number(phone_number)
 
+    def collapsible_sections(self, text: Markup | None) -> Markup | None:
+        return utils.collapsible_sections(text)
+
     def password_reset_url(self, user: User | None) -> str | None:
         if not user:
             return None

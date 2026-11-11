@@ -1561,6 +1561,9 @@ msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
 msgid "Describes what this page is about"
 msgstr "Décrit de quoi parle cette page"
 
+msgid "Expand sections"
+msgstr "Déplier les sections"
+
 msgid "Keywords"
 msgstr "Mots-clés"
 

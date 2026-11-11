@@ -1565,6 +1565,9 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
+msgid "Expand sections"
+msgstr "Ausklappen von Abschnitten"
+
 msgid "Keywords"
 msgstr "Schlagworte"
 

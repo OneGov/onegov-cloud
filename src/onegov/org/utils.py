@@ -15,7 +15,8 @@ from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
-from lxml.html import fragments_fromstring, tostring
+from lxml.html import (
+    Element, fragment_fromstring, fragments_fromstring, tostring)
 from markupsafe import escape, Markup
 from math import isclose
 from onegov.core.layout import Layout
@@ -130,6 +131,42 @@ def get_extension_color(extension: str) -> str:
     """
 
     return get_random_color(extension, lightness=0.5, saturation=0.5)
+
+
+def collapsible_sections(html: Markup | None) -> Markup | None:
+    """ Wrap sections starting with an editor title (H2) in disclosures.
+
+    Only used when rendering page content, so the stored editor HTML stays
+    unchanged. Content before the first title remains visible.
+    """
+    if not html:
+        return html
+
+    root = fragment_fromstring(html, create_parent='div')
+    # Pasted text can wrap editor titles in otherwise neutral containers.
+    for container in root.xpath('.//div[.//h2]'):
+        container.drop_tag()
+    if not root.findall('h2'):
+        return html
+
+    section = None
+    for node in list(root):
+        if node.tag == 'h2':
+            section = Element('details', {'class': 'page-section'})
+            summary = Element('summary')
+            # Text immediately following a heading belongs to the body.
+            summary.tail = node.tail
+            node.tail = None
+            root.replace(node, section)
+            section.append(summary)
+            summary.append(node)
+        elif section is not None:
+            section.append(node)
+
+    return escape(root.text or '') + Markup('').join(
+        Markup(tostring(node, encoding=str))  # nosec: B704
+        for node in root
+    )
 
 
 def add_class_to_node(node: _Element, classname: str) -> None:
