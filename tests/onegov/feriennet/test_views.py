@@ -2816,6 +2816,25 @@ def test_accept_tos(client: Client, scenario: Scenario) -> None:
     assert data[0]['Benutzer AGB akzeptiert']
     assert not data[1]['Benutzer AGB akzeptiert']
 
+    # the TOS need to be accepted again in a new period
+    scenario.refresh()
+    assert scenario.latest_period is not None
+    scenario.latest_period.active = False
+    scenario.add_period(title="Next", confirmed=True)
+    scenario.add_activity(title="Barfoo", state='accepted')
+    scenario.add_occasion(age=(0, 100))
+    scenario.commit()
+
+    page = client.get('/activity/barfoo').click("Anmelden")
+    assert "accept_tos" in page.form.fields
+
+    page.form['accept_tos'] = True
+    page = page.form.submit().follow()
+    assert "erfolgreich" in page
+
+    page = client.get('/activity/barfoo').click("Anmelden")
+    assert "accept_tos" not in page.form.fields
+
 
 def test_donations(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=True, finalized=False)

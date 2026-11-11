@@ -91,6 +91,7 @@ class InvoiceItemExport(FeriennetExport):
     ) -> Iterator[tuple[str, Any]]:
 
         yield from self.invoice_item_fields(item)
-        yield from self.user_fields(item.invoice.user)
+        yield from self.user_fields(
+            item.invoice.user, item.invoice.period_id)
         yield from self.activity_tags(tags)
         yield from self.invoice_attendee_fields(attendee)

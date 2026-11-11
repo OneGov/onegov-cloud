@@ -11,7 +11,7 @@ from onegov.feriennet.exports.const import GENDERS
 from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.exports.const import STATES
-from onegov.feriennet.utils import decode_name
+from onegov.feriennet.utils import decode_name, tos_accepted_periods
 from onegov.org.models import Export
 from turbohtml import unescape
 
@@ -23,6 +23,7 @@ if TYPE_CHECKING:
         Activity, ActivityInvoiceItem, Attendee, Booking,
         Occasion, OccasionNeed, Volunteer)
     from onegov.user import User
+    from uuid import UUID
 
 SPACES = re.compile(r'[ ]+')
 
@@ -175,7 +176,11 @@ class FeriennetExport(Export):
 
         yield _('Activity Tags'), '\n'.join(sorted(tags or []))
 
-    def user_fields(self, user: User) -> Iterator[tuple[str, Any]]:
+    def user_fields(
+        self,
+        user: User,
+        period_id: UUID | None = None
+    ) -> Iterator[tuple[str, Any]]:
         user_data = user.data or {}
         salutation = user_data.get('salutation')
         first_name, last_name = decode_name(user.realname)
@@ -206,7 +211,13 @@ class FeriennetExport(Export):
         yield _('User Bank Account'), user_data.get('bank_account', '')
         yield _('User Beneficiary'), user_data.get('bank_beneficiary', '')
         yield _('User Status E-Mail'), FREQUENCIES.get(status_email, '')
-        yield _('User TOS Accepted'), user_data.get('tos_accepted', False)
+        # without a period we report whether the TOS were ever accepted
+        tos_accepted = tos_accepted_periods(user_data)
+        yield _('User TOS Accepted'), (
+            period_id.hex in tos_accepted
+            if period_id is not None
+            else bool(tos_accepted)
+        )
         yield _('User Allow contact for carpooling'), user_data.get(
             'show_contact_data_to_others', False)
 

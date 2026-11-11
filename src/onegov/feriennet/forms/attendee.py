@@ -7,6 +7,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.utils import encode_name, decode_name
+from onegov.feriennet.utils import tos_accepted_periods
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
@@ -359,7 +360,8 @@ class AttendeeSignupForm(AttendeeBase):
         assert self.request.current_user is not None
 
         url = self.request.app.org.meta.get('tos_url', None)
-        if not url or self.request.current_user.data.get('tos_accepted', None):
+        accepted = tos_accepted_periods(self.request.current_user.data)
+        if not url or self.model.period_id.hex in accepted:
             self.delete_field('accept_tos')
             return
 

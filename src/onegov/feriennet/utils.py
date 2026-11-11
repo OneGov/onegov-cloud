@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.activity import Activity
@@ -16,6 +16,18 @@ NAME_SEPARATOR = '\u00A0'  # non-breaking space
 def encode_name(first_name: str, last_name: str) -> str:
     names = (first_name, last_name)
     return NAME_SEPARATOR.join(n.replace(NAME_SEPARATOR, ' ') for n in names)
+
+
+def tos_accepted_periods(user_data: dict[str, Any] | None) -> list[str]:
+    """ Returns the ids (hex) of the periods for which the user accepted
+    the TOS. Anything that isn't a list (e.g. legacy ``True`` values) is
+    treated as not accepted.
+
+    """
+    accepted = (user_data or {}).get('tos_accepted')
+    if not isinstance(accepted, list):
+        return []
+    return [p for p in accepted if isinstance(p, str)]
 
 
 def decode_name(fullname: str | None) -> tuple[str | None, str | None]:

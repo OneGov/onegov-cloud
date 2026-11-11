@@ -15,6 +15,7 @@ from onegov.feriennet.forms import OccasionForm
 from onegov.feriennet.forms import OccasionNeedForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.feriennet.utils import tos_accepted_periods
 from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
 from sqlalchemy import text
@@ -288,11 +289,16 @@ def book_occasion(
         if form.group_code.data:
             booking.group_code = form.group_code.data
 
-        # if the TOS have been accepted, record this now
+        # if the TOS have been accepted, record this now (per period)
         if hasattr(form, 'accept_tos') and form.accept_tos:
             if form.accept_tos.data:
                 assert request.current_user is not None
-                request.current_user.data['tos_accepted'] = True
+                user_data = request.current_user.data
+                accepted = tos_accepted_periods(user_data)
+                if self.period_id.hex not in accepted:
+                    # assign a new list, in-place changes are not tracked
+                    user_data['tos_accepted'] = [
+                        *accepted, self.period_id.hex]
 
         # to get the final cost, we need to accept bookings without wishlist
         if self.period.confirmed:
