@@ -102,7 +102,8 @@ from zipfile import BadZipFile, ZipFile
 from typing import IO, Any, TypedDict, TYPE_CHECKING
 if TYPE_CHECKING:
     from bs4 import Tag
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterator, Sequence)
     from depot.fields.upload import UploadedFile
     from libres.db.scheduler import Scheduler
     from onegov.core.cli.core import GroupContext
@@ -1555,20 +1556,395 @@ class ReservationImportLog:
         self._write(self.error_fh, message)
 
 
+RESERVATION_TEST_RUN_LIMIT = 4
+
+
+class ImportedReservation(TypedDict):
+    state: str
+    general: dict[str, Any]
+    fields: dict[str, Any]
+    dates: list[datetime]
+
+
+# resource name -> reservation id -> reservation
+ImportedReservations = dict[str, dict[str, ImportedReservation]]
+
+
+def reservation_import_options(
+    func: Callable[..., Any]
+) -> Callable[..., Any]:
+    """ Options shared by all reservation import commands. """
+
+    for option in reversed((
+        click.option('--dry-run', is_flag=True, default=False),
+        click.option(
+            '--test-run', is_flag=True, default=False,
+            help=f'Only import the first {RESERVATION_TEST_RUN_LIMIT} '
+                 f'reservations per resource (and the first '
+                 f'{RESERVATION_TEST_RUN_LIMIT} dates per reservation).'),
+        click.option(
+            '--success-log', default='import_reservations_success.log',
+            type=click.Path(dir_okay=False),
+            help='Log file for successfully imported reservations.'),
+        click.option(
+            '--error-log', default='import_reservations_errors.log',
+            type=click.Path(dir_okay=False),
+            help='Log file for warnings and errors.'),
+    )):
+        func = option(func)
+    return func
+
+
+def run_logged_reservation_import(
+    success_log: str,
+    error_log: str,
+    run: Callable[[ReservationImportLog], None]
+) -> None:
+    """ Opens the log files and runs the given import with them. """
+
+    success_path = Path(success_log)
+    error_path = Path(error_log)
+    for path in (success_path, error_path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    with (
+        success_path.open('w', encoding='utf-8') as success_fh,
+        error_path.open('w', encoding='utf-8') as error_fh,
+    ):
+        log = ReservationImportLog(success_fh, error_fh)
+        log.info(f'Reservation import started at '
+                 f'{datetime.now():%Y-%m-%d %H:%M:%S}')
+        try:
+            run(log)
+        except BaseException as e:
+            log.problem(f'Import aborted with {e!r}. Reservations '
+                        f'committed before this point are kept.')
+            raise
+
+    click.secho(f'Success log written to {success_path.resolve()}',
+                fg='cyan')
+    click.secho(f'Error log written to {error_path.resolve()}',
+                fg='cyan')
+
+
+def split_reservation_into_days(
+    start: datetime,
+    end: datetime
+) -> list[datetime]:
+    """ Splits reservations spreading across multiple days into one
+    reservation per day, e.g. 1.1. 08:00 - 3.1. 10:00 becomes
+    1.1. 08:00 - 23:59, 2.1. 00:00 - 23:59, 3.1. 00:00 - 10:00
+
+    Returns a flat list of alternating start and end dates.
+    """
+    # Interpret an end at midnight of the same day as the end of that day
+    if end.date() == start.date() and end.time() == time(0, 0):
+        end = end.replace(hour=23, minute=59)
+
+    dates = []
+    day_start = start
+    while day_start.date() < end.date():
+        dates.append(day_start)
+        dates.append(datetime.combine(day_start.date(), time(23, 59)))
+        day_start = datetime.combine(
+            day_start.date() + timedelta(days=1), time(0, 0))
+    # Skip an empty last day if the reservation ends at midnight
+    if day_start < end or not dates:
+        dates.append(day_start)
+        dates.append(end)
+    return dates
+
+
+def ensure_virtual_allocation(
+    session: Session,
+    day: date,
+    scheduler: Scheduler,
+    timezone: str
+) -> bool:
+    """ Creates a whole-day virtual allocation for the given day if none
+    exists yet. Returns True if one was created. """
+
+    allocation_range = sedate.get_date_range(
+        sedate.replace_timezone(sedate.as_datetime(day), timezone),
+        time(0, 0),
+        time(23, 59)
+    )
+    if session.query(
+        scheduler.allocations_in_range(*allocation_range).exists()
+    ).scalar():
+        return False
+    scheduler.allocate(
+        allocation_range,
+        partly_available=True,
+        whole_day=True,
+        quota=1,
+        quota_limit=1,
+    )
+    return True
+
+
+def create_imported_reservations(
+    request: OrgRequest,
+    app: OrgApp,
+    log: ReservationImportLog,
+    reservations: ImportedReservations,
+    skipped_states: Collection[str] = ('annulliert',),
+    open_states: Collection[str] = ('unbestätigt',),
+) -> None:
+    """ Creates the reservations, their submissions and tickets.
+
+    :param reservations: The reservations keyed by the resource name used
+        in the database (not the title).
+    :param skipped_states: Reservations with these states are skipped.
+    :param open_states: Tickets of reservations with these states are
+        accepted but not closed.
+    """
+
+    user = UserCollection(request.session).by_username('info@seantis.ch')
+    if not user:
+        abort('info@seantis.ch not found in users')
+
+    resources = ResourceCollection(app.libres_context)
+    forms = FormCollection(request.session)
+    tickets = TicketCollection(request.session)
+
+    # Commit in batches, so a late failure doesn't lose everything
+    commit_interval = 500
+    imported_count = 0
+
+    for resource_name, resource_reservations in reservations.items():
+        resource = resources.by_name(resource_name.lower())
+        if not resource:
+            log.problem(
+                f'Resource {resource_name} not found in the database'
+            )
+            continue
+
+        # Creating reservations
+        assert resource.form_class is not None
+        resource_id = resource.id
+        log.info(f'Importing reservations for {resource.title}')
+        # Reserve on the internal (virtual) layer, which ignores the
+        # regular allocations but still blocks against them
+        scheduler = resource.virtual_scheduler
+
+        for id, reservation in resource_reservations.items():
+            if reservation['state'] in skipped_states:
+                log.problem(
+                    f'{id}: Reservation state is {reservation["state"]}, '
+                    f'skipping {resource.title}', fg='yellow')
+                continue
+
+            email = str(reservation['general'].get('email'))
+            session_id = uuid4()
+            reserve = partial(
+                scheduler.reserve,
+                email=email,
+                session_id=session_id,
+                single_token_per_session=True,
+                data={'accepted': True}
+            )
+
+            # Conflicts
+            found_conflict = False
+            token_uuid: UUID | None = None
+            dates = reservation['dates']
+            for start, end in zip(dates[::2], dates[1::2]):
+                savepoint = transaction.savepoint()
+                try:
+                    ensure_virtual_allocation(
+                        request.session, start.date(), scheduler,
+                        resource.timezone)
+                    token_uuid = reserve(dates=(start, end))
+                except InvalidEmailAddress:
+                    savepoint.rollback()
+                    log.problem(f'{id}: {email} is an invalid e-mail '
+                                'address')
+                except AlreadyReservedError:
+                    savepoint.rollback()
+                    found_conflict = True
+                    log.problem(
+                        f'{id}: Booking conflict in {resource.title} '
+                        f'at {start} - {end}', fg='yellow')
+                except TimerangeTooLong:
+                    savepoint.rollback()
+                    found_conflict = True
+                    log.problem(
+                        f'{id}: Timerange too long in {resource.title} '
+                        f'at {start} - {end}')
+                except Exception as e:
+                    savepoint.rollback()
+                    found_conflict = True
+                    log.problem(
+                        f'{id}: Error {e!r} reserving {resource.title} '
+                        f'at {start} - {end}', fg='red')
+
+            if found_conflict or token_uuid is None:
+                continue
+
+            # Filling the form
+            form_data = {
+                key: (
+                    [str(v) for v in value]
+                    if isinstance(value, list) else str(value)
+                )
+                for key, value in reservation['fields'].items()
+            }
+            form = resource.form_class(data=form_data)
+
+            form_is_valid = form.validate()
+            if not form_is_valid:
+                has_other_errors = False
+                for field_name, errors in form.errors.items():
+                    for error in errors:
+                        is_required = (
+                            isinstance(error, str)
+                            and error == 'This field is required.'
+                        )
+                        has_other_errors |= not is_required
+                        log.problem(
+                            f'{id}: {field_name}: {error} '
+                            f'(value: {form_data.get(field_name)!r})',
+                            fg='yellow' if is_required else 'red')
+                if has_other_errors:
+                    form_data_show = json.dumps(
+                        form_data, indent=4, default=str)
+                    log.problem(f'{id}: form data: {form_data_show}')
+
+            submission = forms.submissions.add_external(
+                form=form,
+                state='pending',
+                id=token_uuid
+            )
+
+            scheduler.queries.confirm_reservations_for_session(session_id)
+            scheduler.approve_reservations(token_uuid)
+
+            if form_is_valid:
+                forms.submissions.complete_submission(submission)
+            else:
+                # complete_submission re-validates and would raise
+                # UnableToComplete, so we complete it manually
+                submission.state = 'complete'
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        action='ignore',
+                        message=r'Flushing object',
+                        category=SAWarning
+                    )
+                    forms.session.flush()
+                forms.session.expunge(submission)
+
+            with forms.session.no_autoflush:
+                ticket = tickets.open_ticket(
+                    handler_code='RSV', handler_id=token_uuid.hex
+                )
+                ticket.accept_ticket(user)
+                if reservation['state'] not in open_states:
+                    ticket.close_ticket()
+
+            log.success(f'{id}: Successfully imported reservation '
+                        f'for {resource.title} at {dates[0]} - '
+                        f'{dates[-1]}')
+            imported_count += 1
+
+            if imported_count % commit_interval == 0:
+                transaction.commit()
+                log.info(f'Committed {imported_count} reservations')
+
+                # The session is closed on commit, so we need to
+                # re-fetch the objects we keep using
+                user = UserCollection(request.session).by_username(
+                    'info@seantis.ch')
+                assert user is not None
+                refetched = resources.by_id(resource_id)
+                if refetched is None:
+                    log.problem(f'Failed to re-fetch resource '
+                                f'{resource_name}, skipping the '
+                                f'rest of its reservations')
+                    break
+                resource = refetched
+                assert resource.form_class is not None
+                scheduler = resource.virtual_scheduler
+
+        transaction.commit()
+        log.info(f'Committed reservations for {resource_name} '
+                 f'({imported_count} in total)')
+
+
+class ImportedBlocker(TypedDict):
+    reason: str | None
+    dates: list[datetime]
+
+
+def create_imported_blockers(
+    request: OrgRequest,
+    app: OrgApp,
+    log: ReservationImportLog,
+    resource_name: str,
+    blockers: dict[str, ImportedBlocker],
+) -> None:
+    """ Adds the blockers to the virtual layer of the given resource. Each
+    blocker gets a single token for all its dates. """
+
+    if not blockers:
+        return
+
+    resource = ResourceCollection(app.libres_context).by_name(
+        resource_name.lower())
+    if not resource:
+        log.problem(f'Resource {resource_name} not found in the database')
+        return
+
+    log.info(f'Importing blockers for {resource.title}')
+    scheduler = resource.virtual_scheduler
+    imported_count = 0
+
+    for id, blocker in blockers.items():
+        dates = blocker['dates']
+        ranges = list(zip(dates[::2], dates[1::2]))
+
+        # Also rolls back the virtual allocations created for this blocker
+        savepoint = transaction.savepoint()
+        try:
+            for start, _end in ranges:
+                ensure_virtual_allocation(
+                    request.session, start.date(), scheduler,
+                    resource.timezone)
+            scheduler.add_blocker(dates=ranges, reason=blocker['reason'])
+        except AlreadyReservedError:
+            savepoint.rollback()
+            log.problem(
+                f'{id}: Blocker conflicts with an existing reservation or '
+                f'blocker in {resource.title} at {dates[0]} - {dates[-1]}',
+                fg='yellow')
+            continue
+        except Exception as e:
+            savepoint.rollback()
+            log.problem(
+                f'{id}: Error {e!r} adding blocker to {resource.title} '
+                f'at {dates[0]} - {dates[-1]}')
+            continue
+
+        log.success(f'{id}: Successfully imported blocker for '
+                    f'{resource.title} at {dates[0]} - {dates[-1]} '
+                    f'(reason: {blocker["reason"]!r})')
+        imported_count += 1
+
+    transaction.commit()
+    log.info(f'Committed {imported_count} blockers for {resource_name}')
+
+
+def print_imported_reservations(reservations: ImportedReservations) -> None:
+    res_show = json.dumps(reservations, indent=4, default=str)
+    click.secho(f'Reservations: {res_show}', fg='green')
+
+
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.argument('reservation_file', type=click.File('rb'))
 @click.argument('option_file', type=click.File('rb'))
 @click.argument('mapping_yaml', type=click.File('rb'))
-@click.option('--dry-run', is_flag=True, default=False)
-@click.option('--test-run', is_flag=True, default=False,
-              help='Only import the first 4 reservations per resource '
-                   '(and the first 4 dates per reservation).')
-@click.option('--success-log', default='import_reservations_success.log',
-              type=click.Path(dir_okay=False),
-              help='Log file for successfully imported reservations.')
-@click.option('--error-log', default='import_reservations_errors.log',
-              type=click.Path(dir_okay=False),
-              help='Log file for warnings and errors.')
+@reservation_import_options
 def import_reservations(
     reservation_file: IO[bytes],
     option_file: IO[bytes],
@@ -1586,45 +1962,19 @@ def import_reservations(
     successful imports and one for warnings and errors.
     """
 
-    test_run_limit = 4
     fixed_columns = {0, 3, 6, 8, 22, 37}
 
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
-        success_path = Path(success_log)
-        error_path = Path(error_log)
-        for path in (success_path, error_path):
-            path.parent.mkdir(parents=True, exist_ok=True)
-
-        with (
-            success_path.open('w', encoding='utf-8') as success_fh,
-            error_path.open('w', encoding='utf-8') as error_fh,
-        ):
-            log = ReservationImportLog(success_fh, error_fh)
-            log.info(f'Reservation import started at '
-                     f'{datetime.now():%Y-%m-%d %H:%M:%S}')
-            try:
-                run_import(request, app, log)
-            except BaseException as e:
-                log.problem(f'Import aborted with {e!r}. Reservations '
-                            f'committed before this point are kept.')
-                raise
-
-        click.secho(f'Success log written to {success_path.resolve()}',
-                    fg='cyan')
-        click.secho(f'Error log written to {error_path.resolve()}',
-                    fg='cyan')
+        run_logged_reservation_import(
+            success_log, error_log,
+            lambda log: run_import(request, app, log)
+        )
 
     def run_import(
         request: OrgRequest,
         app: OrgApp,
         log: ReservationImportLog
     ) -> None:
-
-        class Reservation(TypedDict):
-            state: str
-            general: dict[str, Any]
-            fields: dict[str, Any]
-            dates: list[Any]
 
         yaml_dict = yaml.safe_load(mapping_yaml)
         shared_fields = sorted(
@@ -1639,7 +1989,7 @@ def import_reservations(
         prefilled_fields = yaml_dict.get('prefilled_fields', {})
 
         # A reservation may span multiple consecutive rows with the same id
-        reservations: dict[str, dict[str, Reservation]] = {}
+        reservations: ImportedReservations = {}
         last_id = ''
         book = load_workbook(reservation_file, read_only=True)
         rows: Iterator[tuple[Any, ...]] = book['Reservationsdaten'].iter_rows(
@@ -1663,7 +2013,11 @@ def import_reservations(
                 last_id = id
                 if id in resource_reservations:
                     continue
-                if test_run and len(resource_reservations) >= test_run_limit:
+                if (
+                    test_run
+                    and len(resource_reservations)
+                    >= RESERVATION_TEST_RUN_LIMIT
+                ):
                     continue
                 reservation = {
                     'state': '',
@@ -1694,27 +2048,13 @@ def import_reservations(
                 if fields.get(key) is None:
                     fields[key] = value
 
-            # Split reservations spreading across multiple days into one
-            # reservation per day, e.g. 1.1. 08:00 - 3.1. 10:00 becomes
-            # 1.1. 08:00 - 23:59, 2.1. 00:00 - 23:59, 3.1. 00:00 - 10:00
-            start, end = row[6], row[8]
-            dates = []
-            day_start = start
-            while day_start.date() < end.date():
-                dates.append(day_start)
-                dates.append(datetime.combine(day_start.date(), time(23, 59)))
-                day_start = datetime.combine(
-                    day_start.date() + timedelta(days=1), time(0, 0))
-            # Skip an empty last day if the reservation ends at midnight
-            if day_start < end or not dates:
-                dates.append(day_start)
-                dates.append(end)
             # In a test run, also limit the dates of recurring reservations
             if (
                 not test_run
-                or len(reservation['dates']) < 2 * test_run_limit
+                or len(reservation['dates']) < 2 * RESERVATION_TEST_RUN_LIMIT
             ):
-                reservation['dates'].extend(dates)
+                reservation['dates'].extend(
+                    split_reservation_into_days(row[6], row[8]))
         book.close()
 
         options_not_found = set()
@@ -1754,25 +2094,14 @@ def import_reservations(
 
         for option in options_not_found:
             log.problem(f'Option not found in the mapping file: {option}',
-                      fg='yellow')
+                        fg='yellow')
 
         if dry_run:
-            res_show = json.dumps(reservations, indent=4, default=str)
-            click.secho(f'Reservations: {res_show}', fg='green')
+            print_imported_reservations(reservations)
             return
 
-        user = UserCollection(request.session).by_username('info@seantis.ch')
-        if not user:
-            abort('info@seantis.ch not found in users')
-
-        resources = ResourceCollection(app.libres_context)
-        forms = FormCollection(request.session)
-        tickets = TicketCollection(request.session)
-
-        # Commit in batches, so a late failure doesn't lose everything
-        commit_interval = 500
-        imported_count = 0
-
+        # Map the resource names of the export to the ones in the database
+        mapped: ImportedReservations = {}
         for resource_name, resource_reservations in reservations.items():
             real_resource_name = (
                 resource_options.get(resource_name) or {}
@@ -1782,189 +2111,155 @@ def import_reservations(
                     f'Resource {resource_name} not found in the mapping file'
                 )
                 continue
+            mapped.setdefault(real_resource_name, {}).update(
+                resource_reservations)
 
-            resource = resources.by_name(real_resource_name.lower())
-            if not resource:
-                log.problem(
-                    f'Resource {real_resource_name} not found in the database'
-                )
+        create_imported_reservations(request, app, log, mapped)
+
+    return import_reservations
+
+
+@cli.command(
+    name='import-reservations-for-resource',
+    context_settings={'singular': True}
+)
+@click.argument('reservation_file', type=click.File('rb'))
+@click.option('--resource', 'resource_name', required=True,
+              help='Name of the resource (as used in its URL) all '
+                   'reservations of the file are imported to.')
+@click.option('--sheet-name', default=None,
+              help='Name of the sheet in the Excel file to import. ')
+@click.option('--field', 'field_name', required=True,
+              help='Id of the form field the value of the field column '
+                   'is stored in, e.g. "anlass_bezeichnung".')
+@click.option('--email-field', default='kontaktangaben_e_mail',
+              show_default=True,
+              help='Id of the form field the e-mail address is stored in.')
+@click.option('--blocker', 'blocker_values', multiple=True,
+              help='Import rows having this value in the blocker column as '
+                   'blockers instead of reservations. Can be passed '
+                   'multiple times.')
+@reservation_import_options
+def import_reservations_for_resource(
+    reservation_file: IO[bytes],
+    resource_name: str,
+    field_name: str,
+    email_field: str,
+    blocker_values: tuple[str, ...],
+    sheet_name: str | None,
+    dry_run: bool,
+    test_run: bool,
+    success_log: str,
+    error_log: str,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports reservations for a single resource from a Excel file (needs
+    to be .xlsx). Every row is one reservation, or one blocker if the
+    blocker column contains one of the values passed with --blocker. The
+    value of the field column is used as the reason of the blocker.
+
+    Creates no resources. Reservations and blockers are made on the internal
+    (virtual) layer, so they ignore the regular allocations (availability
+    periods).
+
+    Output is printed and additionally written to two log files, one for
+    successful imports and one for warnings and errors.
+    """
+
+    # TODO: Adjust to the layout of the export (zero-based column indexes)
+    first_row = 2
+    start_column = 0
+    end_column = 1
+    field_column = 2
+    email_column = 5
+    blocker_column = 3
+
+    # Rows having one of these values in the blocker column are imported as
+    # blockers (in addition to the ones passed with --blocker)
+    default_blocker_values: set[str] = set()
+
+    all_blocker_values = default_blocker_values | {
+        v.strip() for v in blocker_values}
+    width = max(
+        start_column, end_column, field_column, email_column, blocker_column
+    ) + 1
+
+    def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+        run_logged_reservation_import(
+            success_log, error_log,
+            lambda log: run_import(request, app, log)
+        )
+
+    def run_import(
+        request: OrgRequest,
+        app: OrgApp,
+        log: ReservationImportLog
+    ) -> None:
+
+        resource_reservations: dict[str, ImportedReservation] = {}
+        blockers: dict[str, ImportedBlocker] = {}
+        book = load_workbook(reservation_file, read_only=True)
+        sheet = book[sheet_name] if sheet_name else book.worksheets[0]
+        rows: Iterator[tuple[Any, ...]] = sheet.iter_rows(
+            min_row=first_row, values_only=True)
+        for row_number, row in enumerate(rows, start=first_row):
+            if not row or all(value is None for value in row):
+                continue
+            if len(row) < width:
+                row = (*row, *(None,) * (width - len(row)))
+
+            id = f'Row {row_number}'
+            start, end = row[start_column], row[end_column]
+            if not (
+                isinstance(start, datetime) and isinstance(end, datetime)
+            ):
+                log.problem(f'{id}: Invalid dates {start!r} - {end!r}, '
+                            f'skipping')
                 continue
 
-            # Creating reservations
-            assert resource.form_class is not None
-            resource_id = resource.id
-            log.info(f'Importing reservations for {resource.title}')
-            # Reserve on the internal (virtual) layer, which ignores the
-            # regular allocations but still blocks against them
-            scheduler = resource.virtual_scheduler
+            cell = row[blocker_column]
+            blocker_value = '' if cell is None else str(cell).strip()
+            if blocker_value in all_blocker_values:
+                if (
+                    not test_run
+                    or len(blockers) < RESERVATION_TEST_RUN_LIMIT
+                ):
+                    reason = row[field_column]
+                    blockers[id] = {
+                        'reason': None if reason is None else str(reason),
+                        'dates': split_reservation_into_days(start, end),
+                    }
+                continue
 
-            def ensure_virtual_allocation(
-                day: date,
-                scheduler: Scheduler,
-                timezone: str
-            ) -> bool:
-                """ Creates a whole-day virtual allocation for the given day
-                if none exists yet. Returns True if one was created. """
-                allocation_range = sedate.get_date_range(
-                    sedate.replace_timezone(sedate.as_datetime(day), timezone),
-                    time(0, 0),
-                    time(23, 59)
-                )
-                if request.session.query(
-                    scheduler.allocations_in_range(*allocation_range).exists()
-                ).scalar():
-                    return False
-                scheduler.allocate(
-                    allocation_range,
-                    partly_available=True,
-                    whole_day=True,
-                    quota=1,
-                    quota_limit=1,
-                )
-                return True
+            if (
+                test_run
+                and len(resource_reservations) >= RESERVATION_TEST_RUN_LIMIT
+            ):
+                continue
 
-            for id, reservation in resource_reservations.items():
-                if reservation['state'] == 'annulliert':
-                    log.problem(
-                        f'{id}: Reservation state is deleted, '
-                        f'skipping {resource.title}', fg='yellow')
-                    continue
+            email = row[email_column]
+            if email is None:
+                email = 'info@seantis.ch'
+            fields: dict[str, Any] = {email_field: email}
+            if row[field_column] is not None:
+                fields[field_name] = row[field_column]
 
-                email = str(reservation['general'].get('email'))
-                session_id = uuid4()
-                reserve = partial(
-                    scheduler.reserve,
-                    email=email,
-                    session_id=session_id,
-                    single_token_per_session=True,
-                    data={'accepted': True}
-                )
+            resource_reservations[id] = {
+                'state': '',
+                'general': {'email': email},
+                'fields': fields,
+                'dates': split_reservation_into_days(start, end),
+            }
+        book.close()
 
-                # Conflicts
-                found_conflict = False
-                token_uuid: UUID | None = None
-                dates = reservation['dates']
-                for start, end in zip(dates[::2], dates[1::2]):
-                    savepoint = transaction.savepoint()
-                    try:
-                        ensure_virtual_allocation(
-                            start.date(), scheduler, resource.timezone)
-                        token_uuid = reserve(dates=(start, end))
-                    except InvalidEmailAddress:
-                        savepoint.rollback()
-                        log.problem(f'{id}: {email} is an invalid e-mail '
-                                  'address')
-                    except AlreadyReservedError:
-                        savepoint.rollback()
-                        found_conflict = True
-                        log.problem(
-                            f'{id}: Booking conflict in {resource.title} '
-                            f'at {start} - {end}', fg='yellow')
-                    except TimerangeTooLong:
-                        savepoint.rollback()
-                        found_conflict = True
-                        log.problem(
-                            f'{id}: Timerange too long in {resource.title} '
-                            f'at {start} - {end}')
-                    except Exception as e:
-                        savepoint.rollback()
-                        found_conflict = True
-                        log.problem(
-                            f'{id}: Error {e!r} reserving {resource.title} '
-                            f'at {start} - {end}', fg='red')
+        reservations = {resource_name: resource_reservations}
+        if dry_run:
+            print_imported_reservations(reservations)
+            blockers_show = json.dumps(blockers, indent=4, default=str)
+            click.secho(f'Blockers: {blockers_show}', fg='green')
+            return
 
-                if found_conflict or token_uuid is None:
-                    continue
-
-                # Filling the form
-                form_data = {
-                    key: (
-                        [str(v) for v in value]
-                        if isinstance(value, list) else str(value)
-                    )
-                    for key, value in reservation['fields'].items()
-                }
-                form = resource.form_class(data=form_data)
-
-                form_is_valid = form.validate()
-                if not form_is_valid:
-                    has_other_errors = False
-                    for field_name, errors in form.errors.items():
-                        for error in errors:
-                            is_required = (
-                                isinstance(error, str)
-                                and error == 'This field is required.'
-                            )
-                            has_other_errors |= not is_required
-                            log.problem(
-                                f'{id}: {field_name}: {error} '
-                                f'(value: {form_data.get(field_name)!r})',
-                                fg='yellow' if is_required else 'red')
-                    if has_other_errors:
-                        form_data_show = json.dumps(
-                            form_data, indent=4, default=str)
-                        log.problem(f'{id}: form data: {form_data_show}')
-
-                submission = forms.submissions.add_external(
-                    form=form,
-                    state='pending',
-                    id=token_uuid
-                )
-
-                scheduler.queries.confirm_reservations_for_session(
-                    session_id)
-                scheduler.approve_reservations(token_uuid)
-
-                if form_is_valid:
-                    forms.submissions.complete_submission(submission)
-                else:
-                    # complete_submission re-validates and would raise
-                    # UnableToComplete, so we complete it manually
-                    submission.state = 'complete'
-                    with warnings.catch_warnings():
-                        warnings.filterwarnings(
-                            action='ignore',
-                            message=r'Flushing object',
-                            category=SAWarning
-                        )
-                        forms.session.flush()
-                    forms.session.expunge(submission)
-
-                with forms.session.no_autoflush:
-                    ticket = tickets.open_ticket(
-                        handler_code='RSV', handler_id=token_uuid.hex
-                    )
-                    ticket.accept_ticket(user)
-                    if reservation['state'] != 'unbestätigt':
-                        ticket.close_ticket()
-
-                log.success(f'{id}: Successfully imported reservation '
-                            f'for {resource.title} at {dates[0]} - '
-                            f'{dates[-1]}')
-                imported_count += 1
-
-                if imported_count % commit_interval == 0:
-                    transaction.commit()
-                    log.info(f'Committed {imported_count} reservations')
-
-                    # The session is closed on commit, so we need to
-                    # re-fetch the objects we keep using
-                    user = UserCollection(request.session).by_username(
-                        'info@seantis.ch')
-                    assert user is not None
-                    refetched = resources.by_id(resource_id)
-                    if refetched is None:
-                        log.problem(f'Failed to re-fetch resource '
-                                    f'{real_resource_name}, skipping the '
-                                    f'rest of its reservations')
-                        break
-                    resource = refetched
-                    assert resource.form_class is not None
-                    scheduler = resource.virtual_scheduler
-
-            transaction.commit()
-            log.info(f'Committed reservations for {real_resource_name} '
-                     f'({imported_count} in total)')
+        create_imported_reservations(request, app, log, reservations)
+        create_imported_blockers(request, app, log, resource_name, blockers)
 
     return import_reservations
 
