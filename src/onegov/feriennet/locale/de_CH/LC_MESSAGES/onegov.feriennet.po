@@ -3271,6 +3271,16 @@ msgstr ""
 "Der Text wird unter dem Bestätigungstext für ein Angebot in der E-Mail "
 "angezeigt"
 
+msgid "Enable carpooling"
+msgstr "Fahrgemeinschaften ermöglichen"
+
+msgid ""
+"Parents can share contact details with other parents in the same occasion if "
+"they allow it in their user profile."
+msgstr ""
+"Eltern können ihre Kontaktdaten mit anderen Eltern derselben Durchführung "
+"teilen, sofern sie dies in ihrem Benutzerprofil erlauben."
+
 msgid "Public organiser data"
 msgstr "Öffentliche Daten Veranstaltende"
 

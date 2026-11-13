@@ -126,6 +126,10 @@ class FeriennetApp(TownApp):
     def public_organiser_data(self) -> Sequence[str]:
         return self.org.meta.get('public_organiser_data', ('name', 'website'))
 
+    @property
+    def carpooling_enabled(self) -> bool:
+        return self.org.meta.get('carpooling_enabled', True)
+
     def get_sponsors(
         self,
         request: FeriennetRequest

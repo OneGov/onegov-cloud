@@ -177,6 +177,11 @@ class UserProfileForm(Form):
     def on_request(self) -> None:
         self.toggle_political_municipality()
         self.toggle_ticket_statistics()
+        self.toggle_carpooling()
+
+    def toggle_carpooling(self) -> None:
+        if not self.request.app.carpooling_enabled:
+            self.delete_field('show_contact_data_to_others')
 
     @property
     def show_political_municipality(self) -> bool | None:
@@ -222,6 +227,10 @@ class UserProfileForm(Form):
 
         if key == 'ticket_statistics':
             if not self.show_ticket_statistics:
+                return True
+
+        if key == 'show_contact_data_to_others':
+            if not self.request.app.carpooling_enabled:
                 return True
 
         return False

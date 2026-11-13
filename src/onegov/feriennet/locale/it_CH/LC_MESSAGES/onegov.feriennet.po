@@ -3266,6 +3266,16 @@ msgid ""
 msgstr ""
 "Il testo sarà mostrato sotto il testo di conferma dell'attività nell'email"
 
+msgid "Enable carpooling"
+msgstr "Consentire i viaggi condivisi"
+
+msgid ""
+"Parents can share contact details with other parents in the same occasion if "
+"they allow it in their user profile."
+msgstr ""
+"I genitori possono condividere i propri recapiti con gli altri genitori dello "
+"stesso evento, se lo autorizzano nel proprio profilo utente."
+
 msgid "Public organiser data"
 msgstr "Dati pubblici dell'organizzatore"
 

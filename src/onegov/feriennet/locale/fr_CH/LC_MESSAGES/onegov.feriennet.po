@@ -3288,6 +3288,16 @@ msgstr ""
 "Le texte sera affiché sous le texte de confirmation d'une activité dans le "
 "mail"
 
+msgid "Enable carpooling"
+msgstr "Activer le covoiturage"
+
+msgid ""
+"Parents can share contact details with other parents in the same occasion if "
+"they allow it in their user profile."
+msgstr ""
+"Les parents peuvent partager leurs coordonnées avec les autres parents du "
+"même événement s'ils l'autorisent dans leur profil d'utilisateur·trice."
+
 msgid "Public organiser data"
 msgstr "Données contacts des prestataires"
 

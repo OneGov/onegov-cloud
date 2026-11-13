@@ -1240,6 +1240,42 @@ def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
     assert "tom@example.org" not in c2_bookings
     assert 'href="tel:+41 000000011"' not in c2_bookings
 
+    # Existing instances keep sharing enabled until an admin disables it.
+    assert 'carpooling_enabled' not in client.app.org.meta
+    client.login_admin()
+    settings = client.get('/feriennet-settings')
+    assert settings.form['carpooling_enabled'].checked
+    settings.form['carpooling_enabled'] = False
+    settings.form.submit()
+    assert not client.get('/feriennet-settings').form[
+        'carpooling_enabled'].checked
+
+    # Opted-in contacts must disappear from the HTML, not just be hidden.
+    c1_bookings = c1.get('/my-bookings')
+    assert not c1_bookings.pyquery('.attendees-toggle, .attendees-table')
+    for contact in (
+        'doc@example.org', 'zak@example.org',
+        '+41 000000012', '+41 000000013', 'Mike', 'Luca'
+    ):
+        assert contact not in c1_bookings
+
+    c2_bookings = c2.get('/my-bookings')
+    assert not c2_bookings.pyquery('.attendees-toggle, .attendees-table')
+    assert 'zak@example.org' not in c2_bookings
+
+    # Re-enabling sharing still respects each parent's saved consent.
+    settings = client.get('/feriennet-settings')
+    settings.form['carpooling_enabled'] = True
+    settings.form.submit()
+    assert client.get('/feriennet-settings').form[
+        'carpooling_enabled'].checked
+
+    c2_bookings = c2.get('/my-bookings')
+    assert 'doc@example.org' in c2_bookings
+    assert 'zak@example.org' in c2_bookings
+    assert 'tom@example.org' not in c2_bookings
+    assert 'href="tel:+41 000000011"' not in c2_bookings
+
 
 def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
@@ -1865,6 +1901,58 @@ def test_userprofile_login(client: Client) -> None:
     page = page.form.submit().follow()
 
     assert 'settings' in page.request.url
+
+
+@pytest.mark.parametrize('consent', [False, True])
+def test_userprofile_carpooling_disabled(
+    client: Client,
+    scenario: Scenario,
+    consent: bool
+) -> None:
+
+    user = scenario.add_user(
+        username='parent@example.org',
+        role='member',
+        show_contact_data_to_others=consent
+    )
+    scenario.session.flush()
+    user_id = user.id
+    scenario.commit()
+
+    client.login_admin()
+    settings = client.get('/feriennet-settings')
+    settings.form['carpooling_enabled'] = False
+    settings.form.submit()
+
+    parent = client.spawn()
+    parent.login('parent@example.org', 'hunter2')
+    profile = parent.get('/userprofile')
+    assert 'show_contact_data_to_others' not in profile.form.fields
+    profile.form['place'] = 'New Place'
+    profile.form.submit()
+
+    profile = parent.get('/userprofile')
+    assert profile.form['place'].value == 'New Place'
+
+    # A stale or forged submission cannot change the hidden consent field.
+    fields = profile.form.submit_fields()
+    fields.append(('show_contact_data_to_others', '' if consent else 'y'))
+    parent.post('/userprofile', params=fields)
+
+    # Admins can still load and edit the rest of the user's profile.
+    profile = client.get(f'/benutzer/{user_id}/edit')
+    assert 'show_contact_data_to_others' not in profile.form.fields
+    profile.form['organisation'] = 'Parent Organisation'
+    profile.form.submit()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['carpooling_enabled'] = True
+    settings.form.submit()
+
+    profile = parent.get('/userprofile')
+    assert profile.form['show_contact_data_to_others'].checked is consent
+    assert profile.form['place'].value == 'New Place'
+    assert profile.form['organisation'].value == 'Parent Organisation'
 
 
 def test_provide_activity_again(client: Client, scenario: Scenario) -> None:
