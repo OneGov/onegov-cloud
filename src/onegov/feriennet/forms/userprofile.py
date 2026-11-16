@@ -42,6 +42,17 @@ class UserProfileForm(Form):
         'show_contact_data_to_others',
     )
 
+    show_contact_data_to_others = BooleanField(
+        label=_('Allow contact for carpooling'),
+        description=_(
+            'The email address and phone number are displayed to parents '
+            'whose child has signed up for the same program. This makes it '
+            'possible to get in touch, for example, to organize carpools..'
+        ),
+        fieldset=_('Privacy'),
+        default=False
+    )
+
     ticket_statistics = RadioField(
         label=_('Send a periodic status e-mail.'),
         fieldset=_('General'),
@@ -153,12 +164,6 @@ class UserProfileForm(Form):
     bank_beneficiary = StringField(
         label=_('Beneficiary'),
         fieldset=_('Personal'),
-    )
-
-    show_contact_data_to_others = BooleanField(
-        label=_('Allow contact for carpooling'),
-        fieldset=_('Privacy'),
-        default=False
     )
 
     @property
