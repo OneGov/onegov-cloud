@@ -218,9 +218,8 @@ def test_directory_entry_deep_link(client: Client[TestApp]) -> None:
 
     client.logout()
 
-    entry = client.get('/directories/clubs?redirect=pilatus')
-    assert entry.location.endswith('/directories/clubs/pilatus')
-    entry = entry.follow()
+    entry = client.get('/directories/clubs?redirect=pilatus').follow()
+    assert entry.request.path == '/directories/clubs/pilatus'
     assert 'Pilatus' in entry
     back = client.get(entry.pyquery('.framed-only a').attr('href')).follow()
     assert back.request.path == '/directories/clubs'
