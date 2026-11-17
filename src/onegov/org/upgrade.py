@@ -27,7 +27,6 @@ from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS,
     POLITICAL_BUSINESS_TYPE,
 )
-from onegov.org.models.meeting_item import meeting_item_political_businesses
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
@@ -1125,11 +1124,3 @@ def add_horw_political_business_enums(context: UpgradeContext) -> bool:
             )
             changed = True
     return changed
-
-
-@upgrade_task('Support multiple businesses per RIS agenda item')
-def add_meeting_item_political_businesses(context: UpgradeContext) -> None:
-    if context.has_table('par_meeting_item_political_businesses'):
-        return
-    mark_changed(context.session)
-    meeting_item_political_businesses.create(context.session.connection())
