@@ -1224,6 +1224,21 @@ def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
     c2 = client.spawn()
     c2.login('m2@example.org', 'hunter2')
 
+    # Contact sharing is disabled by default
+    assert 'carpooling_enabled' not in client.app.org.meta
+    c1_bookings = c1.get('/my-bookings')
+    assert not c1_bookings.pyquery('.attendees-toggle, .attendees-table')
+    assert 'doc@example.org' not in c1_bookings
+    assert 'zak@example.org' not in c1_bookings
+
+    client.login_admin()
+    settings = client.get('/feriennet-settings')
+    assert not settings.form['carpooling_enabled'].checked
+    settings.form['carpooling_enabled'] = True
+    settings.form.submit()
+    assert client.get('/feriennet-settings').form[
+        'carpooling_enabled'].checked
+
     # Tom can see the contact data of Doc and Zak
     c1_bookings = c1.get('/').click('Buchungen')
     assert "doc@example.org" in c1_bookings
@@ -1240,11 +1255,8 @@ def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
     assert "tom@example.org" not in c2_bookings
     assert 'href="tel:+41 000000011"' not in c2_bookings
 
-    # Existing instances keep sharing enabled until an admin disables it.
-    assert 'carpooling_enabled' not in client.app.org.meta
-    client.login_admin()
+    # Disabling sharing hides the contact data again
     settings = client.get('/feriennet-settings')
-    assert settings.form['carpooling_enabled'].checked
     settings.form['carpooling_enabled'] = False
     settings.form.submit()
     assert not client.get('/feriennet-settings').form[
