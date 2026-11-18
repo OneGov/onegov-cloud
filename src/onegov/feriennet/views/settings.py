@@ -111,7 +111,7 @@ class FeriennetSettingsForm(Form):
             'occurrence.'
         ),
         fieldset=_('Privacy'),
-        default=True
+        default=False
     )
 
     public_organiser_data = MultiCheckboxField(
@@ -298,7 +298,7 @@ class FeriennetSettingsForm(Form):
             ('require_swisspass', False),
             ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
-            ('carpooling_enabled', True),
+            ('carpooling_enabled', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
             ('bank_beneficiary', ''),

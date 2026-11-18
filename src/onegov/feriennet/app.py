@@ -128,7 +128,7 @@ class FeriennetApp(TownApp):
 
     @property
     def carpooling_enabled(self) -> bool:
-        return self.org.meta.get('carpooling_enabled', True)
+        return self.org.meta.get('carpooling_enabled', False)
 
     def get_sponsors(
         self,

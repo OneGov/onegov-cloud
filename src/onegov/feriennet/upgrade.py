@@ -243,3 +243,20 @@ def convert_text_to_html_for_notification_templates(
             template.text = Markup('\n').join(as_paragraphs(template.text))
 
         context.session.flush()
+
+
+@upgrade_task('Disable carpooling for existing feriennet instances')
+def disable_carpooling_for_existing_instances(
+    context: UpgradeContext
+) -> None:
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    if 'carpooling_enabled' not in org.meta:
+        org.meta['carpooling_enabled'] = False
