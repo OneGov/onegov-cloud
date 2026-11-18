@@ -1,8 +1,30 @@
 # Changes
 
+## 2026.60
+
+`2026-11-18` | [596eb662b3...f2d7a8c42a](https://github.com/OneGov/onegov-cloud/compare/596eb662b3^...f2d7a8c42a)
+
+### Core
+
+##### Add audit trail for user table as well.
+
+`Feature` | [OGC-3548](https://linear.app/onegovcloud/issue/OGC-3548) | [e9e960bd44](https://github.com/onegov/onegov-cloud/commit/e9e960bd44c0fed470288d955899ae327b1cb4f7)
+
+### Ris
+
+##### Prepare for horw data import.
+
+`Feature` | [OGC-3260](https://linear.app/onegovcloud/issue/OGC-3260) | [f2d7a8c42a](https://github.com/onegov/onegov-cloud/commit/f2d7a8c42ad1fd33eb5683c101663da61e94ed36)
+
+### Winterthur
+
+##### Adds redirect URL argument to directories.
+
+`Feature` | [OGC-3571](https://linear.app/onegovcloud/issue/OGC-3571) | [762e054148](https://github.com/onegov/onegov-cloud/commit/762e054148e8d66a5e58119f786d225ace1584c0)
+
 ## 2026.59
 
-`2026-11-13` | [b47395ebbc...3ca158d606](https://github.com/OneGov/onegov-cloud/compare/b47395ebbc^...3ca158d606)
+`2026-11-13` | [b47395ebbc...b8c190078b](https://github.com/OneGov/onegov-cloud/compare/b47395ebbc^...b8c190078b)
 
 ### Feriennet
 
@@ -5481,24 +5503,4 @@ Order imagesets by lat change
 ##### Fix calendar view (cleaner solution)
 
 `Bugfix` | [OGC-2432](https://linear.app/onegovcloud/issue/OGC-2432) | [45679a46fb](https://github.com/onegov/onegov-cloud/commit/45679a46fbe371e321dbf2f956bcdddf6e14aeb1)
-
-## 2025.31
-
-`2025-07-07` | [fe887383ec...c31c34321c](https://github.com/OneGov/onegov-cloud/compare/fe887383ec^...c31c34321c)
-
-### Org
-
-##### Vimeo unlisted videos
-
-`Feature` | [OGC-2412](https://linear.app/onegovcloud/issue/OGC-2412) | [1fec99e1b9](https://github.com/onegov/onegov-cloud/commit/1fec99e1b9505559e6e07930a55511c151367dc6)
-
-### Ris
-
-##### Show date and time of meeting
-
-`Feature` | [OGC-2254](https://linear.app/onegovcloud/issue/OGC-2254) | [7b7a5861b4](https://github.com/onegov/onegov-cloud/commit/7b7a5861b45e8ff8d8128ff0c07a565b3dbf3c67)
-
-##### Provide files to political business template
-
-`Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
 
