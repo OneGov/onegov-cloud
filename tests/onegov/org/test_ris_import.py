@@ -2,7 +2,7 @@ import base64
 import hashlib
 import json
 
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, TYPE_CHECKING, cast
 
@@ -299,7 +299,7 @@ def test_ogi_import(org_app: TestOrgApp, tmp_path: Path) -> None:
     assert historical.meta['ogi_unresolved_name'] == 'Ruth Strässle-Erismann'
     meeting = session.query(Meeting).one()
     assert meeting.start_datetime is not None
-    assert meeting.start_datetime.hour == 17
+    assert meeting.start_datetime == datetime(2024, 11, 7, 16, tzinfo=UTC)
     assert meeting.end_datetime is None
     assert 'Aula Zentrum' in meeting.address
     assert (
