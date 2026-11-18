@@ -1,8 +1,32 @@
 # Changes
 
+## 2026.59
+
+`2026-11-13` | [b47395ebbc...3ca158d606](https://github.com/OneGov/onegov-cloud/compare/b47395ebbc^...3ca158d606)
+
+### Feriennet
+
+##### Details Volunteer Activity
+
+Display the need descriptions in the volunteer view
+
+`Feature` | [PRO-1535](https://linear.app/projuventute/issue/PRO-1535) | [b47395ebbc](https://github.com/onegov/onegov-cloud/commit/b47395ebbcd985545aebe0c5effe787438bde263)
+
+### Town6
+
+##### Rename "export" button
+
+`Bugfix` | [OGC-3590](https://linear.app/onegovcloud/issue/OGC-3590) | [9eea50fda7](https://github.com/onegov/onegov-cloud/commit/9eea50fda7a934b90d407ff0f1b908e8cc694012)
+
+### Winterthur
+
+##### Move filter to top of directories and events
+
+`Bugfix` | [OGC-3543](https://linear.app/onegovcloud/issue/OGC-3543) | [3ca158d606](https://github.com/onegov/onegov-cloud/commit/3ca158d606396302b4fbde7b72f7dd22a6d9c29d)
+
 ## 2026.58
 
-`2026-11-09` | [eb8b62d5f8...a0b3024cf3](https://github.com/OneGov/onegov-cloud/compare/eb8b62d5f8^...a0b3024cf3)
+`2026-11-09` | [eb8b62d5f8...d67bd20c05](https://github.com/OneGov/onegov-cloud/compare/eb8b62d5f8^...d67bd20c05)
 
 ### Agency
 
@@ -5477,20 +5501,4 @@ Order imagesets by lat change
 ##### Provide files to political business template
 
 `Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
-
-## 2025.30
-
-`2025-07-03` | [5fb710d69d...5725423a04](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...5725423a04)
-
-### Org
-
-##### Allows subscription to confirmed personal reservations via iCal
-
-`Feature` | [OGC-2399](https://linear.app/onegovcloud/issue/OGC-2399) | [5fb710d69d](https://github.com/onegov/onegov-cloud/commit/5fb710d69d4b6df8476c6021c5e74a8ae2f94796)
-
-### Pay
-
-##### Silences 3D-Secure Verification errors
-
-`Bugfix` | [92d3e8da7f](https://github.com/onegov/onegov-cloud/commit/92d3e8da7fd1b41ae6949bbbd26670136ed81903)
 

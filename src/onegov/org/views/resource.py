@@ -2247,17 +2247,15 @@ def view_export_all(
     self: ResourceCollection,
     request: OrgRequest,
     form: AllResourcesExportForm,
-    layout: ResourceLayout | None = None
+    layout: ResourcesLayout | None = None
 ) -> RenderData | BaseResponse:
 
-    # FIXME: Why are we using ResouceLayout and not ResourcesLayout?
-    #        this is a weird hack, if you want to be able to use the
-    #        ResourceLayout with ResourceCollection, then make it work
-    #        in the Layout, not by patching the collection...
     self.title = _('Export All')  # type:ignore
-    layout = layout or ResourceLayout(self, request)  # type:ignore
-    layout.editbar_links = None
+    layout = layout or ResourcesLayout(self, request)
     layout.edit_mode = True
+    layout.editmode_links[0].text = _('Export')  # type:ignore
+    layout.editmode_links[0].attrs['class'].discard('save-link')  # type:ignore
+    layout.editmode_links[0].attrs['class'].add('export-link')  # type:ignore
 
     if form.submitted(request):
 
