@@ -6,7 +6,6 @@ import json
 import re
 
 from collections import Counter
-from collections.abc import Iterator
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from pathlib import Path
@@ -28,13 +27,14 @@ from onegov.org.models import (
     RISParliamentaryGroup,
 )
 from onegov.org.models.file import GeneralFileCollection
-from onegov.parliament.models.parliamentarian_role import Role
 from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS,
     PoliticalBusinessType,
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.parliament.models.parliamentarian_role import Role
     from sqlalchemy.orm import Session
 
 SECTIONS: tuple[str, ...] = (
