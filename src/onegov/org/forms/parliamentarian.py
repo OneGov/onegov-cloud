@@ -15,6 +15,7 @@ from onegov.org import _
 from onegov.parliament.models.parliamentarian import GENDERS
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -23,8 +24,8 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import URL
 
-from typing import Any, TYPE_CHECKING
 
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian import Parliamentarian
 
@@ -33,7 +34,10 @@ class ParliamentarianForm(NamedFileForm):
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
-        choices=list(GENDERS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in GENDERS.items()
+        ],
         validators=[InputRequired()],
         default='male'
     )

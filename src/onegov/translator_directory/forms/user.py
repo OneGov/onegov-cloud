@@ -1,5 +1,6 @@
 from onegov.org.forms import ManageUserForm
 from onegov.translator_directory import _
+from wtforms import SelectChoice
 
 
 class ManageUserFormCustom(ManageUserForm):
@@ -8,8 +9,8 @@ class ManageUserFormCustom(ManageUserForm):
     def on_request(self) -> None:
         super().on_request()
         self.role.choices = [
-            ('admin', _('Admin')),
-            ('editor', _('Editor')),
-            ('member', _('Member')),
-            ('translator', _('Translator'))
+            SelectChoice('admin', _('Admin')),
+            SelectChoice('editor', _('Editor')),
+            SelectChoice('member', _('Member')),
+            SelectChoice('translator', _('Translator'))
         ]

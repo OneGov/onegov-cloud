@@ -29,6 +29,8 @@ wtforms.fields.choices.SelectMultipleField.widget
 wtforms.fields.core.Field.widget
 wtforms.fields.form.FormField.widget
 wtforms.fields.simple.TextAreaField.widget
+# __post_init__ ensures label never is None
+wtforms.fields.choices.SelectChoice.label
 
 # Error: is inconsistent
 # ======================
@@ -36,3 +38,5 @@ wtforms.fields.simple.TextAreaField.widget
 # of UnboundField.kwargs before the field actually gets constructed
 # so we have to ignore __init__ being inconsistent for all Field classes
 wtforms\.(fields\.)?([a-z]+\.)?([A-Z][a-z]+)?Field(List)?\.__init__
+# __post_init__ ensures label never is None
+wtforms.fields.choices.SelectChoice.__init__

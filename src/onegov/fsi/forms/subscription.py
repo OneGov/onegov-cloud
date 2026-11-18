@@ -4,7 +4,7 @@ from onegov.fsi import _
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models import CourseEvent, CourseSubscription
-from wtforms.fields import StringField
+from wtforms.fields import SelectChoice, StringField
 from wtforms.validators import InputRequired
 
 
@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from onegov.fsi.models import (
         CourseAttendee)
     from onegov.fsi.request import FsiRequest
-    from wtforms.fields.choices import _Choice
 
 
 class SubscriptionFormMixin:
@@ -38,13 +37,13 @@ class SubscriptionFormMixin:
     def attendee(self) -> CourseAttendee | None:
         return self.model.attendee
 
-    def event_choice(self, event: CourseEvent) -> tuple[str, str]:
-        return str(event.id), str(event)
+    def event_choice(self, event: CourseEvent) -> SelectChoice:
+        return SelectChoice(str(event.id), str(event))
 
     def attendee_choice(
         self,
         attendee: CourseAttendee | None
-    ) -> tuple[str, str]:
+    ) -> SelectChoice:
         if not attendee:
             return self.none_choice
         text = str(attendee)
@@ -52,11 +51,11 @@ class SubscriptionFormMixin:
             text = f'{text}, {attendee.organisation}'
         if attendee.user_id and attendee.source_id:
             text += f' | {attendee.source_id}'
-        return str(attendee.id), text
+        return SelectChoice(str(attendee.id), text)
 
     @property
-    def none_choice(self) -> tuple[str, str]:
-        return '', self.request.translate(_('None'))
+    def none_choice(self) -> SelectChoice:
+        return SelectChoice('', self.request.translate(_('None')))
 
 
 class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
@@ -88,7 +87,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
             auth_attendee=self.request.attendee
         )
 
-    def get_event_choices(self) -> list[_Choice]:
+    def get_event_choices(self) -> list[SelectChoice]:
 
         if self.model.course_event_id:
             return [self.event_choice(self.event)]
@@ -105,7 +104,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
         return [self.event_choice(e) for e in events] or [self.none_choice]
 
-    def get_attendee_choices(self) -> list[_Choice]:
+    def get_attendee_choices(self) -> list[SelectChoice]:
 
         if self.model.attendee_id:
             return [self.attendee_choice(self.attendee)]
@@ -213,7 +212,7 @@ class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         label=_('Placeholder Description (optional)'),
     )
 
-    def get_event_choices(self) -> list[_Choice]:
+    def get_event_choices(self) -> list[SelectChoice]:
 
         if self.model.course_event_id:
             return [self.event_choice(self.event)]
@@ -270,14 +269,14 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
         self.course_event_id.data = model.course_event_id
         self.attendee_id.data = model.attendee_id
 
-    def get_event_choices(self) -> list[_Choice]:
+    def get_event_choices(self) -> list[SelectChoice]:
         return [self.event_choice(self.model.course_event)]
 
-    def get_attendee_choices(self) -> list[_Choice]:
+    def get_attendee_choices(self) -> list[SelectChoice]:
         attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
-        choices: list[_Choice] = [self.attendee_choice(a) for a in attendees]
+        choices = [self.attendee_choice(a) for a in attendees]
         choices.insert(0, self.attendee_choice(self.attendee))
         return choices
 
@@ -313,7 +312,7 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
         self.course_event_id.data = model.course_event_id
         self.dummy_desc.data = model.dummy_desc
 
-    def get_event_choices(self) -> list[_Choice]:
+    def get_event_choices(self) -> list[SelectChoice]:
         return [self.event_choice(self.model.course_event)]
 
     def on_request(self) -> None:

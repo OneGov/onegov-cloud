@@ -4,6 +4,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.user import RoleMapping
 from onegov.org.forms import ManageUserGroupForm
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -15,7 +16,10 @@ class UserGroupForm(ManageUserGroupForm):
 
     agencies = ChosenSelectMultipleField(
         label=_('Agencies'),
-        choices=[]
+        choices=lambda form, field: [
+            SelectChoice(str(a.id), a.title)
+            for a in ExtendedAgencyCollection(form.request.session).query()
+        ]
     )
 
     # NOTE: We use the value of agencies to determine which tickets
@@ -27,21 +31,14 @@ class UserGroupForm(ManageUserGroupForm):
             'Immediate e-mail notification to members upon ticket submission'
         ),
         choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ),
         default='no'
     )
 
     # NOTE: This settting is not supported in agency yet
     shared_email = None  # type:ignore[assignment]
-
-    def on_request(self) -> None:
-        super().on_request()
-        self.agencies.choices = [
-            (str(a.id), a.title)
-            for a in ExtendedAgencyCollection(self.request.session).query()
-        ]
 
     def update_model(self, model: UserGroup) -> None:
         super().update_model(model)

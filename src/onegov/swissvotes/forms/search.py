@@ -9,6 +9,7 @@ from onegov.swissvotes.models import SwissVote
 from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 
 
@@ -33,11 +34,11 @@ class SearchForm(Form):
     full_text = RadioField(
         label=_('Full-text'),
         choices=(
-            (1, _('Yes')),
-            (0, _('No')),
+            SelectChoice('1', _('Yes')),
+            SelectChoice('0', _('No')),
         ),
         default=1,
-        coerce=bool,
+        coerce=int,
         render_kw={'size': 6},
         description=_(
             'Select «No» if you want to limit the search to title, keyword, '
@@ -151,13 +152,13 @@ class SearchForm(Form):
 
         remove = remove or []
         field.choices = [
-            (code, text)
+            SelectChoice(str(code), text)
             # NOTE: This assumes we don't pass a custom name to the field
             for code, text in SwissVote.codes(field.name).items()
             if code not in remove
         ]
         if add_none:
-            field.choices.append((-1, _('Missing')))
+            field.choices.append(SelectChoice('-1', _('Missing')))
 
     def on_request(self) -> None:
         if 'csrf_token' in self:
@@ -171,7 +172,10 @@ class SearchForm(Form):
 
     def select_all(self, field: SelectMultipleField) -> None:
         if not field.data:
-            field.data = [choice[0] for choice in field.choices]
+            field.data = [
+                field.coerce(choice.value)
+                for choice in field.choices
+            ]
 
     def apply_model(self, model: SwissVoteCollection) -> None:
         self.from_date.data = model.from_date

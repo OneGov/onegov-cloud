@@ -21,9 +21,13 @@ function handleBulkAddCommission() {
     // commission. Hides checkboxes for parliamentarians not in the
     // commission.
 
-   if (!window.location.href.includes('new-commission-bulk')) {
-        return;
-    }
+  const url = window.location.href;
+  if (
+    !url.includes('new-commission-bulk')
+    && !url.includes('new-file-study-bulk')
+  ) {
+    return;
+  }
 
   const commissionSelect = document.getElementById("commission_id");
   const parliamentarianList = document.getElementById("parliamentarian_id");
@@ -116,7 +120,10 @@ function handleBulkAddCommission() {
         const li = existingCheckbox.closest('li');
         if (li) {
           li.style.display = 'block';
-          existingCheckbox.checked = true;
+          // Only check for commission bulk forms, not file study bulk forms
+          if (url.includes('new-commission-bulk')) {
+            existingCheckbox.checked = true;
+          }
           if (!isInitialLoad) {
             li.classList.add("animate-in");
           }

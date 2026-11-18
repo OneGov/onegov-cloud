@@ -4,6 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import HoneyPotField, MultiCheckboxField
 from onegov.org import _
 from onegov.org.utils import extract_categories_and_subcategories
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
@@ -12,7 +13,6 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from wtforms.fields.choices import _Choice
 
 
 class SignupForm(Form):
@@ -50,12 +50,12 @@ class SignupForm(Form):
             self.request.app.org.newsletter_categories)
 
         data: list[str] = []
-        choices: list[_Choice] = []
+        choices = []
         for cat, sub in zip(categories, subcategories):
             data.append(cat)
-            choices.append((cat, cat))
+            choices.append(SelectChoice(cat))
             data.extend(sub)
-            choices.extend((s, f'\xa0\xa0\xa0{s}') for s in sub)
+            choices.extend(SelectChoice(s, f'\xa0\xa0\xa0{s}') for s in sub)
 
         self.subscribed_categories.choices = choices
         self.subscribed_categories.data = data

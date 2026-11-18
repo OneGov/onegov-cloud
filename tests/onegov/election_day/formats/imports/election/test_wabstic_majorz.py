@@ -809,3 +809,78 @@ def test_import_wabstic_majorz_regional(session: Session) -> None:
     )
     assert not errors
     assert election.progress == (1, 2)
+
+
+def test_import_wabstic_majorz_same_number(session: Session) -> None:
+    # Two elections sharing the same SortGeschaeft, distinguished only by
+    # SortWahlkreis (WMStatic_Gemeinden, WM_Wahl) and GeLfNr (all files)
+
+    def csv(lines: list[str]) -> tuple[BytesIO, str]:
+        return BytesIO('\n'.join(lines).encode('utf-8')), 'text/plain'
+
+    files = (
+        *csv([
+            'SortGeschaeft,SortWahlkreis,AbsolutesMehr,Ausmittlungsstand,'
+            'AnzPendentGde,GeLfNr',
+            '1,1,100,0,1,a',
+            '1,6,200,0,1,b',
+        ]),
+        *csv([
+            'SortWahlkreis,SortGeschaeft,BfsNrGemeinde,Stimmberechtigte,'
+            'GeLfNr',
+            '1,1,3203,1000,a',
+            '6,1,3392,2000,b',
+        ]),
+        *csv([
+            'BfsNrGemeinde,Stimmberechtigte,Sperrung,StmAbgegeben,StmLeer,'
+            'StmUngueltig,StimmenLeer,StimmenUngueltig,GeLfNr',
+            '3203,1000,1200,500,0,0,0,0,a',
+            '3392,2000,1200,800,0,0,0,0,b',
+        ]),
+        *csv([
+            'SortGeschaeft,KNR,Nachname,Vorname,Gewaehlt,Partei,GeLfNr',
+            '1,01,Muster,Anna,1,,a',
+            '1,01,Beispiel,Bruno,,,b',
+        ]),
+        *csv([
+            'SortGeschaeft,BfsNrGemeinde,KNR,Stimmen,GeLfNr',
+            '1,3203,01,400,a',
+            '1,3392,01,700,b',
+        ]),
+    )
+
+    session.add(
+        Election(
+            title='election',
+            domain='none',
+            date=date(2026, 11, 29),
+            number_of_mandates=1
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='sg')
+
+    for f in files[::2]:
+        f.seek(0)
+    errors = import_election_wabstic_majorz(
+        election, principal, '1', '1', *files
+    )
+    assert not errors
+    assert election.absolute_majority == 100
+    assert election.progress == (1, 1)
+    assert [(c.family_name, c.votes) for c in election.candidates] == [
+        ('Muster', 400)
+    ]
+
+    for f in files[::2]:
+        f.seek(0)
+    errors = import_election_wabstic_majorz(
+        election, principal, '1', '6', *files
+    )
+    assert not errors
+    assert election.absolute_majority == 200
+    assert election.progress == (1, 1)
+    assert [(c.family_name, c.votes) for c in election.candidates] == [
+        ('Beispiel', 700)
+    ]

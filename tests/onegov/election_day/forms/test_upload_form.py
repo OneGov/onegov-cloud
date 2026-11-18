@@ -27,7 +27,7 @@ def test_upload_vote_form(session: Session) -> None:
     # Test if wabsti_c is added when data sources are available
     form = UploadVoteForm()
     assert sorted(
-        f[0] for f in form.file_format.choices) == ['internal']
+        f.value for f in form.file_format.choices) == ['internal']
 
     session.add(vote)
     session.add(DataSource(name='test', type='vote'))
@@ -38,7 +38,7 @@ def test_upload_vote_form(session: Session) -> None:
     vote = session.query(Vote).one()
 
     form.adjust(principal, vote)
-    assert sorted(f[0] for f in form.file_format.choices) == [
+    assert sorted(f.value for f in form.file_format.choices) == [
         'internal', 'wabsti_c'
     ]
 
@@ -58,11 +58,11 @@ def test_upload_election_form(session: Session) -> None:
 
     # Test if wabsti_c is added when data sources are available
     form_majorz = UploadMajorzElectionForm()
-    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
+    assert sorted(f.value for f in form_majorz.file_format.choices) == [
         'internal'
     ]
     form_proporz = UploadProporzElectionForm()
-    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
+    assert sorted(f.value for f in form_proporz.file_format.choices) == [
         'internal'
     ]
 
@@ -75,11 +75,11 @@ def test_upload_election_form(session: Session) -> None:
     election = session.query(Election).one()
 
     form_majorz.adjust(principal, election)
-    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
+    assert sorted(f.value for f in form_majorz.file_format.choices) == [
         'internal', 'wabsti_c'
     ]
     form_proporz.adjust(principal, session.query(Election).one())
-    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
+    assert sorted(f.value for f in form_proporz.file_format.choices) == [
         'internal', 'wabsti_c'
     ]
 

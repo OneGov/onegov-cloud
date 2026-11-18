@@ -20,6 +20,7 @@ from onegov.org.forms.fields import UploadMultipleFilesWithORMSupport
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -45,7 +46,10 @@ class AssemblyForm(NamedFileForm):
     state = RadioField(
         _('State'),
         fieldset=_('General'),
-        choices=list(STATES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in STATES.items()
+        ],
         validators=[
             InputRequired()
         ],

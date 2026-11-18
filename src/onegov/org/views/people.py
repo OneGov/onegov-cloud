@@ -126,7 +126,7 @@ def view_people(
         request.app.org.organisation_hierarchy or [])
     sub_orgs = get_sub_organisations(
         request.app.org.organisation_hierarchy or [])
-    if selected_org:
+    if selected_org and selected_org in top_orgs:
         index = top_orgs.index(selected_org)
         top_org = request.app.org.organisation_hierarchy[index]
         if isinstance(top_org, dict):

@@ -14,6 +14,7 @@ from onegov.form.validators import UniqueColumnValue
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -64,23 +65,23 @@ class ScreenForm(Form):
     type = RadioField(
         label=_('Type'),
         choices=[
-            (
+            SelectChoice(
                 'simple_vote',
                 _('Simple Vote')
             ),
-            (
+            SelectChoice(
                 'complex_vote',
                 _('Vote with Counter-Proposal')
             ),
-            (
+            SelectChoice(
                 'majorz_election',
                 _('Election based on the simple majority system')
             ),
-            (
+            SelectChoice(
                 'proporz_election',
                 _('Election based on proportional representation')
             ),
-            (
+            SelectChoice(
                 'election_compound',
                 _('Compound of Elections')
             ),
@@ -292,19 +293,19 @@ class ScreenForm(Form):
 
         vquery = session.query(Vote).filter_by(type='simple')
         self.simple_vote.choices = [
-            (vote.id, f'{vote.title} [{vote.date}]')
+            SelectChoice(vote.id, f'{vote.title} [{vote.date}]')
             for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
         vquery = session.query(Vote).filter_by(type='complex')
         self.complex_vote.choices = [
-            (vote.id, f'{vote.title} [{vote.date}]')
+            SelectChoice(vote.id, f'{vote.title} [{vote.date}]')
             for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
         equery = session.query(Election).filter_by(type='majorz')
         self.majorz_election.choices = [
-            (election.id, f'{election.title} [{election.date}]')
+            SelectChoice(election.id, f'{election.title} [{election.date}]')
             for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
@@ -312,7 +313,7 @@ class ScreenForm(Form):
 
         equery = session.query(Election).filter_by(type='proporz')
         self.proporz_election.choices = [
-            (election.id, f'{election.title} [{election.date}]')
+            SelectChoice(election.id, f'{election.title} [{election.date}]')
             for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
@@ -320,7 +321,7 @@ class ScreenForm(Form):
 
         query = session.query(ElectionCompound)
         self.election_compound.choices = [
-            (compound.id, f'{compound.title} [{compound.date}]')
+            SelectChoice(compound.id, f'{compound.title} [{compound.date}]')
             for compound in query.order_by(
                 ElectionCompound.date.desc(), ElectionCompound.shortcode
             )

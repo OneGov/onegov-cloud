@@ -16,6 +16,7 @@ from sqlalchemy import or_
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -29,7 +30,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.request import ElectionDayRequest
     from onegov.file import File
-    from wtforms.fields.choices import _Choice
 
 
 class ElectionCompoundForm(Form):
@@ -64,7 +64,7 @@ class ElectionCompoundForm(Form):
         label=_('Domain'),
         fieldset=_('Properties'),
         choices=[
-            ('canton', _('Cantonal'))
+            SelectChoice('canton', _('Cantonal'))
         ],
         default='canton',
         validators=[
@@ -406,13 +406,14 @@ class ElectionCompoundForm(Form):
     def on_request(self) -> None:
         principal = self.request.app.principal
 
-        self.domain_elections.choices = []
-        for domain in ('region', 'district', 'municipality'):
-            if domain in principal.domains_election:
-                self.domain_elections.choices.append((
-                    domain,
-                    self.request.translate(principal.domains_election[domain])
-                ))
+        self.domain_elections.choices = [
+            SelectChoice(
+                domain,
+                self.request.translate(principal.domains_election[domain])
+            )
+            for domain in ('region', 'district', 'municipality')
+            if domain in principal.domains_election
+        ]
 
         self.title_de.validators = []
         self.title_fr.validators = []
@@ -434,7 +435,7 @@ class ElectionCompoundForm(Form):
         query = query.order_by(Election.date.desc(), Election.shortcode)
         query = query.filter(Election.type == 'proporz')
         self.region_elections.choices = [
-            (
+            SelectChoice(
                 item.id,
                 '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),
@@ -444,7 +445,7 @@ class ElectionCompoundForm(Form):
             ) for item in query.filter(Election.domain == 'region')
         ]
         self.district_elections.choices = [
-            (
+            SelectChoice(
                 item.id,
                 '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),
@@ -454,7 +455,7 @@ class ElectionCompoundForm(Form):
             ) for item in query.filter(Election.domain == 'district')
         ]
         self.municipality_elections.choices = [
-            (
+            SelectChoice(
                 item.id,
                 '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),
@@ -469,8 +470,8 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices: list[_Choice] = [
-            (
+        choices = [
+            SelectChoice(
                 compound.id,
                 '{} {} {}'.format(
                     layout.format_date(compound.date, 'date'),
@@ -677,11 +678,11 @@ class ElectionCompoundForm(Form):
 
         self.related_compounds_historical.choices = [
             choice for choice in self.related_compounds_historical.choices
-            if choice[0] != model.id
+            if choice.value != model.id
         ]
         self.related_compounds_other.choices = [
             choice for choice in self.related_compounds_other.choices
-            if choice[0] != model.id
+            if choice.value != model.id
         ]
         self.related_compounds_historical.data = [
             association.target_id for association in model.related_compounds

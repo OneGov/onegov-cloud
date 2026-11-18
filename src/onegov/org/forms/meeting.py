@@ -1,23 +1,21 @@
 import json
 
-from operator import itemgetter
+from operator import attrgetter
 from wtforms.validators import Optional, InputRequired
-from wtforms import StringField
+from wtforms import SelectChoice, StringField
 
 from onegov.form import Form
 from onegov.form.fields import TimezoneDateTimeField, MultiCheckboxField
-from onegov.org.forms.fields import HtmlField
 from onegov.org import _
+from onegov.org.forms.fields import HtmlField
+from onegov.org.utils import complete_url
 
 
 from typing import TYPE_CHECKING, Any
-
-from onegov.org.utils import complete_url
-
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
-    from wtforms.fields.choices import _Choice, SelectMultipleField
+    from wtforms import SelectMultipleField
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -263,27 +261,23 @@ class MeetingExportPoliticalBusinessForm(Form):
 
         super().process_obj(obj)
 
-        self.meeting_documents.choices = [
-            (str(doc.id), doc.name)
+        self.meeting_documents.choices = sorted((
+            SelectChoice(str(doc.id), doc.name)
             for doc in obj.files
-        ]
-        self.meeting_documents.choices = sorted(
-            self.meeting_documents.choices, key=itemgetter(1))
+        ), key=attrgetter('label'))
         self.meeting_documents.description = obj.display_name
 
-        choices: list[_Choice] = []
         businesses = PoliticalBusinessCollection(self.meta.request)
-        for meeting_item in obj.meeting_items:
-            business = meeting_item.political_business
-            if business is None or not businesses.is_listed(business):
-                continue
-
-            choices.extend([
-                (str(doc.id), f'{meeting_item.display_name} - {doc.name}')
-                for doc in business.files
-            ])
-        self.agenda_item_documents.choices = sorted(
-            choices, key=itemgetter(1))
+        self.agenda_item_documents.choices = sorted((
+            SelectChoice(
+                str(doc.id),
+                f'{meeting_item.display_name} - {doc.name}'
+            )
+            for meeting_item in obj.meeting_items
+            if (business := meeting_item.political_business) is not None
+            if businesses.is_listed(business)
+            for doc in business.files
+        ), key=attrgetter('label'))
 
         if self.meta.request.method == 'GET':
             # preselect all files on form get
@@ -292,7 +286,7 @@ class MeetingExportPoliticalBusinessForm(Form):
 
     def select_all(self, field: SelectMultipleField) -> None:
         if not field.data:
-            field.data = [choice[0] for choice in field.choices]
+            field.data = [choice.value for choice in field.choices]
 
     def get_selected_meeting_documents_ids(self) -> list[str]:
         return [str(i) for i in self.meeting_documents.data or []]

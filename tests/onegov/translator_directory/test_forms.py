@@ -12,6 +12,7 @@ from tests.onegov.translator_directory.shared import create_certificates
 from tests.onegov.translator_directory.shared import create_languages
 from tests.onegov.translator_directory.shared import create_translator
 from tests.shared.utils import encode_map_value
+from wtforms import SelectChoice
 
 
 from typing import Any, TYPE_CHECKING
@@ -174,36 +175,38 @@ def test_translator_mutation_form(translator_app: TestApp) -> None:
     ) == 'Some other comment'
 
     # Test inserting of no choice
-    assert form.admission.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.withholding_tax.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.self_employed.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.gender.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.confirm_name_reveal.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.mother_tongues.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.spoken_languages.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.written_languages.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.monitoring_languages.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.expertise_professional_guilds.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.expertise_interpreting_types.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.education_as_interpreter.choices[0] == ('', '_')  # type: ignore[index]
-    assert form.certificates.choices[0] == ('', '_')  # type: ignore[index]
+    assert form.admission.choices[0] == SelectChoice('', '_')
+    assert form.withholding_tax.choices[0] == SelectChoice('', '_')
+    assert form.self_employed.choices[0] == SelectChoice('', '_')
+    assert form.gender.choices[0] == SelectChoice('', '_')
+    assert form.confirm_name_reveal.choices[0] == SelectChoice('', '_')
+    assert form.mother_tongues.choices[0] == SelectChoice('', '_')
+    assert form.spoken_languages.choices[0] == SelectChoice('', '_')
+    assert form.written_languages.choices[0] == SelectChoice('', '_')
+    assert form.monitoring_languages.choices[0] == SelectChoice('', '_')
+    assert form.expertise_professional_guilds.choices[0] == SelectChoice(
+        '', '_')
+    assert form.expertise_interpreting_types.choices[0] == SelectChoice(
+        '', '_')
+    assert form.education_as_interpreter.choices[0] == SelectChoice('', '_')
+    assert form.certificates.choices[0] == SelectChoice('', '_')
 
     # Test translating choices
-    assert form.admission.choices[1][1] == '_uncertified'  # type: ignore[index]
-    assert form.withholding_tax.choices[1][1] == '_Yes'  # type: ignore[index]
-    assert form.self_employed.choices[1][1] == '_Yes'  # type: ignore[index]
-    assert form.gender.choices[1][1] == '_masculin'  # type: ignore[index]
-    assert form.confirm_name_reveal.choices[1][1] == '_Yes'  # type: ignore[index]
-    assert form.mother_tongues.choices[1][1] == '_Arabic'  # type: ignore[index]
-    assert form.spoken_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
-    assert form.written_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
-    assert form.monitoring_languages.choices[1][1] == '_Arabic'  # type: ignore[index]
-    assert form.expertise_professional_guilds.choices[1][1] == (  # type: ignore[index]
+    assert form.admission.choices[1].label == '_uncertified'
+    assert form.withholding_tax.choices[1].label == '_Yes'
+    assert form.self_employed.choices[1].label == '_Yes'
+    assert form.gender.choices[1].label == '_masculin'
+    assert form.confirm_name_reveal.choices[1].label == '_Yes'
+    assert form.mother_tongues.choices[1].label == '_Arabic'
+    assert form.spoken_languages.choices[1].label == '_Arabic'
+    assert form.written_languages.choices[1].label == '_Arabic'
+    assert form.monitoring_languages.choices[1].label == '_Arabic'
+    assert form.expertise_professional_guilds.choices[1].label == (
         '_Nutrition and agriculture')
-    assert form.expertise_interpreting_types.choices[1][1] == (  # type: ignore[index]
+    assert form.expertise_interpreting_types.choices[1].label == (
         '_Simultaneous interpreting')
-    assert form.education_as_interpreter.choices[1][1] == '_Yes'  # type: ignore[index]
-    assert form.certificates.choices[1][1] == '_AAAA'  # type: ignore[index]
+    assert form.education_as_interpreter.choices[1].label == '_Yes'
+    assert form.certificates.choices[1].label == '_AAAA'
 
     # Test removing fields by role
     form = TranslatorMutationForm()
@@ -473,15 +476,15 @@ def test_accreditation_form(translator_app: TestApp) -> None:
     form.request = request
     form.on_request()
 
-    assert '_neutral' in dict(form.gender.choices).values()  # type: ignore[arg-type]
-    assert 'German' in dict(form.mother_tongues_ids.choices).values()  # type: ignore[arg-type]
-    assert 'German' in dict(form.spoken_languages_ids.choices).values()  # type: ignore[arg-type]
-    assert 'German' in dict(form.written_languages_ids.choices).values()  # type: ignore[arg-type]
-    assert 'German' in dict(form.monitoring_languages_ids.choices).values()  # type: ignore[arg-type]
-    assert '_Military' in dict(
-        form.expertise_professional_guilds.choices).values()  # type: ignore[arg-type]
-    assert '_Negotiation interpreting' in dict(
-        form.expertise_interpreting_types.choices).values()  # type: ignore[arg-type]
+    assert '_neutral' in (c.label for c in form.gender.choices)
+    assert 'German' in (c.label for c in form.mother_tongues_ids.choices)
+    assert 'German' in (c.label for c in form.spoken_languages_ids.choices)
+    assert 'German' in (c.label for c in form.written_languages_ids.choices)
+    assert 'German' in (c.label for c in form.monitoring_languages_ids.choices)
+    assert '_Military' in (
+        c.label for c in form.expertise_professional_guilds.choices)
+    assert '_Negotiation interpreting' in (
+        c.label for c in form.expertise_interpreting_types.choices)
 
     # Test validation
     form = RequestAccreditationForm(DummyPostData({

@@ -38,13 +38,15 @@ from onegov.form.widgets import TreeSelectWidget
 from onegov.form.widgets import TypeAheadInput
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
-from operator import itemgetter
+from operator import attrgetter
 from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
+from wtforms.fields import Choice
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
 from wtforms.fields import FieldList
 from wtforms.fields import FileField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
@@ -71,12 +73,19 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.form.parser import ParsedForm
     from onegov.form.types import (
-        FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
+        FormT, Filter, PricingRules, RawFormValue,
+        SelectChoices, SelectChoicesCallback, Validators, Widget)
     from typing import NotRequired, TypedDict, Self
     from webob.request import _FieldStorageWithFile
+    from wtforms.datalist import DataList
     from wtforms.form import BaseForm
     from wtforms.meta import (
         _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
+
+    type TreeSelectNodes[FieldT: _TreeSelectMixin] = (
+        Iterable[TreeSelectNode]
+        | Callable[[Any, FieldT], Iterable[TreeSelectNode]]
+    )
 
     class FileDict(TypedDict, total=False):
         data: str
@@ -126,9 +135,11 @@ class URLField(StringField):
         description: str = '',
         id: str | None = None,
         default: str | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         default_scheme: str | None = 'https',
         _form: BaseForm | None = None,
         _prefix: str = '',
@@ -165,9 +176,11 @@ class URLField(StringField):
             description=description,
             id=id,
             default=default,
+            invalid_value_message=invalid_value_message,
             widget=widget,
             render_kw=render_kw,
             name=name,
+            datalist=datalist,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
@@ -241,26 +254,74 @@ class TranslatedSelectField(SelectField):
 
     def __init__(
         self,
-        *args: Any,
-        **kwargs: Any,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        coerce: Callable[[Any], Any] = str,
+        choices: SelectChoices[Self] | None = None,
+        choices_sorted: bool = False,
+        validate_choice: bool = True,
+        invalid_value_message: str | None = None,
+        invalid_choice_message: str | None = None,
+        *,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: object | None = None,
+        widget: Widget[Self] | None = None,
+        option_widget: Widget[SelectField._Option] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        datalist: DataList | str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
     ):
-        self.choices_sorted = kwargs.pop('choices_sorted', False)
-        super().__init__(*args, **kwargs)
+        self.choices_sorted = choices_sorted
+        super().__init__(
+            label=label,
+            validators=validators,
+            coerce=coerce,
+            choices=choices,
+            validate_choice=validate_choice,
+            invalid_value_message=invalid_value_message,
+            invalid_choice_message=invalid_choice_message,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            option_widget=option_widget,
+            render_kw=render_kw,
+            name=name,
+            datalist=datalist,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
 
-    def iter_choices(self) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+    # TODO: If we ever want to do support optgroups we also need
+    #       to override iter_groups
+    def iter_choices(self) -> Iterator[Choice]:
         choices = []
 
         for choice in super().iter_choices():
-            result = list(choice)
-            result[1] = self.meta.request.translate(result[1])
+            choice = choice._replace(
+                label=self.meta.request.translate(choice.label))
 
             if self.choices_sorted:
-                choices.append(tuple(result))
+                choices.append(choice)
             else:
-                yield tuple(result)
+                yield choice
 
         if self.choices_sorted:
-            choices.sort(key=itemgetter(1))
+            choices.sort(key=attrgetter('label'))
             for choice in choices:
                 yield choice
 
@@ -294,9 +355,11 @@ class UploadField(FileField):
         description: str = '',
         id: str | None = None,
         default: StrictFileDict | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         allowed_mimetypes: Collection[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
@@ -326,9 +389,11 @@ class UploadField(FileField):
             description=description,
             id=id,
             default=default,
+            invalid_value_message=invalid_value_message,
             widget=widget,
             render_kw=render_kw,
             name=name,
+            datalist=datalist,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
@@ -348,7 +413,7 @@ class UploadField(FileField):
         # give the required validators the idea that the data is there
         # when the action was to keep the current file - an evil approach
         if isinstance(caller, (DataRequired, InputRequired)):
-            truthy = (
+            truthy: Any = (
                 getattr(self, '_data', None)
                 or getattr(self, 'action', None) == 'keep'
             )
@@ -520,9 +585,11 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         description: str = '',
         id: str | None = None,
         default: Sequence[FileDict] = (),
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         upload_widget: Widget[UploadField] | None = None,
         allowed_mimetypes: Collection[str] | None = None,
         _form: BaseForm | None = None,
@@ -550,6 +617,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         unbound_field = self.upload_field_class(
             filters=filters,
             description=description,
+            invalid_value_message=invalid_value_message,
             widget=upload_widget,
             render_kw=render_kw,
             allowed_mimetypes=allowed_mimetypes,
@@ -567,8 +635,10 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             max_entries=None,
             id=id,
             default=default,
+            invalid_value_message=invalid_value_message,
             widget=widget,  # type:ignore[arg-type]
             render_kw=render_kw,
+            datalist=datalist,
             name=name,
             _form=_form,
             _prefix=_prefix,
@@ -699,14 +769,16 @@ class HtmlField(TextAreaField):
 
     data: Markup | None
 
-    def __init__(self, *args: Any, **kwargs: Any):
-        self.form = kwargs.get('_form')
+    if not TYPE_CHECKING:
+        # keep the original signature intact
+        def __init__(self, *args: Any, **kwargs: Any):
+            self.form = kwargs.get('_form')
 
-        if 'render_kw' not in kwargs or not kwargs['render_kw'].get('class_'):
-            kwargs['render_kw'] = kwargs.get('render_kw', {})
-            kwargs['render_kw']['class_'] = 'editor'
+            if not (render_kw := kwargs.get('render_kw', {})).get('class_'):
+                render_kw['class_'] = 'editor'
+                kwargs['render_kw'] = render_kw
 
-        super().__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
     def pre_validate(self, form: BaseForm) -> None:
         self.data = sanitize_html(self.data)
@@ -877,17 +949,19 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
         label: str | None = None,
         validators: Validators[FormT, Self] | None = None,
         coerce: Callable[[Any], Any] = str,
-        choices: Iterable[TreeSelectNode] | None = None,
+        choices: TreeSelectNodes[Self] | None = None,
         validate_choice: bool = True,
         *,
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
         default: object | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         option_widget: Widget[SelectField._Option] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -899,48 +973,64 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
         discount: dict[str, float] | None = None,
     ) -> None:
 
-        if not render_kw:
-            render_kw = {}
-
-        if choices is None:
-            choices = []
-        elif not isinstance(choices, (list, tuple)):
-            choices = list(choices)
-
-        render_kw['data-choices'] = json.dumps(choices)
+        if choices is not None:
+            choices_callback = self._generate_choices_callback(choices)
+        else:
+            choices_callback = None
 
         super().__init__(
             label=label,
             validators=validators,
             coerce=coerce,
-            choices=self.flatten_choices(choices) if choices else None,
+            choices=choices_callback,
             validate_choice=validate_choice,
             filters=filters,
             description=description,
             id=id,
             default=default,
+            invalid_value_message=invalid_value_message,
             widget=widget,
             option_widget=option_widget,
             render_kw=render_kw,
             name=name,
+            datalist=datalist,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
             _meta=_meta,
         )
 
+    def _generate_choices_callback(
+        self,
+        choices: TreeSelectNodes[Self]
+    ) -> SelectChoicesCallback[Self]:
+        def choices_callback(
+            form: object,
+            field: Self
+        ) -> list[SelectChoice]:
+            c = choices(form, field) if callable(choices) else choices
+            if not self.render_kw:
+                self.render_kw = {}
+            self.render_kw['data-choices'] = json.dumps(c)
+            return list(self.flatten_choices(c))
+        return choices_callback
+
     def flatten_choices(
         self,
-        choices: Iterable[TreeSelectNode]
-    ) -> Iterator[tuple[str, str]]:
+        choices: Iterable[TreeSelectNode],
+        _root: bool = True
+    ) -> Iterator[SelectChoice]:
+        if _root and not self.widget.multiple:
+            # yield an empty fallback choice
+            yield SelectChoice('')
         for choice in choices:
             if not choice.get('disabled', False):
                 if choice.get('isGroupSelectable', True):
-                    yield choice['value'], choice['name']
+                    yield SelectChoice(choice['value'], choice['name'])
                 elif self.widget.multiple and self.render_kw is not None:
                     # NOTE: Make sure we don't summarize values
                     self.render_kw['data-grouped'] = 'false'
-            yield from self.flatten_choices(choice['children'])
+            yield from self.flatten_choices(choice['children'], _root=False)
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
         if not self.render_kw:
@@ -948,9 +1038,6 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
 
         self.render_kw['data-choices'] = json.dumps(choices)
         self.choices = list(self.flatten_choices(choices))
-        if not self.widget.multiple:
-            # NOTE: Add a blank choice so the field can be cleared
-            self.choices.insert(0, ('', ''))
 
 
 class TreeSelectField(_TreeSelectMixin, SelectField):
@@ -1251,9 +1338,11 @@ class FormcodeField(TextAreaField):
         description: str = '',
         id: str | None = None,
         default: ParsedForm | Callable[[], ParsedForm] | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         reserved_fields: Collection[str] | None = None,
         require_email_field: bool = True,
         require_title_fields: bool = False,
@@ -1282,9 +1371,11 @@ class FormcodeField(TextAreaField):
             description=description,
             id=id,
             default=default,  # type: ignore[arg-type]
+            invalid_value_message=invalid_value_message,
             widget=widget,
             render_kw=render_kw,
             name=name,
+            datalist=datalist,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,
@@ -1427,10 +1518,12 @@ class FieldTable[FieldT: Field](Field):
         separator: str = '-',
         description: str = '',
         id: str | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         cell_widget: Widget[FieldT] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -1455,9 +1548,11 @@ class FieldTable[FieldT: Field](Field):
             validators=validators,
             description=description,
             id=id,
+            invalid_value_message=invalid_value_message,
             widget=widget,
             render_kw=render_kw,
             name=name,
+            datalist=datalist,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,

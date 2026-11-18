@@ -2,10 +2,10 @@ import textwrap
 
 from markupsafe import Markup
 from onegov.core.security import Secret
-from onegov.directory import Directory, DirectoryCollection
+from onegov.directory import DirectoryCollection
 from onegov.form import Form
 from onegov.form.fields import HtmlField
-from onegov.org.models import Organisation
+from onegov.org.models import ExtendedDirectory, Organisation
 from onegov.org.views.settings import handle_generic_settings
 from onegov.winterthur import _
 from onegov.winterthur.app import WinterthurApp
@@ -13,6 +13,7 @@ from onegov.winterthur.daycare import Services
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, ValidationError
 from yaml.error import YAMLError
@@ -20,9 +21,8 @@ from yaml.error import YAMLError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterator
+    from collections.abc import Collection
     from onegov.core.types import RenderData
-    from onegov.org.models import ExtendedDirectory
     from onegov.winterthur.request import WinterthurRequest
     from webob import Response
 
@@ -105,7 +105,15 @@ class WinterthurDaycareSettingsForm(Form):
         label=_('Directory'),
         fieldset=_('Institutions'),
         validators=[InputRequired()],
-        choices=None)
+        choices=lambda form, field: [
+            SelectChoice(id.hex, title)
+            for id, title in DirectoryCollection['ExtendedDirectory'](
+                form.request.session,
+                type='extended'
+            ).query()
+            .order_by(ExtendedDirectory.order)
+            .with_entities(ExtendedDirectory.id, ExtendedDirectory.title)
+        ])
 
     explanation = HtmlField(
         label=_('Explanation'),
@@ -152,22 +160,6 @@ class WinterthurDaycareSettingsForm(Form):
             raise ValidationError(
                 _('Invalid services configuration')
             ) from exception
-
-    def directory_choices(self) -> Iterator[tuple[str, str]]:
-        dirs: DirectoryCollection[ExtendedDirectory]
-        dirs = DirectoryCollection(self.request.session, type='extended')
-
-        def choice(directory: ExtendedDirectory) -> tuple[str, str]:
-            return (
-                directory.id.hex,
-                directory.title
-            )
-
-        for d in dirs.query().order_by(Directory.order):
-            yield choice(d)
-
-    def on_request(self) -> None:
-        self.directory.choices = list(self.directory_choices())
 
 
 @WinterthurApp.setting_form(

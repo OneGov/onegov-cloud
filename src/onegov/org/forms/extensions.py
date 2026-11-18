@@ -13,6 +13,7 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
@@ -340,7 +341,8 @@ class PushNotificationFormExtension[T: Form](FormExtension[T], name='publish'):
                 )
                 # Format choices to show both ID and value
                 self.push_notifications.choices = [
-                    (id, f'{id} ↔ {value}') for id, value in id_topic_pairs
+                    SelectChoice(id, f'{id} ↔ {value}')
+                    for id, value in id_topic_pairs
                 ]
 
             def validate_send_push_notifications_to_app(

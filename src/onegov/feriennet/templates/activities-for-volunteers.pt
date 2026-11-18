@@ -48,7 +48,8 @@
                                                         <ul class="dense needs">
                                                             <tal:b repeat="need occasion.needs">
                                                                 <li tal:condition="need.accept_signups and wants_more_volunteers(need)">
-                                                                    <span>${need.name}</span>
+                                                                    <h4>${need.name}</h4>
+                                                                    <i>${need.description}</i>
 
                                                                     <a class="button narrow" data-need="${need.id.hex}" data-error-container="#error-for-${occasion.id.hex}">
                                                                         <i class="fa fa-plus" aria-hidden="true"></i>

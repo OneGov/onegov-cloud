@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-10-22 13:13+0200\n"
+"POT-Creation-Date: 2026-10-29 16:05+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -430,6 +430,12 @@ msgstr "Prolunga di un mese alla fine del mese"
 
 msgid "Extend by one year at the end of the year"
 msgstr "Prolunga di un anno alla fine dell'anno"
+
+msgid "Extend by one year at a given date"
+msgstr "Prolunga di un anno a partire da una determinata data"
+
+msgid "Extend on"
+msgstr "Prolunga alla"
 
 msgid "Start"
 msgstr "Inizio"
@@ -3814,9 +3820,6 @@ msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
-msgid "This event has been imported. Once saved, it will no longer be updated by the import."
-msgstr "Questo evento è stato importato. Una volta salvato, non verrà più aggiornato dall'importazione."
-
 msgid "Do you really want to delete this event?"
 msgstr "Desideri davvero eliminare questo evento?"
 
@@ -5071,6 +5074,9 @@ msgstr "Caricamento degli argomenti..."
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
 
+msgid "Close menu"
+msgstr "Chiudi il menu"
+
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
 
@@ -5085,6 +5091,9 @@ msgstr "Cerca"
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
+
+msgid "Sidebar"
+msgstr "Barra laterale"
 
 msgid "Healthy"
 msgstr "In stato corretto"
@@ -7322,6 +7331,13 @@ msgstr "La tua richiesta non può essere accettata automaticamente!"
 msgid "Thank you for your submission!"
 msgstr "Ti ringraziamo per l'iscrizione!"
 
+msgid ""
+"This event has been imported. Once saved, it will no longer be updated by "
+"the import."
+msgstr ""
+"Questo evento è stato importato. Una volta salvato, non verrà più aggiornato "
+"dall'importazione."
+
 msgid "Your event was rejected"
 msgstr "Il tuo evento è stato rifiutato"
 
@@ -8028,8 +8044,8 @@ msgstr ""
 "La tua richiesta di cancellazione è stata inviata. Sarai informato/a quando "
 "sarà elaborata."
 
-#. We adjust the wording for users that do not know what a ticket is
 #.
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Stato della richiesta"
 

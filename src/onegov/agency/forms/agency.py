@@ -21,6 +21,7 @@ from onegov.form.validators import (
 )
 from onegov.gis import CoordinatesField
 from sqlalchemy import func
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
@@ -29,6 +30,7 @@ from typing import cast
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Collection
     from webob.request import _FieldStorageWithFile
 
 
@@ -93,24 +95,78 @@ class ExtendedAgencyForm(Form):
     export_fields = MultiCheckboxField(
         label=_('Fields to include for each membership'),
         choices=[
-            ('membership.title', _('Membership: Title')),
-            ('membership.since', _('Membership: Since')),
-            ('membership.addition', _('Membership: Addition')),
-            ('person.title', _('Person: Title')),
-            ('person.function', _('Person: Function')),
-            ('person.last_name', _('Person: Last Name')),
-            ('person.first_name', _('Person: First Name')),
-            ('person.born', _('Person: Born')),
-            ('person.academic_title', _('Person: Academic Title')),
-            ('person.profession', _('Person: Profession')),
-            ('person.location_address', _('Person: Location address')),
-            ('person.location_code_city', _('Person: Location Code and City')),
-            ('person.postal_address', _('Person: Postal address')),
-            ('person.postal_code_city', _('Person: Postal Code and City')),
-            ('person.political_party', _('Person: Political Party')),
-            ('person.parliamentary_group', _('Person: Parliamentary Group')),
-            ('person.phone', _('Person: Phone')),
-            ('person.phone_direct', _('Person: Direct Phone')),
+            SelectChoice(
+                'membership.title',
+                _('Membership: Title')
+            ),
+            SelectChoice(
+                'membership.since',
+                _('Membership: Since')
+            ),
+            SelectChoice(
+                'membership.addition',
+                _('Membership: Addition')
+            ),
+            SelectChoice(
+                'person.title',
+                _('Person: Title')
+            ),
+            SelectChoice(
+                'person.function',
+                _('Person: Function')
+            ),
+            SelectChoice(
+                'person.last_name',
+                _('Person: Last Name')
+            ),
+            SelectChoice(
+                'person.first_name',
+                _('Person: First Name')
+            ),
+            SelectChoice(
+                'person.born',
+                _('Person: Born')
+            ),
+            SelectChoice(
+                'person.academic_title',
+                _('Person: Academic Title')
+            ),
+            SelectChoice(
+                'person.profession',
+                _('Person: Profession')
+            ),
+            SelectChoice(
+                'person.location_address',
+                _('Person: Location address')
+            ),
+            SelectChoice(
+                'person.location_code_city',
+                _('Person: Location Code and City')
+            ),
+            SelectChoice(
+                'person.postal_address',
+                _('Person: Postal address')
+            ),
+            SelectChoice(
+                'person.postal_code_city',
+                _('Person: Postal Code and City')
+            ),
+            SelectChoice(
+                'person.political_party',
+                _('Person: Political Party')
+            ),
+            SelectChoice(
+                'person.parliamentary_group',
+                _('Person: Parliamentary Group')
+            ),
+            SelectChoice(
+                'person.phone',
+                _('Person: Phone')
+            ),
+            SelectChoice(
+                'person.phone_direct',
+                _('Person: Direct Phone')
+            ),
         ],
         default=['membership.title', 'person.title'],
         fieldset=_('PDF Export'),
@@ -155,16 +211,20 @@ class ExtendedAgencyForm(Form):
             model.publication_end = self.publication_end.data
 
     def reorder_export_fields(self) -> None:
-        titles: dict[str, str] = dict(
-            self.export_fields.choices  # type:ignore[arg-type]
-        )
         chosen = self.export_fields.data or []
-        self.export_fields.choices = [
-            (choice, titles[choice]) for choice in chosen
-        ] + [
-            choice for choice in self.export_fields.choices
-            if choice[0] not in chosen
-        ]
+
+        # sort the chosen values in the same order they were chosen in
+        # the rest of the values go at the end
+        def sort_key(choice: SelectChoice) -> float:
+            for idx, c in enumerate(chosen):
+                if c == choice.value:
+                    return idx
+            return float('Inf')
+
+        self.export_fields.choices = sorted(
+            self.export_fields.choices,
+            key=sort_key,
+        )
 
     def apply_model(self, model: ExtendedAgency) -> None:
         self.title.data = model.title
@@ -198,31 +258,43 @@ class ExtendedAgencyForm(Form):
         self.reorder_export_fields()
 
 
+def get_parent_id_choices_callback(
+    excluded: Collection[str] = ()
+) -> Callable[[MoveAgencyForm, ChosenSelectField], list[SelectChoice]]:
+    def parent_id_choices(
+        form: MoveAgencyForm,
+        field: ChosenSelectField
+    ) -> list[SelectChoice]:
+        agencies = ExtendedAgencyCollection(form.request.session)
+        choices = [
+            SelectChoice(str(agency.id), agency.title)
+            for agency in agencies.query().order_by(None).order_by(
+                func.unaccent(ExtendedAgency.title)
+            )
+            if form.request.has_permission(agency, Private)
+            if str(agency.id) not in excluded
+        ]
+        if (
+            form.request.has_permission(agencies, Private)
+            and 'root' not in excluded
+        ):
+            choices.insert(
+                0, SelectChoice('root', form.request.translate(_('- Root -')))
+            )
+        return choices
+    return parent_id_choices
+
+
 class MoveAgencyForm(Form):
     """ Form to move an agency. """
 
     parent_id = ChosenSelectField(
         label=_('Destination'),
-        choices=[],
+        choices=get_parent_id_choices_callback(),
         validators=[
             InputRequired()
         ]
     )
-
-    def on_request(self) -> None:
-
-        agencies = ExtendedAgencyCollection(self.request.session)
-        self.parent_id.choices = [
-            (str(agency.id), agency.title)
-            for agency in agencies.query().order_by(None).order_by(
-                func.unaccent(ExtendedAgency.title)
-            )
-            if self.request.has_permission(agency, Private)
-        ]
-        if self.request.has_permission(agencies, Private):
-            self.parent_id.choices.insert(
-                0, ('root', self.request.translate(_('- Root -')))
-            )
 
     def ensure_valid_parent(self) -> bool:
         """
@@ -255,11 +327,10 @@ class MoveAgencyForm(Form):
         model.parent_id = new_parent_id
 
     def apply_model(self, model: ExtendedAgency) -> None:
+        removed: set[str] = set()
+
         def remove(item: ExtendedAgency) -> None:
-            choice = (str(item.id), item.title)
-            if choice in self.parent_id.choices:
-                assert isinstance(self.parent_id.choices, list)
-                self.parent_id.choices.remove(choice)
+            removed.add(str(item.id))
 
         def remove_with_children(item: ExtendedAgency) -> None:
             remove(item)
@@ -269,6 +340,7 @@ class MoveAgencyForm(Form):
         if model.parent:
             remove(model.parent)
         else:
-            assert isinstance(self.parent_id.choices, list)
-            self.parent_id.choices.pop(0)
+            removed.add('root')
         remove_with_children(model)
+
+        self.parent_id.choices = get_parent_id_choices_callback(removed)

@@ -128,7 +128,7 @@ def test_duplicate_course_event(client_with_db: Client) -> None:
     client.login_admin()
     view = f'/fsi/event/{event.id}/duplicate'
     dup = client.get(view)
-    assert dup.form['course_id'].value == str(event.course.id)
+    assert dup.form['course_id'].value == event.course.id.hex
     assert dup.form['presenter_name'].value == event.presenter_name
     assert dup.form['presenter_email'].value == event.presenter_email
     assert not dup.form['start'].value

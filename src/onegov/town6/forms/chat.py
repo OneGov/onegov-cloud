@@ -1,5 +1,5 @@
 from wtforms.fields import EmailField, HiddenField, SelectField, StringField
-from wtforms.fields import BooleanField
+from wtforms.fields import BooleanField, SelectChoice
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
@@ -47,9 +47,10 @@ class ChatInitiationForm(Form):
     def populate_topics(self) -> None:
         topics = self.request.app.org.chat_topics
         if topics:
-            self.topic.choices = [(t, t) for t in topics]
+            choices = [SelectChoice(t) for t in topics]
             general = self.request.translate(_('General'))
-            self.topic.choices.append((general, general))
+            choices.append(SelectChoice(general))
+            self.topic.choices = choices
         else:
             self.delete_field('topic')
 

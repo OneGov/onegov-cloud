@@ -6,6 +6,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
@@ -29,9 +30,9 @@ class FormRegistrationMessageForm(Form):
     registration_state = MultiCheckboxField(
         label=_('Send to attendees with status'),
         choices=[
-            ('open', _('Open')),
-            ('confirmed', _('Confirmed')),
-            ('cancelled', _('Cancelled')),
+            SelectChoice('open', _('Open')),
+            SelectChoice('confirmed', _('Confirmed')),
+            SelectChoice('cancelled', _('Cancelled')),
         ],
         default=['confirmed'],
         validators=[InputRequired()]
@@ -78,8 +79,8 @@ class FormRegistrationWindowForm(Form):
         label=_('Limit the number of attendees'),
         fieldset=_('Attendees'),
         choices=[
-            ('yes', _('Yes, limit the number of attendees')),
-            ('no', _('No, allow an unlimited number of attendees'))
+            SelectChoice('yes', _('Yes, limit the number of attendees')),
+            SelectChoice('no', _('No, allow an unlimited number of attendees'))
         ],
         default='yes'
     )
@@ -96,8 +97,14 @@ class FormRegistrationWindowForm(Form):
         fieldset=_('Attendees'),
         depends_on=('limit_attendees', 'yes'),
         choices=[
-            ('yes', _('Yes, allow for more submissions than available spots')),
-            ('no', _('No, ensure that all submissions can be confirmed'))
+            SelectChoice(
+                'yes',
+                _('Yes, allow for more submissions than available spots')
+            ),
+            SelectChoice(
+                'no',
+                _('No, ensure that all submissions can be confirmed')
+            )
         ],
         default='yes'
     )

@@ -8,6 +8,7 @@ from onegov.swissvotes.fields import SwissvoteDatasetField
 from onegov.swissvotes.fields import SwissvoteMetadataField
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import ColumnMapperMetadata
+from wtforms import SelectChoice
 from xlsxwriter.workbook import Workbook
 
 
@@ -726,6 +727,7 @@ def test_policy_area_field() -> None:
     form = Form()
     field = PolicyAreaField()
     field = field.bind(form, 'policy_area')  # type: ignore[attr-defined]
+    field.process(formdata=None)
 
     html = field()
     assert 'class="policy-selector"' in html
@@ -764,7 +766,11 @@ def test_policy_area_field() -> None:
         }
     ]
     assert field.choices == [
-        ('a', 'A'), ('a1', 'A.1'), ('a2', 'A.2'), ('a21', 'A.2.1'), ('b', 'B')
+        SelectChoice('a', 'A'),
+        SelectChoice('a1', 'A.1'),
+        SelectChoice('a2', 'A.2'),
+        SelectChoice('a21', 'A.2.1'),
+        SelectChoice('b', 'B')
     ]
 
     field.process(DummyPostData({'policy_area': ['a2', 'b']}))

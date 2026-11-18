@@ -15,6 +15,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
 from uuid import UUID
+from wtforms import SelectChoice
 from wtforms.fields import BooleanField, DecimalField, Field, SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
@@ -785,9 +786,9 @@ class DaycareSubsidyCalculatorForm(Form):
         self.daycare.choices = list(self.daycare_choices)
 
     @property
-    def daycare_choices(self) -> Iterator[tuple[str, str]]:
+    def daycare_choices(self) -> Iterator[SelectChoice]:
 
-        def choice(daycare: Daycare) -> tuple[str, str]:
+        def choice(daycare: Daycare) -> SelectChoice:
             label = _(
                 '${title} / day rate CHF ${rate} / '
                 '${weeks} weeks open per year',
@@ -798,7 +799,7 @@ class DaycareSubsidyCalculatorForm(Form):
                 }
             )
 
-            return (daycare.id.hex, self.request.translate(label))
+            return SelectChoice(daycare.id.hex, self.request.translate(label))
 
         for daycare in self.model.daycares.values():
             yield choice(daycare)

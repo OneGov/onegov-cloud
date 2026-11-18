@@ -2,6 +2,7 @@ from onegov.form import Form
 from onegov.org import _
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -19,8 +20,8 @@ class ImageSetForm(Form):
         label=_('View'),
         default='full',
         choices=[
-            ('full', _('Full size images')),
-            ('grid', _('Grid layout'))
+            SelectChoice('full', _('Full size images')),
+            SelectChoice('grid', _('Grid layout'))
         ])
 
     show_images_on_homepage = BooleanField(
@@ -30,9 +31,9 @@ class ImageSetForm(Form):
         label=_('Order'),
         fieldset=_('Order'),
         choices=[
-            ('by-name', _('By filename')),
-            ('by-caption', _('By caption')),
-            ('by-last-change', _('By last change'))
+            SelectChoice('by-name', _('By filename')),
+            SelectChoice('by-caption', _('By caption')),
+            SelectChoice('by-last-change', _('By last change'))
         ],
         default='by-last-change')
 
@@ -40,7 +41,7 @@ class ImageSetForm(Form):
         label=_('Direction'),
         fieldset=_('Order'),
         choices=[
-            ('asc', _('Ascending')),
-            ('desc', _('Descending'))
+            SelectChoice('asc', _('Ascending')),
+            SelectChoice('desc', _('Descending'))
         ],
         default='desc')

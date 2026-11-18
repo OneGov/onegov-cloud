@@ -12,6 +12,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -120,8 +121,14 @@ class OccasionForm(Form):
     administrative_cost = RadioField(
         label=_('The administrative cost of each booking'),
         choices=(
-            ('default', _('Use default costs defined by the period')),
-            ('custom', _('Use custom costs')),
+            SelectChoice(
+                'default',
+                _('Use default costs defined by the period')
+            ),
+            SelectChoice(
+                'custom',
+                _('Use custom costs')
+            ),
         ),
         fieldset=_('Advanced'),
         default='default'
@@ -200,16 +207,18 @@ class OccasionForm(Form):
             BookingPeriod.active.desc(),
             BookingPeriod.title
         )
-
-        def choice(period: BookingPeriod) -> tuple[str, str]:
-            return str(period.id), '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(
-                period.title,
-                period.execution_start,
-                period.execution_end
-            )
-
         periods = query.all()
-        self.period_id.choices = [choice(p) for p in periods]
+        self.period_id.choices = [
+            SelectChoice(
+                str(period.id),
+                '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(
+                    period.title,
+                    period.execution_start,
+                    period.execution_end
+                )
+            )
+            for period in periods
+        ]
 
         if self.period_id.data == '0xdeadbeef':
             self.period_id.data = periods[0].id

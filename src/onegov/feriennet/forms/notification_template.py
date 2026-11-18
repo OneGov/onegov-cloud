@@ -1,5 +1,5 @@
 from functools import cached_property
-from markupsafe import Markup, escape
+from markupsafe import escape
 
 from onegov.activity import Activity, Attendee, OccasionNeed, Volunteer
 from onegov.activity import Booking, BookingCollection
@@ -16,6 +16,7 @@ from onegov.form.fields import (MultiCheckboxField, HtmlField,
 from onegov.user import User, UserCollection
 from sqlalchemy import or_, and_, select, exists
 from uuid import uuid4
+from wtforms import SelectChoice
 from wtforms.fields import BooleanField, StringField, RadioField
 from wtforms.validators import InputRequired, ValidationError
 
@@ -64,37 +65,49 @@ class NotificationTemplateSendForm(Form):
     send_to = TranslatedSelectField(
         label=_('Send to'),
         choices=[
-            ('myself', _(
-                'Myself'
-            )),
-            ('active_organisers', _(
-                'Organisers with an occasion'
-            )),
-            ('inactive_organisers', _(
-                'Organisers without occasions'
-            )),
-            ('volunteers', _(
-                'Volunteers'
-            )),
-            ('by_role', _(
-                'Users of a given role'
-            )),
-            ('with_wishlist', _(
-                'Users with wishes'
-            )),
-            ('with_accepted_bookings', _(
-                'Users with accepted bookings'
-            )),
-            ('with_no_wishes_or_bookings', _(
-                'Users with attendees that have no wishes or bookings'
-            )),
-            ('with_unpaid_bills', _(
-                'Users with unpaid bills'
-            )),
-            ('by_occasion', _(
-                'Users with attenedees that have an occasion on their '
-                'wish- or booking-list'
-            ))
+            SelectChoice(
+                'myself',
+                _('Myself')
+            ),
+            SelectChoice(
+                'active_organisers',
+                _('Organisers with an occasion')
+            ),
+            SelectChoice(
+                'inactive_organisers',
+                _('Organisers without occasions')
+            ),
+            SelectChoice(
+                'volunteers',
+                _('Volunteers')
+            ),
+            SelectChoice(
+                'by_role',
+                _('Users of a given role')
+            ),
+            SelectChoice(
+                'with_wishlist',
+                _('Users with wishes')
+            ),
+            SelectChoice(
+                'with_accepted_bookings',
+                _('Users with accepted bookings')
+            ),
+            SelectChoice(
+                'with_no_wishes_or_bookings',
+                _('Users with attendees that have no wishes or bookings')
+            ),
+            SelectChoice(
+                'with_unpaid_bills',
+                _('Users with unpaid bills')
+            ),
+            SelectChoice(
+                'by_occasion',
+                _(
+                    'Users with attenedees that have an occasion on '
+                    'their wish- or booking-list'
+                )
+            )
         ],
         default='by_role'
     )
@@ -102,10 +115,10 @@ class NotificationTemplateSendForm(Form):
     volunteer_state = RadioField(
         label=_('State'),
         choices=[
-            ('all', _('All')),
-            ('open', _('Open')),
-            ('contacted', _('Contacted')),
-            ('confirmed', _('Confirmed')),
+            SelectChoice('all', _('All')),
+            SelectChoice('open', _('Open')),
+            SelectChoice('contacted', _('Contacted')),
+            SelectChoice('confirmed', _('Confirmed')),
         ],
         depends_on=('send_to', 'volunteers'),
         default='all',
@@ -114,9 +127,9 @@ class NotificationTemplateSendForm(Form):
     roles = MultiCheckboxField(
         label=_('Role'),
         choices=[
-            ('admin', _('Administrators')),
-            ('editor', _('Organisers')),
-            ('member', _('Members'))
+            SelectChoice('admin', _('Administrators')),
+            SelectChoice('editor', _('Organisers')),
+            SelectChoice('member', _('Members'))
         ],
         depends_on=('send_to', 'by_role')
     )
@@ -130,8 +143,8 @@ class NotificationTemplateSendForm(Form):
     state = MultiCheckboxField(
         label=_('Useraccounts'),
         choices=[
-            ('active', _('Active users')),
-            ('inactive', _('Inactive users')),
+            SelectChoice('active', _('Active users')),
+            SelectChoice('inactive', _('Inactive users')),
         ],
         default=['active'],
         depends_on=(
@@ -360,7 +373,7 @@ class NotificationTemplateSendForm(Form):
         return {v for v, in query}
 
     @property
-    def occasion_choices(self) -> Iterator[tuple[str, Markup]]:
+    def occasion_choices(self) -> Iterator[SelectChoice]:
         layout = DefaultLayout(self.model, self.request)
 
         stmt = as_selectable_from_path(
@@ -396,4 +409,4 @@ class NotificationTemplateSendForm(Form):
                     layout.format_datetime_range(*d) for d in record.dates
                 )
             })
-            yield record.occasion_id.hex, label
+            yield SelectChoice(record.occasion_id.hex, label)

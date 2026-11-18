@@ -8,6 +8,7 @@ from onegov.election_day.models import Municipality
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 from wtforms.validators import InputRequired
 
 
@@ -24,9 +25,9 @@ def test_vote_form_on_request() -> None:
     form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     assert form.domain.choices == [
-        ('federation', 'Federal'),
-        ('canton', 'Cantonal'),
-        ('municipality', 'Communal'),
+        SelectChoice('federation', 'Federal'),
+        SelectChoice('canton', 'Cantonal'),
+        SelectChoice('municipality', 'Communal'),
     ]
     assert isinstance(form.title_de.validators[0], InputRequired)
     assert form.title_fr.validators == []
@@ -41,9 +42,9 @@ def test_vote_form_on_request() -> None:
     )
     form.on_request()
     assert form.domain.choices == [
-        ('federation', 'Federal'),
-        ('canton', 'Cantonal'),
-        ('municipality', 'Communal'),
+        SelectChoice('federation', 'Federal'),
+        SelectChoice('canton', 'Cantonal'),
+        SelectChoice('municipality', 'Communal'),
     ]
     assert form.title_de.validators == []
     assert isinstance(form.title_fr.validators[0], InputRequired)

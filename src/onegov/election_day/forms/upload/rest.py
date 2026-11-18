@@ -6,6 +6,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import InputRequiredIf
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -16,10 +17,10 @@ class UploadRestForm(Form):
     type = RadioField(
         _('Type'),
         choices=[
-            ('vote', _('Vote')),
-            ('election', _('Election')),
-            ('parties', _('Party results')),
-            ('xml', 'eCH-0252'),
+            SelectChoice('vote', _('Vote')),
+            SelectChoice('election', _('Election')),
+            SelectChoice('parties', _('Party results')),
+            SelectChoice('xml', 'eCH-0252'),
         ],
         validators=[
             InputRequired()

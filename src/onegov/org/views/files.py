@@ -3,6 +3,7 @@ import datetime
 import isodate
 import morepath
 import sedate
+import transaction
 
 from babel.core import Locale
 from babel.dates import parse_pattern
@@ -560,6 +561,13 @@ def view_upload_file_by_json(
 
     request.assert_valid_csrf_token()
 
+    def error(message: str) -> JSON_ro:
+        transaction.abort()
+        return {
+            'error': True,
+            'message': request.translate(message)
+        }
+
     try:
         f = handle_file_upload(self, request)
     except FileExistsError as e:
@@ -571,20 +579,11 @@ def view_upload_file_by_json(
             'filename': e.args[0].name
         }
     except exc.HTTPUnsupportedMediaType:
-        return {
-            'error': True,
-            'message': request.translate(_('This file type is not supported'))
-        }
+        return error(_('This file type is not supported'))
     except exc.HTTPRequestHeaderFieldsTooLarge:
-        return {
-            'error': True,
-            'message': request.translate(_('The file name is too long'))
-        }
+        return error(_('The file name is too long'))
     except ValueError:
-        return {
-            'error': True,
-            'message': request.translate(_('The file cannot be processed'))
-        }
+        return error(_('The file cannot be processed'))
 
     return {
         'filelink': request.link(f),

@@ -2566,8 +2566,8 @@
             <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
                 <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
                     <tal:b tal:repeat="choice field.choices">
-                        <tal:b tal:define="val results[field.id][choice[0]]; max max(maximum, 1)">
-                            <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
+                        <tal:b tal:define="val results[field.id][choice.value]; max max(maximum, 1)">
+                            <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice.label} (${val})" title="${choice.label} (${val})"></div>
                         </tal:b>
                     </tal:b>
                 </div>
@@ -2575,8 +2575,8 @@
             <div class="chart-wrap" tal:condition="field.type == 'RadioField'">
                 <div tal:define="sum sum(results[field.id].values())" class="grid horizontal">
                     <tal:b tal:repeat="choice field.choices" >
-                        <tal:b tal:define="val results[field.id][choice[0]]">
-                            <div class="bar" style="--bar-value:${val/sum*100}%;" data-name="${choice[1]} (${val}/${sum})" title="${choice[1]} (${val}/${sum})"></div>
+                        <tal:b tal:define="val results[field.id][choice.value]">
+                            <div class="bar" style="--bar-value:${val/sum*100}%;" data-name="${choice.label} (${val}/${sum})" title="${choice.label} (${val}/${sum})"></div>
                         </tal:b>
                     </tal:b>
                 </div>

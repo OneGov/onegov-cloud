@@ -2,6 +2,7 @@ from onegov.form import Form
 from onegov.user import _
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 
@@ -18,9 +19,9 @@ class SignupLinkForm(Form):
         label=_('Role'),
         validators=[InputRequired()],
         choices=[
-            ('member', ('Member')),
-            ('editor', _('Editor')),
-            ('admin', _('Admin'))
+            SelectChoice('member', ('Member')),
+            SelectChoice('editor', _('Editor')),
+            SelectChoice('admin', _('Admin'))
         ]
     )
 
@@ -28,10 +29,10 @@ class SignupLinkForm(Form):
         label=_('Expires in'),
         validators=[InputRequired()],
         choices=[
-            ('hour', _('1 hour')),
-            ('day', _('24 hours')),
-            ('week', _('7 days')),
-            ('month', _('30 days'))
+            SelectChoice('hour', _('1 hour')),
+            SelectChoice('day', _('24 hours')),
+            SelectChoice('week', _('7 days')),
+            SelectChoice('month', _('30 days'))
         ]
     )
 

@@ -8,6 +8,7 @@ from onegov.pay import Price
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -103,8 +104,8 @@ def test_dependent_field() -> None:
         switch = RadioField(
             label="Switch",
             choices=[
-                ('on', "On"),
-                ('off', "Off")
+                SelectChoice('on', "On"),
+                SelectChoice('off', "Off")
             ]
         )
 
@@ -157,8 +158,8 @@ def test_dependent_field_inverted() -> None:
         switch = RadioField(
             label="Switch",
             choices=[
-                ('on', "On"),
-                ('off', "Off")
+                SelectChoice('on', "On"),
+                SelectChoice('off', "Off")
             ]
         )
 
@@ -211,16 +212,16 @@ def test_dependent_field_multiple() -> None:
         switch_1 = RadioField(
             label="Switch",
             choices=[
-                ('on', "On"),
-                ('off', "Off")
+                SelectChoice('on', "On"),
+                SelectChoice('off', "Off")
             ]
         )
 
         switch_2 = RadioField(
             label="Switch",
             choices=[
-                ('on', "On"),
-                ('off', "Off")
+                SelectChoice('on', "On"),
+                SelectChoice('off', "Off")
             ]
         )
 
@@ -352,7 +353,7 @@ def test_dependent_field_on_email_not_empty() -> None:
 
         signing = RadioField(
             label="Sign the attachment",
-            choices=[('yes', "Yes"), ('no', "No")],
+            choices=[SelectChoice('yes', "Yes"), SelectChoice('no', "No")],
             default='yes',
             depends_on=('notification_address', '!')
         )
@@ -422,7 +423,10 @@ def _make_select_form() -> type[Form]:
     class TestForm(Form):
         shipping = SelectField(
             label="Shipping",
-            choices=[('pickup', "Pickup"), ('courier', "Courier")]
+            choices=[
+                SelectChoice('pickup', "Pickup"),
+                SelectChoice('courier', "Courier")
+            ]
         )
         dependent = StringField(
             label="Dependent",
@@ -441,7 +445,7 @@ def _make_select_form() -> type[Form]:
     (_make_select_form, {'shipping': 'pickup'}, {'shipping': 'courier'}),
 ], ids=['text-specific', 'boolean', 'boolean-inverted', 'select'])
 def test_dependent_field_required(
-    make_form: 'Callable[[], type[Form]]',
+    make_form: Callable[[], type[Form]],
     unfulfilled: dict[str, Any],
     fulfilled: dict[str, Any],
 ) -> None:
@@ -626,8 +630,8 @@ def test_pricing() -> None:
 
     class TestForm(Form):
         ticket_insurance = RadioField('Option', choices=[
-            ('yes', 'Yes'),
-            ('no', 'No')
+            SelectChoice('yes', 'Yes'),
+            SelectChoice('no', 'No')
         ], pricing={
             'yes': (10.0, 'CHF'),
         })
@@ -672,13 +676,13 @@ def test_dependent_pricing() -> None:
     class TestForm(Form):
 
         give_donation = RadioField('Option', choices=[
-            ('yes', 'Yes'),
-            ('no', 'No')
+            SelectChoice('yes', 'Yes'),
+            SelectChoice('no', 'No')
         ])
 
         donation = RadioField('Option', choices=[
-            ('small', '10 CHF'),
-            ('big', '100 CHF'),
+            SelectChoice('small', '10 CHF'),
+            SelectChoice('big', '100 CHF'),
         ], pricing={
             'small': (10.0, 'CHF'),
             'big': (100.0, 'CHF')
@@ -715,18 +719,18 @@ def test_nested_dependent_pricing() -> None:
     class TestForm(Form):
 
         give_donation = RadioField('Option', choices=[
-            ('yes', 'Yes'),
-            ('no', 'No')
+            SelectChoice('yes', 'Yes'),
+            SelectChoice('no', 'No')
         ])
 
         really_give = RadioField('Option', choices=[
-            ('yes', 'Yes'),
-            ('no', 'No')
+            SelectChoice('yes', 'Yes'),
+            SelectChoice('no', 'No')
         ], depends_on=('give_donation', 'yes'))
 
         donation = RadioField('Option', choices=[
-            ('small', '10 CHF'),
-            ('big', '100 CHF'),
+            SelectChoice('small', '10 CHF'),
+            SelectChoice('big', '100 CHF'),
         ], pricing={
             'small': (10.0, 'CHF'),
             'big': (100.0, 'CHF')

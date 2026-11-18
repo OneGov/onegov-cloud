@@ -3,15 +3,22 @@ import transaction
 
 from onegov.activity import Activity
 from onegov.activity.models import Booking
+from datetime import date, datetime, timedelta
+
+from onegov.activity import (BookingPeriodCollection,
+                             OccasionCollection)
+from onegov.core.cli import command_group
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
 from onegov.activity.models import Volunteer
-from onegov.core.cli import command_group
 from sqlalchemy import text
 from sqlalchemy.orm import joinedload
 
 
 from typing import TYPE_CHECKING
+
+from onegov.feriennet.collections.activity import VacationActivityCollection
+from onegov.user import UserCollection
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -494,3 +501,173 @@ def which_ferienpass(
                 click.echo(f'{app.schema} - {app.org.title}')
 
     return search_ferienpass
+
+
+@cli.command(name='create-period-with-test-data')
+@click.argument('phase')
+@click.option('--confirmed', default=False, is_flag=True)
+@click.option('--finalized', default=False, is_flag=True)
+# @pass_group_context
+def create_period_with_test_data(
+    phase: str,
+    finalized: bool,
+    confirmed: bool
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """Creates a period with 3 activities, 2 users and 2 attendees each.
+
+    Usage:
+    onegov-feriennet --select /onegov_feriennet/* create-period-with-test-data
+
+    """
+    def create_period(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        session = request.session
+        now = datetime.now()
+
+        def date_offset(offset: int) -> date:
+            return (now + timedelta(days=offset)).date()
+
+        # Create period
+        periods = BookingPeriodCollection(session)
+        nonlocal confirmed, finalized
+
+        if phase == 'wishlist':
+            prebooking = (date_offset(-1), date_offset(+1))
+            booking = (date_offset(+1), date_offset(+10))
+            execution = (date_offset(+10), date_offset(+20))
+
+            period_values = {
+                'title': f'Wunschtest {now.year}',
+                'prebooking': prebooking,
+                'booking': booking,
+                'execution': execution,
+            }
+
+        elif phase == 'booking':
+            prebooking = (date_offset(-10), date_offset(-5))
+            booking = (date_offset(-5), date_offset(+5))
+            execution = (date_offset(+5), date_offset(+10))
+            confirmed = True
+
+            period_values = {
+                'title': f'Buchungstest {now.year}',
+                'prebooking': prebooking,
+                'booking': booking,
+                'execution': execution,
+            }
+
+        elif phase == 'past':
+            prebooking = (date_offset(-20), date_offset(-15))
+            booking = (date_offset(-15), date_offset(-10))
+            execution = (date_offset(-10), date_offset(-1))
+            confirmed = True
+
+            period_values = {
+                'title': f'Vergangenheitstest {now.year}',
+                'prebooking': prebooking,
+                'booking': booking,
+                'execution': execution,
+            }
+        else:
+            raise NotImplementedError
+
+        # register the orm cache keys in this process, so they get
+        # evicted when we modify the periods table below
+        for name in ('periods', 'active_period', 'periods_by_id'):
+            getattr(app, name)
+
+        period = periods.add(
+            title=period_values['title'],  # type:ignore
+            prebooking=period_values['prebooking'],  # type:ignore
+            booking=period_values['booking'],  # type:ignore
+            execution=period_values['execution'],  # type:ignore
+            minutes_between=0,
+            confirmable=True,
+            finalizable=True,
+            active=False,
+        )
+
+        period.activate()
+
+        if confirmed:
+            period.confirm_and_start_booking_phase()
+
+        if finalized:
+            period.finalized = True
+
+        session.flush()
+
+        click.secho(
+            f'Created period {period_values["title"]}',
+            fg='green'
+        )
+
+        # Create users
+        users = UserCollection(session)
+        emily = users.by_username('emily.larlham@mantics.org')
+        if not emily:
+            emily = users.add(
+                'emily.larlham@mantics.org',
+                'test',
+                'member',
+                realname='Emily Larlham'
+            )
+            click.secho('Created user: emily.larlham@mantics.org', fg='green')
+        else:
+            click.secho('User already exists: emily.larlham@mantics.org',
+                        fg='cyan')
+
+        zak = users.by_username('zak.george@revolution.com')
+        if not zak:
+            users.add(
+                'zak.george@revolution.com',
+                'test',
+                'member',
+                realname='Zak George'
+            )
+            click.secho('Created user: zak.george@revolution.com', fg='green')
+        else:
+            click.secho('User already exists: zak.george@revolution.com',
+                        fg='cyan')
+
+        # Create activities
+        activities = VacationActivityCollection(session)
+        dog_training = activities.add(
+            title='Hundetraining',
+            username='admin@example.org')
+        click.secho('Created activity: Hundetraining', fg='green')
+        dog_training.state = 'accepted'
+
+        dance = activities.add(
+            title='Tanzen',
+            username='admin@example.org')
+        click.secho('Created activity: Tanzen', fg='green')
+        dance.state = 'accepted'
+
+        # Create occasions
+        occasions = OccasionCollection(session)
+
+        occasions.add(
+            activity=dog_training,
+            start=datetime.combine(execution[0], now.time()),
+            end=datetime.combine(
+                execution[0], (now + timedelta(hours=3)).time()),
+            timezone='Europe/Zurich',
+            period=period
+        )
+        click.secho('Created occasion: Hundetraining', fg='green')
+
+        occasions.add(
+            activity=dance,
+            start=datetime.combine(execution[0], now.time()),
+            end=datetime.combine(
+                execution[0], (now + timedelta(hours=3)).time()),
+            timezone='Europe/Zurich',
+            period=period
+        )
+        click.secho('Created occasion: Tanzen', fg='green')
+
+    return create_period

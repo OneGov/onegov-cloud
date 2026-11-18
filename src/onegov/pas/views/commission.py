@@ -140,7 +140,7 @@ def commissions_parliamentarians_json(
 
         # Get commission IDs where this parliamentarian is a member
         parliamentarian_commission_ids = {
-            str(m.commission_id)
+            m.commission_id.hex
             for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
                 on_date=today,
             )
@@ -150,7 +150,7 @@ def commissions_parliamentarians_json(
         valid_memberships = (
             m for m in memberships
             if m.parliamentarian
-            and str(m.commission_id) in parliamentarian_commission_ids
+            and m.commission_id.hex in parliamentarian_commission_ids
         )
     # If user is commission_president, filter to only their commissions
     elif (hasattr(request.identity, 'role')
@@ -164,7 +164,7 @@ def commissions_parliamentarians_json(
 
         # Get commission IDs where this user is president
         president_commission_ids = {
-            str(m.commission_id)
+            m.commission_id.hex
             for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
                 on_date=today,
                 role='president',
@@ -175,14 +175,14 @@ def commissions_parliamentarians_json(
         valid_memberships = (
             m for m in memberships
             if m.parliamentarian
-            and str(m.commission_id) in president_commission_ids
+            and m.commission_id.hex in president_commission_ids
         )
     else:
         # Admin gets all commissions
         valid_memberships = (m for m in memberships if m.parliamentarian)
 
     def key_func(m: PASCommissionMembership) -> str:
-        return str(m.commission_id)
+        return m.commission_id.hex
 
     # Note: Iterable passed into groupby needs to be sorted
     sorted_memberships = sorted(valid_memberships, key=key_func)
@@ -190,7 +190,7 @@ def commissions_parliamentarians_json(
     return {
         commission_id: [
             {
-                'id': str(m.parliamentarian.id),
+                'id': m.parliamentarian.id.hex,
                 'title': m.parliamentarian.title
             }
             for m in group

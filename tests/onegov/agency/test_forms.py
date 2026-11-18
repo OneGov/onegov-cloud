@@ -17,6 +17,7 @@ from onegov.user import UserGroupCollection
 from tempfile import TemporaryFile
 from tests.shared.utils import encode_map_value
 from unittest.mock import MagicMock
+from wtforms import SelectChoice
 
 
 from typing import Any, TYPE_CHECKING
@@ -151,9 +152,9 @@ def test_extended_agency_form(agency_app: AgencyApp) -> None:
     assert form.title.data == 'Springfield Hospital'
     assert form.portrait.data == 'Springfield Hospital is hospital.'
     assert form.export_fields.data == ['person.first_name', 'person.last_name']
-    assert form.export_fields.choices[:2] == [  # type: ignore[index]
-        ('person.first_name', 'Person: First Name'),
-        ('person.last_name', 'Person: Last Name')
+    assert form.export_fields.choices[:2] == [
+        SelectChoice('person.first_name', 'Person: First Name'),
+        SelectChoice('person.last_name', 'Person: Last Name')
     ]
     assert form.organigram.data['size']  # type: ignore[index]
 
@@ -166,7 +167,7 @@ def test_extended_agency_form_choices() -> None:
 
     form = ExtendedAgencyForm()
     for choice in form.export_fields.choices:
-        model, attribute = choice[0].split('.')
+        model, attribute = choice.value.split('.')
         assert hasattr(models[model], attribute)
 
 
@@ -188,61 +189,72 @@ def test_move_agency_form(session: Session) -> None:
     form = MoveAgencyForm()
 
     form.request = DummyRequest(session)
-    form.on_request()
     assert form.parent_id.choices == []
 
     form.request = DummyRequest(session, permissions={
         'ExtendedAgency': ['Private']
     })
-    form.on_request()
+    form.parent_id._choices_stale = True
     assert form.parent_id.choices == [
-        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
-        ('6', 'ç'), ('5', 'f')
+        SelectChoice('1', 'a'),
+        SelectChoice('2', 'a.1'),
+        SelectChoice('3', 'a.2'),
+        SelectChoice('4', 'a.2.1'),
+        SelectChoice('6', 'ç'),
+        SelectChoice('5', 'f')
     ]
 
     form.request = DummyRequest(session, permissions={
         'ExtendedAgencyCollection': ['Private']
     })
-    form.on_request()
+    form.parent_id._choices_stale = True
     assert form.parent_id.choices == [
-        ('root', '- Root -'),
+        SelectChoice('root', '- Root -'),
     ]
 
     form.request = DummyRequest(session, permissions=all_permissions)
-    form.on_request()
+    form.parent_id._choices_stale = True
     assert form.parent_id.choices == [
-        ('root', '- Root -'),
-        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
-        ('6', 'ç'), ('5', 'f')
+        SelectChoice('root', '- Root -'),
+        SelectChoice('1', 'a'),
+        SelectChoice('2', 'a.1'),
+        SelectChoice('3', 'a.2'),
+        SelectChoice('4', 'a.2.1'),
+        SelectChoice('6', 'ç'),
+        SelectChoice('5', 'f')
     ]
 
     # apply
     form.apply_model(agency_a)
     assert form.parent_id.choices == [
-        ('6', 'ç'), ('5', 'f')
+        SelectChoice('6', 'ç'),
+        SelectChoice('5', 'f')
     ]
 
-    form.on_request()
     form.apply_model(agency_a_2)
     assert form.parent_id.choices == [
-        ('root', '- Root -'),
-        ('2', 'a.1'),
-        ('6', 'ç'), ('5', 'f')
+        SelectChoice('root', '- Root -'),
+        SelectChoice('2', 'a.1'),
+        SelectChoice('6', 'ç'),
+        SelectChoice('5', 'f')
     ]
 
-    form.on_request()
     form.apply_model(agency_a_2_1)
     assert form.parent_id.choices == [
-        ('root', '- Root -'),
-        ('1', 'a'), ('2', 'a.1'),
-        ('6', 'ç'), ('5', 'f')
+        SelectChoice('root', '- Root -'),
+        SelectChoice('1', 'a'),
+        SelectChoice('2', 'a.1'),
+        SelectChoice('6', 'ç'),
+        SelectChoice('5', 'f')
     ]
 
-    form.on_request()
     form.apply_model(agency_f)
     assert form.parent_id.choices == [
-        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
-        ('6', 'ç')
+        SelectChoice('1', 'a'),
+        SelectChoice('2', 'a.1'),
+        SelectChoice('3', 'a.2'),
+        SelectChoice('4', 'a.2.1'),
+        SelectChoice('6', 'ç')
     ]
 
     # update
@@ -279,11 +291,12 @@ def test_membership_form(session: Session) -> None:
 
     form = MembershipForm()
     form.request = request
-    form.on_request()
-    assert form.person_id.choices == [(str(doctor.id), 'Rivera Nick')]
+    assert form.person_id.choices == [
+        SelectChoice(doctor.id.hex, 'Rivera Nick')
+    ]
 
     form = MembershipForm(DummyPostData({
-        'person_id': str(doctor.id),
+        'person_id': doctor.id.hex,
         'title': "Doctor",
         'since': "2000",
         'addition': "Surgery",
@@ -291,7 +304,7 @@ def test_membership_form(session: Session) -> None:
         'prefix': "*",
     }))
     assert form.get_useful_data() == {
-        'person_id': str(doctor.id),
+        'person_id': doctor.id,
         'title': "Doctor",
         'addition': "Surgery",
         'note': "Retired",
@@ -318,9 +331,8 @@ def test_membership_form_choices(session: Session) -> None:
     request = DummyRequest(session)
     form = MembershipForm()
     form.request = request
-    form.on_request()
 
-    assert sorted([x[1] for x in form.person_id.choices]) == [
+    assert sorted([x.label for x in form.person_id.choices]) == [
         'Rivera Nick',
         'Rivera Nick (1234)',
         'Rivera Nick (4)',
@@ -463,9 +475,10 @@ def test_apply_muation_form() -> None:
         changes={'a': 'X', 'b': 'Y', 'c': 'Z'},
         apply=MagicMock()
     )
-    form.on_request()
     assert form.changes.choices == [
-        ('a', 'A: X'), ('b', 'b: Y'), ('c', 'C: Z')
+        SelectChoice('a', 'A: X'),
+        SelectChoice('b', 'b: Y'),
+        SelectChoice('c', 'C: Z')
     ]
     assert form.changes.data == ['a', 'b']
 
@@ -493,13 +506,12 @@ def test_user_group_form(session: Session) -> None:
     request = DummyRequest(session)
     form = UserGroupForm()
     form.request = request
-    form.on_request()
 
     # choices
-    assert sorted([x[1] for x in form.users.choices]) == [
+    assert sorted(x.label for x in form.users.choices) == [
         'a@example.org', 'b@example.org', 'c@example.org',
     ]
-    assert sorted([x[1] for x in form.agencies.choices]) == ['a', 'a.1', 'b']
+    assert sorted(x.label for x in form.agencies.choices) == ['a', 'a.1', 'b']
 
     # apply / update
     groups = UserGroupCollection(session)
@@ -526,7 +538,7 @@ def test_user_group_form(session: Session) -> None:
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
-    assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+    assert set(form.users.data) == {user_a.id, user_b.id}
     assert set(form.agencies.data) == {str(agency_a.id), str(agency_b.id)}
     assert form.immediate_notification.data == 'yes'
 
@@ -535,7 +547,7 @@ def test_user_group_form(session: Session) -> None:
     user_c.logout_all_sessions.reset_mock()
 
     form.name.data = 'A.1'
-    form.users.data = [str(user_c.id)]
+    form.users.data = [user_c.id]
     form.agencies.data = [str(agency_a_1.id)]
     form.immediate_notification.data = 'no'
     form.update_model(group)

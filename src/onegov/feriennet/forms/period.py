@@ -13,6 +13,7 @@ from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired, Optional, NumberRange
@@ -22,7 +23,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
-    from wtforms.fields.choices import _Choice
 
 
 class PeriodSelectForm(Form):
@@ -35,9 +35,9 @@ class PeriodSelectForm(Form):
         default='0xdeadbeef')
 
     @property
-    def period_choices(self) -> list[_Choice]:
+    def period_choices(self) -> list[SelectChoice]:
         return [
-            (row.id.hex, row.title)
+            SelectChoice(row.id.hex, row.title)
             for row in (
                 BookingPeriodCollection(self.request.session).query()
                 .with_entities(BookingPeriod.id, BookingPeriod.title)
@@ -150,8 +150,8 @@ class PeriodForm(Form):
         label=_('Stop accepting bookings'),
         fieldset=_('Deadline'),
         choices=[
-            ('fix', _('At the end of the booking phase')),
-            ('rel', _('X days before each occasion')),
+            SelectChoice('fix', _('At the end of the booking phase')),
+            SelectChoice('rel', _('X days before each occasion')),
         ],
         default='fix',
     )
@@ -195,15 +195,15 @@ class PeriodForm(Form):
         label=_('How are the activities conducted?'),
         fieldset=_('Execution'),
         choices=[
-            ('no', _(
+            SelectChoice('no', _(
                 'Each attendee may book as many activites as he likes. '
                 'Each activity is billed separately.'
             )),
-            ('yes', _(
+            SelectChoice('yes', _(
                 'Each attendee may attend a limited number of activites '
                 'for a fixed price.'
             )),
-            ('fixed', _(
+            SelectChoice('fixed', _(
                 'Each attendee may attend a fixed number of activites. '
                 'Each activity is billed separately.'
             )),
@@ -255,11 +255,11 @@ class PeriodForm(Form):
         label=_('How is the organiser paid?'),
         fieldset=_('Execution'),
         choices=[
-            ('indirect', _(
+            SelectChoice('indirect', _(
                 'The parents pay everything by bill, '
                 'the organisers are paid later'
             )),
-            ('direct', _(
+            SelectChoice('direct', _(
                 'The parents pay the pass by bill, the organisers are paid in '
                 'cash at the beginning of each occasion'
             ))
@@ -283,8 +283,8 @@ class PeriodForm(Form):
         label=_('Attendees are limited to one activity per day'),
         fieldset=_('Bookings'),
         choices=[
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ],
         default='no'
     )
@@ -293,9 +293,9 @@ class PeriodForm(Form):
         label=_('Allow members to cancel confirmed bookings'),
         fieldset=_('Cancellation Deadline'),
         choices=[
-            ('no', _('No, only allow admins')),
-            ('fix', _('Until a fixed day')),
-            ('rel', _('Up to X days before each occasion')),
+            SelectChoice('no', _('No, only allow admins')),
+            SelectChoice('fix', _('Until a fixed day')),
+            SelectChoice('rel', _('Up to X days before each occasion')),
         ],
         default='no',
     )
@@ -321,11 +321,11 @@ class PeriodForm(Form):
         label=_('Method'),
         fieldset=_('Age check'),
         choices=[
-            ('exact', _(
+            SelectChoice('exact', _(
                 'Exact - the attendees need to be of the expected age '
                 'at the beginning of the occasion'
             )),
-            ('year', _(
+            SelectChoice('year', _(
                 'Age group - The attendees need to be of the expected '
                 'age sometime during the year of the occasion'
             )),

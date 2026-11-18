@@ -8,6 +8,7 @@ from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Municipality
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 from wtforms.validators import InputRequired
 
 
@@ -23,7 +24,7 @@ def test_election_form_on_request(session: Session) -> None:
     form.request.default_locale = 'de_CH'
     form.request.app.principal = Canton(name='zg', canton='zg')  # type: ignore[misc]
     form.on_request()
-    assert [x[0] for x in form.domain.choices] == [
+    assert [x.value for x in form.domain.choices] == [
         'federation', 'canton', 'none', 'municipality'
     ]
     assert form.region.choices == []
@@ -39,7 +40,7 @@ def test_election_form_on_request(session: Session) -> None:
     form.request.default_locale = 'fr_CH'
     form.request.app.principal = Canton(name='sg', canton='sg')  # type: ignore[misc]
     form.on_request()
-    assert [x[0] for x in form.domain.choices] == [
+    assert [x.value for x in form.domain.choices] == [
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
     assert form.region.choices == []
@@ -55,7 +56,7 @@ def test_election_form_on_request(session: Session) -> None:
     form.request.default_locale = 'it_CH'
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
-    assert [x[0] for x in form.domain.choices] == [
+    assert [x.value for x in form.domain.choices] == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
     assert len(form.region.choices) == 39
@@ -74,12 +75,12 @@ def test_election_form_on_request(session: Session) -> None:
         canton='be', canton_name='Kanton Bern'
     )
     form.on_request()
-    assert [x[0] for x in form.domain.choices] == [
+    assert [x.value for x in form.domain.choices] == [
         'federation', 'canton', 'municipality'
     ]
     assert form.region.choices == []
     assert form.district.choices == []
-    assert form.municipality.choices == [('bern', 'bern')]
+    assert form.municipality.choices == [SelectChoice('bern', 'bern')]
     assert form.title_de.validators == []
     assert form.title_fr.validators == []
     assert form.title_it.validators == []
@@ -409,12 +410,12 @@ def test_election_form_relations(session: Session) -> None:
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_elections_historical.choices == [
-        ('second-election', '02.01.2011 Second Election'),
-        ('first-election', '01.01.2011 First Election'),
+        SelectChoice('second-election', '02.01.2011 Second Election'),
+        SelectChoice('first-election', '01.01.2011 First Election'),
     ]
     assert form.related_elections_other.choices == [
-        ('second-election', '02.01.2011 Second Election'),
-        ('first-election', '01.01.2011 First Election'),
+        SelectChoice('second-election', '02.01.2011 Second Election'),
+        SelectChoice('first-election', '01.01.2011 First Election'),
     ]
 
     form.title_de.data = 'Third Election'
@@ -436,14 +437,14 @@ def test_election_form_relations(session: Session) -> None:
     form.request.app.principal = Canton(name='gr', canton='gr')  # type: ignore[misc]
     form.on_request()
     assert form.related_elections_historical.choices == [
-        ('third-election', '03.01.2011 SC Third Election'),
-        ('second-election', '02.01.2011 Second Election'),
-        ('first-election', '01.01.2011 First Election'),
+        SelectChoice('third-election', '03.01.2011 SC Third Election'),
+        SelectChoice('second-election', '02.01.2011 Second Election'),
+        SelectChoice('first-election', '01.01.2011 First Election'),
     ]
     assert form.related_elections_other.choices == [
-        ('third-election', '03.01.2011 SC Third Election'),
-        ('second-election', '02.01.2011 Second Election'),
-        ('first-election', '01.01.2011 First Election'),
+        SelectChoice('third-election', '03.01.2011 SC Third Election'),
+        SelectChoice('second-election', '02.01.2011 Second Election'),
+        SelectChoice('first-election', '01.01.2011 First Election'),
     ]
     form.apply_model(election)
     assert form.related_elections_historical.data == ['third-election']

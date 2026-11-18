@@ -16,6 +16,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import TranslatablePage
 from tests.shared.utils import use_locale
+from wtforms import SelectChoice
 from xlsxwriter.workbook import Workbook
 
 
@@ -310,31 +311,31 @@ def test_search_form(swissvotes_app: TestApp) -> None:
     form.on_request()
 
     assert form.legal_form.choices == [
-        (1, 'Mandatory referendum'),
-        (2, 'Optional referendum'),
-        (3, 'Popular initiative'),
-        (4, 'Direct counter-proposal'),
-        (5, 'Tie-breaker'),
+        SelectChoice('1', 'Mandatory referendum'),
+        SelectChoice('2', 'Optional referendum'),
+        SelectChoice('3', 'Popular initiative'),
+        SelectChoice('4', 'Direct counter-proposal'),
+        SelectChoice('5', 'Tie-breaker'),
     ]
     assert form.result.choices == [
-        (0, 'Rejected'),
-        (1, 'Accepted')
+        SelectChoice('0', 'Rejected'),
+        SelectChoice('1', 'Accepted')
     ]
     assert form.position_federal_council.choices == [
-        (1, 'Accepting'),
-        (2, 'Rejecting'),
-        (3, 'None'),
-        (-1, 'Missing'),
+        SelectChoice('1', 'Accepting'),
+        SelectChoice('2', 'Rejecting'),
+        SelectChoice('3', 'None'),
+        SelectChoice('-1', 'Missing'),
     ]
     assert form.position_national_council.choices == [
-        (1, 'Accepting'),
-        (2, 'Rejecting'),
-        (3, 'None'),
+        SelectChoice('1', 'Accepting'),
+        SelectChoice('2', 'Rejecting'),
+        SelectChoice('3', 'None'),
     ]
     assert form.position_council_of_states.choices == [
-        (1, 'Accepting'),
-        (2, 'Rejecting'),
-        (3, 'None'),
+        SelectChoice('1', 'Accepting'),
+        SelectChoice('2', 'Rejecting'),
+        SelectChoice('3', 'None'),
     ]
     assert form.policy_area.choices == []
 
@@ -386,22 +387,22 @@ def test_search_form(swissvotes_app: TestApp) -> None:
 
     form.on_request()
     assert form.policy_area.choices == [
-        ('4', 'd-1-4'),
-        ('4.42', 'd-2-42'),
-        ('4.42.421', 'd-3-421'),
-        ('6', 'd-1-6'),
-        ('6.61', 'd-2-61'),
-        ('6.61.614', 'd-3-614'),
-        ('7', 'd-1-7'),
-        ('7.75', 'd-2-75'),
-        ('8', 'd-1-8'),
-        ('8.87', 'd-2-87'),
-        ('9', 'd-1-9'),
-        ('9.93', 'd-2-93'),
-        ('10', 'd-1-10'),
-        ('10.103', 'd-2-103'),
-        ('10.103.1033', 'd-3-1033'),
-        ('10.103.1035', 'd-3-1035')
+        SelectChoice('4', 'd-1-4'),
+        SelectChoice('4.42', 'd-2-42'),
+        SelectChoice('4.42.421', 'd-3-421'),
+        SelectChoice('6', 'd-1-6'),
+        SelectChoice('6.61', 'd-2-61'),
+        SelectChoice('6.61.614', 'd-3-614'),
+        SelectChoice('7', 'd-1-7'),
+        SelectChoice('7.75', 'd-2-75'),
+        SelectChoice('8', 'd-1-8'),
+        SelectChoice('8.87', 'd-2-87'),
+        SelectChoice('9', 'd-1-9'),
+        SelectChoice('9.93', 'd-2-93'),
+        SelectChoice('10', 'd-1-10'),
+        SelectChoice('10.103', 'd-2-103'),
+        SelectChoice('10.103.1033', 'd-3-1033'),
+        SelectChoice('10.103.1035', 'd-3-1035')
     ]
 
     # Test apply
@@ -560,9 +561,9 @@ def test_update_external_resources_form(session: Session) -> None:
     form.request = DummyRequest(session, DummyPrincipal())  # type: ignore[assignment]
 
     assert form.resources.choices == [
-        ('mfg', 'eMuseum.ch'),
-        ('bs', 'Plakatsammlung Basel'),
-        ('sa', 'Social Archives')
+        SelectChoice('mfg', 'eMuseum.ch'),
+        SelectChoice('bs', 'Plakatsammlung Basel'),
+        SelectChoice('sa', 'Social Archives')
     ]
 
     # Validate

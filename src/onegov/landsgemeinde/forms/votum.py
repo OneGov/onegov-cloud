@@ -20,6 +20,7 @@ from onegov.people.collections.people import PersonCollection
 from sqlalchemy import func
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -30,7 +31,6 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.request import LandsgemeindeRequest
-    from wtforms.fields.choices import _Choice
 
 
 class VotumForm(NamedFileForm):
@@ -45,7 +45,10 @@ class VotumForm(NamedFileForm):
     state = RadioField(
         _('State'),
         fieldset=_('General'),
-        choices=list(STATES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in STATES.items()
+        ],
         validators=[
             InputRequired()
         ],
@@ -57,7 +60,7 @@ class VotumForm(NamedFileForm):
         label=_('Person from person directory'),
         description=_('Choosing a person will overwrite the fields below'),
         default=', , , , ',
-        choices=[(', , , , ', '...')]
+        choices=[SelectChoice(', , , , ', '...')]
     )
 
     person_name = TypeAheadField(
@@ -160,18 +163,22 @@ class VotumForm(NamedFileForm):
 
     def populate_person_choices(self) -> None:
         people = PersonCollection(self.request.session).query()
-        people_choices: list[_Choice] = [(
-            (
-                (f'{p.first_name} {p.last_name}, {p.function}, '
-                f'{p.political_party}, {p.location_code_city}, '
-                f'{p.picture_url}'),
+        people_choices = [
+            SelectChoice(
+                (
+                    f'{p.first_name} {p.last_name}, {p.function}, '
+                    f'{p.political_party}, {p.location_code_city}, '
+                    f'{p.picture_url}'
+                ),
                 f'{p.first_name} ' + ', '.join(filter(None, [
                     p.last_name,
                     p.function,
                     p.political_party,
-                    p.location_code_city])))
-        ) for p in people]
-        people_choices.insert(0, (', , , , ', '...'))
+                    p.location_code_city]))
+            )
+            for p in people
+        ]
+        people_choices.insert(0, SelectChoice(', , , , ', '...'))
         self.person_choices.choices = people_choices
 
     def on_request(self) -> None:

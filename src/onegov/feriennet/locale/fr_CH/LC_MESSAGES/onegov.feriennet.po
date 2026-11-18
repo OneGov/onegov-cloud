@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-08 07:39+0200\n"
+"POT-Creation-Date: 2026-11-02 09:28+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -443,8 +443,8 @@ msgstr "Aperçu (pas soumis)"
 msgid "Proposed"
 msgstr "Soumis"
 
-#. users like the term 'Published' better
 #.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Publié"
 
@@ -717,8 +717,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -861,6 +861,13 @@ msgstr "Montant invalide"
 
 msgid "Children of organisers"
 msgstr "Enfants des organisateurs/prestataires"
+
+msgid ""
+"Only individuals who offer at least one event during the current period are "
+"considered organizers."
+msgstr ""
+"Seules les personnes proposant au moins une manifestation au cours de la "
+"période actuelle sont considérées comme organisateurs.
 
 msgid "Prefer the following children:"
 msgstr "Priorité aux enfants suivants :"
@@ -1892,16 +1899,6 @@ msgstr "Réservations illimitées"
 
 msgid "Booked"
 msgstr "Réservé"
-
-msgid "These wishes overlap accepted bookings and are therefore blocked."
-msgstr ""
-"Ces souhaits sont bloqués car ils coïncident avec des réservations déjà "
-"confirmées."
-
-msgid "Unfortunately, these wishes could not be fulfilled."
-msgstr ""
-"Ces souhaits n’ont malheureusement pas pu être confirmés lors de "
-"l’attribution."
 
 msgid "Free of charge"
 msgstr "Inclus ou gratuit"
@@ -3486,6 +3483,16 @@ msgstr "${count} e-mails envoyés avec succès"
 
 msgid "The submitter email is not available"
 msgstr "L'e-mail de l'expéditeur n'est pas disponible"
+
+#~ msgid "These wishes overlap accepted bookings and are therefore blocked."
+#~ msgstr ""
+#~ "Ces souhaits sont bloqués car ils coïncident avec des réservations déjà "
+#~ "confirmées."
+
+#~ msgid "Unfortunately, these wishes could not be fulfilled."
+#~ msgstr ""
+#~ "Ces souhaits n’ont malheureusement pas pu être confirmés lors de "
+#~ "l’attribution."
 
 #~ msgid "No activities needing volunteers found."
 #~ msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."

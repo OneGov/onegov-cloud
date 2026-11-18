@@ -3,7 +3,9 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.utils import coerce_uuid
 from sqlalchemy import func
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
@@ -24,6 +26,40 @@ def duplicates[T](iterable: Iterable[T]) -> set[T]:
     return duplicates
 
 
+def person_id_choices(
+    form: MembershipForm,
+    field: ChosenSelectField
+) -> list[SelectChoice]:
+    ambiguous = duplicates(
+        name for name, in form.request.session.query(
+            func.concat(
+                ExtendedPerson.last_name, ' ', ExtendedPerson.first_name
+            )
+        )
+    )
+
+    def title(person: ExtendedPerson) -> str:
+        if person.title in ambiguous:
+            info = (
+                person.phone_direct
+                or person.phone
+                or person.email
+                or person.postal_address
+            )
+            if info:
+                return f'{person.title} ({info})'
+            memberships = person.memberships_by_agency
+            if memberships:
+                return f'{person.title} ({memberships[0].agency.title})'
+
+        return person.title
+
+    return [
+        SelectChoice(p.id.hex, title(p))
+        for p in ExtendedPersonCollection(form.request.session).query()
+    ]
+
+
 class MembershipForm(Form):
     """ Form to edit memberships of an organization. """
 
@@ -36,7 +72,8 @@ class MembershipForm(Form):
 
     person_id = ChosenSelectField(
         label=_('Person'),
-        choices=[],
+        choices=person_id_choices,
+        coerce=coerce_uuid,
         validators=[
             InputRequired()
         ]
@@ -61,34 +98,3 @@ class MembershipForm(Form):
     def validate_title(self, field: StringField) -> None:
         if field.data and not field.data.strip():
             raise ValidationError(_('This field is required.'))
-
-    def on_request(self) -> None:
-
-        ambiguous = duplicates(
-            name for name, in self.request.session.query(
-                func.concat(
-                    ExtendedPerson.last_name, ' ', ExtendedPerson.first_name
-                )
-            )
-        )
-
-        def title(person: ExtendedPerson) -> str:
-            if person.title in ambiguous:
-                info = (
-                    person.phone_direct
-                    or person.phone
-                    or person.email
-                    or person.postal_address
-                )
-                if info:
-                    return f'{person.title} ({info})'
-                memberships = person.memberships_by_agency
-                if memberships:
-                    return f'{person.title} ({memberships[0].agency.title})'
-
-            return person.title
-
-        self.person_id.choices = [
-            (str(p.id), title(p))
-            for p in ExtendedPersonCollection(self.request.session).query()
-        ]

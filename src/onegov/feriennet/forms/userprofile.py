@@ -7,6 +7,7 @@ from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.form.validators import Stdnum
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -47,14 +48,22 @@ class UserProfileForm(Form):
         default='weekly',
         validators=[InputRequired()],
         choices=(
-            ('daily', _(
-                'Daily (exluding the weekend)')),
-            ('weekly', _(
-                'Weekly (on mondays)')),
-            ('monthly', _(
-                'Monthly (on first monday of the month)')),
-            ('never', _(
-                'Never')),
+            SelectChoice(
+                'daily',
+                _('Daily (exluding the weekend)')
+            ),
+            SelectChoice(
+                'weekly',
+                _('Weekly (on mondays)')
+            ),
+            SelectChoice(
+                'monthly',
+                _('Monthly (on first monday of the month)')
+            ),
+            SelectChoice(
+                'never',
+                _('Never')
+            ),
         )
     )
 
@@ -62,8 +71,8 @@ class UserProfileForm(Form):
         label=_('Salutation'),
         fieldset=_('Personal'),
         choices=[
-            ('mr', _('Mr.')),
-            ('ms', _('Ms.')),
+            SelectChoice('mr', _('Mr.')),
+            SelectChoice('ms', _('Ms.')),
         ],
         validators=[InputRequired()]
     )

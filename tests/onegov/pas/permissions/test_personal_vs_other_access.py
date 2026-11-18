@@ -432,11 +432,11 @@ def test_commission_president_can_add_for_commission_members(
     assert 'Member' in form_page
     assert 'Follower' in form_page
 
-    form_page.form['parliamentarian_id'] = str(member_id)
+    form_page.form['parliamentarian_id'] = member_id.hex
     form_page.form['date'] = date.today().isoformat()
     form_page.form['duration'] = '2.0'
     form_page.form['type'] = 'commission'
-    form_page.form['commission_id'] = str(commission_id)
+    form_page.form['commission_id'] = commission_id.hex
 
     response = form_page.form.submit()
     assert 'Das Formular enthält Fehler' not in response

@@ -9,13 +9,16 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
+from onegov.form.utils import coerce_uuid
 from onegov.org import _, log
 from onegov.reservation import Resource
 from onegov.ticket import handlers, Ticket, TicketPermission
 from onegov.user import Auth, User, UserCollection, UserGroup
+from operator import attrgetter
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
@@ -27,7 +30,6 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from onegov.org.request import OrgRequest
     from onegov.user.auth.second_factor import AnySecondFactor
-    from wtforms.fields.choices import _Choice
     from wtforms.meta import _MultiDictLike
 
 
@@ -52,15 +54,18 @@ class ManageUserForm(Form):
         fieldset=_('General'),
         default='active',
         choices=(
-            ('active', _('Active')),
-            ('inactive', _('Inactive'))
+            SelectChoice('active', _('Active')),
+            SelectChoice('inactive', _('Inactive'))
         ),
     )
 
     role = RadioField(
         label=_('Role'),
         fieldset=_('General'),
-        choices=AVAILABLE_ROLES,
+        choices=[
+            SelectChoice(value, label)
+            for value, label in AVAILABLE_ROLES
+        ],
         default='member',
     )
 
@@ -89,9 +94,9 @@ class ManageUserForm(Form):
         # hide roles that are not configured for the current app
         roles_setting = self.request.app.settings.roles
         self.role.choices = [
-            (role, label)
-            for role, label in AVAILABLE_ROLES
-            if hasattr(roles_setting, role)
+            choice
+            for choice in self.role.choices
+            if hasattr(roles_setting, choice.value)
         ]
         self.request.include('tags-input')
 
@@ -292,6 +297,65 @@ else:
     NewUserForm = merge_forms(PartialNewUserForm, ManageUserForm)
 
 
+def ticket_choices(
+    form: ManageUserGroupForm,
+    field: ChosenSelectMultipleField
+) -> list[SelectChoice]:
+    labels = {
+        key: handlers.code_label(form.request, key)
+        for key in handlers.registry.keys()
+    }
+    ticket_choices = [
+        SelectChoice(value, label)
+        for value, label in labels.items()
+    ]
+    ticket_choices.extend(
+        SelectChoice(f'DIR-{group}', f'{labels["DIR"]}: {group}')
+        for group, in form.request.session.query(
+            Directory.title.label('group')
+        # some groups may get deleted, but as long as there are tickets
+        # we need a corresponding permission
+        ).union(
+            form.request.session.query(
+                Ticket.group.label('group')
+            )
+            .filter(Ticket.handler_code == 'DIR')
+            .filter(Ticket.group.isnot(None))
+            .distinct()
+        ).order_by('group').distinct()
+    )
+    ticket_choices.extend(
+        SelectChoice(f'FRM-{group}', f'{labels["FRM"]}: {group}')
+        for group, in form.request.session.query(
+            FormDefinition.title.label('group')
+        # some groups may get deleted, but as long as there are tickets
+        # we need a corresponding permission
+        ).union(
+            form.request.session.query(Ticket.group.label('group'))
+            .filter(Ticket.handler_code == 'FRM')
+            .filter(Ticket.group.isnot(None))
+            .distinct()
+        ).order_by('group').distinct()
+    )
+    ticket_choices.extend(
+        SelectChoice(f'RSV-{group}', f'{labels["RSV"]}: {group}')
+        for group, in form.request.session.query(
+            Resource.title.label('group')
+        # some groups may get deleted, but as long as there are tickets
+        # we need a corresponding permission
+        ).union(
+            form.request.session.query(
+                Ticket.group.label('group')
+            )
+            .filter(Ticket.handler_code == 'RSV')
+            .filter(Ticket.group.isnot(None))
+            .distinct()
+        ).order_by('group').distinct()
+    )
+    ticket_choices.sort(key=attrgetter('value'))
+    return ticket_choices
+
+
 class ManageUserGroupForm(Form):
 
     if TYPE_CHECKING:
@@ -306,7 +370,11 @@ class ManageUserGroupForm(Form):
 
     users = ChosenSelectMultipleField(
         label=_('Users'),
-        choices=[],
+        choices=lambda form, field: [
+            SelectChoice(u.id.hex, u.title)
+            for u in UserCollection(form.request.session).query()
+        ],
+        coerce=coerce_uuid
     )
 
     ticket_permissions = ChosenSelectMultipleField(
@@ -314,7 +382,7 @@ class ManageUserGroupForm(Form):
         description=_(
             'Restricts access and gives permission to these ticket categories'
         ),
-        choices=[],
+        choices=ticket_choices,
     )
 
     immediate_notification = ChosenSelectMultipleField(
@@ -325,7 +393,7 @@ class ManageUserGroupForm(Form):
             'Also gives permission to these ticket categories, '
             'but does not restrict access to other groups.'
         ),
-        choices=[],
+        choices=lambda form, field: form.ticket_permissions.choices[:],
     )
 
     shared_email = StringField(
@@ -337,64 +405,6 @@ class ManageUserGroupForm(Form):
             'one kind of ticket.'
         )
     )
-
-    def on_request(self) -> None:
-        self.users.choices = [
-            (str(u.id), u.title)
-            for u in UserCollection(self.request.session).query()
-        ]
-        labels = {
-            key: handlers.code_label(self.request, key)
-            for key in handlers.registry.keys()
-        }
-        ticket_choices: list[_Choice] = list(labels.items())
-        ticket_choices.extend(
-            (f'DIR-{group}', f'{labels["DIR"]}: {group}')
-            for group, in self.request.session.query(
-                Directory.title.label('group')
-            # some groups may get deleted, but as long as there are tickets
-            # we need a corresponding permission
-            ).union(
-                self.request.session.query(
-                    Ticket.group.label('group')
-                )
-                .filter(Ticket.handler_code == 'DIR')
-                .filter(Ticket.group.isnot(None))
-                .distinct()
-            ).order_by('group').distinct()
-        )
-        ticket_choices.extend(
-            (f'FRM-{group}', f'{labels["FRM"]}: {group}')
-            for group, in self.request.session.query(
-                FormDefinition.title.label('group')
-            # some groups may get deleted, but as long as there are tickets
-            # we need a corresponding permission
-            ).union(
-                self.request.session.query(Ticket.group.label('group'))
-                .filter(Ticket.handler_code == 'FRM')
-                .filter(Ticket.group.isnot(None))
-                .distinct()
-            ).order_by('group').distinct()
-        )
-        ticket_choices.extend(
-            (f'RSV-{group}', f'{labels["RSV"]}: {group}')
-            for group, in self.request.session.query(
-                Resource.title.label('group')
-            # some groups may get deleted, but as long as there are tickets
-            # we need a corresponding permission
-            ).union(
-                self.request.session.query(
-                    Ticket.group.label('group')
-                )
-                .filter(Ticket.handler_code == 'RSV')
-                .filter(Ticket.group.isnot(None))
-                .distinct()
-            ).order_by('group').distinct()
-        )
-        ticket_choices.sort()
-        self.ticket_permissions.choices = ticket_choices
-        if isinstance(self.immediate_notification, ChosenSelectMultipleField):
-            self.immediate_notification.choices = ticket_choices[:]
 
     @property
     def exclusive_permissions(self) -> set[tuple[str, str | None]]:
@@ -419,8 +429,8 @@ class ManageUserGroupForm(Form):
         session = self.request.session
 
         # Logout the new and old users
-        user_ids = {str(r.id) for r in model.users.with_entities(User.id)}
-        user_ids |= set(self.users.data or ())
+        user_ids = {r.id for r in model.users.with_entities(User.id)}
+        user_ids.update(self.users.data or ())
         users = UserCollection(session).query()
         users = users.filter(User.id.in_(user_ids))
         for user in users:
@@ -485,7 +495,7 @@ class ManageUserGroupForm(Form):
 
     def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
-        self.users.data = [str(u.id) for u in model.users]
+        self.users.data = [u.id for u in model.users]
         self.ticket_permissions.data = [
             f'{permission.handler_code}-{permission.group}'
             if permission.group else permission.handler_code

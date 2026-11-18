@@ -18,6 +18,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -31,7 +32,6 @@ from wtforms.validators import ValidationError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.request import ElectionDayRequest
-    from wtforms.fields.choices import _Choice
 
 
 class ElectionForm(Form):
@@ -66,8 +66,14 @@ class ElectionForm(Form):
         label=_('System'),
         fieldset=_('Properties'),
         choices=[
-            ('majorz', _('Election based on the simple majority system')),
-            ('proporz', _('Election based on proportional representation')),
+            SelectChoice(
+                'majorz',
+                _('Election based on the simple majority system')
+            ),
+            SelectChoice(
+                'proporz',
+                _('Election based on proportional representation')
+            ),
         ],
         validators=[
             InputRequired()
@@ -79,8 +85,8 @@ class ElectionForm(Form):
         label=_('Majority Type'),
         fieldset=_('Properties'),
         choices=[
-            ('absolute', _('Absolute')),
-            ('relative', _('Relative')),
+            SelectChoice('absolute', _('Absolute')),
+            SelectChoice('relative', _('Relative')),
         ],
         default='absolute',
         validators=[
@@ -396,7 +402,7 @@ class ElectionForm(Form):
         principal = self.request.app.principal
 
         self.domain.choices = [
-            (key, self.request.translate(text))
+            SelectChoice(key, self.request.translate(text))
             for key, text in principal.domains_election.items()
         ]
 
@@ -407,7 +413,7 @@ class ElectionForm(Form):
 
         self.region.label.text = principal.label('region')
         self.region.choices = [
-            (item, item) for item in sorted({
+            SelectChoice(item) for item in sorted({
                 r for entity in year_entities.values()
                 for r in (entity.get('region'),) if r
             })
@@ -415,21 +421,22 @@ class ElectionForm(Form):
 
         self.district.label.text = principal.label('district')
         self.district.choices = [
-            (item, item) for item in sorted({
+            SelectChoice(item) for item in sorted({
                 d for entity in year_entities.values()
                 for d in (entity.get('district'),) if d
             })
         ]
 
-        self.municipality.choices = [
-            (item, item) for item in sorted({
-                m for entity in year_entities.values()
-                for m in (entity.get('name'),) if m
-            })
-        ]
         if principal.domain == 'municipality':
             assert principal.name is not None
-            self.municipality.choices = [(principal.name, principal.name)]
+            self.municipality.choices = [SelectChoice(principal.name)]
+        else:
+            self.municipality.choices = [
+                SelectChoice(item) for item in sorted({
+                    m for entity in year_entities.values()
+                    for m in (entity.get('name'),) if m
+                })
+            ]
 
         self.title_de.validators = []
         self.title_fr.validators = []
@@ -449,8 +456,8 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices: list[_Choice] = [
-            (
+        choices = [
+            SelectChoice(
                 election.id,
                 '{} {} {}'.format(
                     layout.format_date(election.date, 'date'),
@@ -635,23 +642,29 @@ class ElectionForm(Form):
 
         if model.type == 'majorz':
             self.type.choices = [
-                ('majorz', _('Election based on the simple majority system'))
+                SelectChoice(
+                    'majorz',
+                    _('Election based on the simple majority system')
+                )
             ]
             self.type.data = 'majorz'
 
         else:
             self.type.choices = [
-                ('proporz', _('Election based on proportional representation'))
+                SelectChoice(
+                    'proporz',
+                    _('Election based on proportional representation')
+                )
             ]
             self.type.data = 'proporz'
 
         self.related_elections_historical.choices = [
             choice for choice in self.related_elections_historical.choices
-            if choice[0] != model.id
+            if choice.value != model.id
         ]
         self.related_elections_other.choices = [
             choice for choice in self.related_elections_other.choices
-            if choice[0] != model.id
+            if choice.value != model.id
         ]
         self.related_elections_historical.data = [
             association.target_id for association in model.related_elections

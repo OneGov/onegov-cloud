@@ -4,6 +4,7 @@ from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from wtforms.fields import SelectChoice
 from wtforms.validators import InputRequired
 
 
@@ -33,13 +34,14 @@ class TriggerNotificationForm(Form):
 
         principal = self.request.app.principal
 
-        self.notifications.choices = []
+        choices = []
         if principal.email_notification:
-            self.notifications.choices.append(('email', _('Email')))
+            choices.append(SelectChoice('email', _('Email')))
         if principal.sms_notification:
-            self.notifications.choices.append(('sms', _('SMS')))
+            choices.append(SelectChoice('sms', _('SMS')))
         if principal.webhooks:
-            self.notifications.choices.append(('webhooks', _('Webhooks')))
+            choices.append(SelectChoice('webhooks', _('Webhooks')))
+        self.notifications.choices = choices
 
 
 class TriggerNotificationsForm(TriggerNotificationForm):
@@ -150,14 +152,14 @@ class TriggerNotificationsForm(TriggerNotificationForm):
 
         session = self.request.session
         self.elections.choices = [
-            (election.id, election.title or election.id)
+            SelectChoice(election.id, election.title or election.id)
             for election in self.available_elections(session)
         ]
         self.election_compounds.choices = [
-            (compound.id, compound.title or compound.id)
+            SelectChoice(compound.id, compound.title or compound.id)
             for compound in self.available_election_compounds(session)
         ]
         self.votes.choices = [
-            (vote.id, vote.title or vote.id)
+            SelectChoice(vote.id, vote.title or vote.id)
             for vote in self.available_votes(session)
         ]

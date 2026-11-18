@@ -5288,6 +5288,67 @@ def test_allocation_rules_with_school_holidays(client: Client) -> None:
     assert count_allocations() == 701
 
 
+def test_allocation_rules_extend_on(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/holiday-settings')
+    page.form['school_holidays'] = (
+        '01.03.2019 - 15.03.2019\n06.03.2020 - 20.03.2020'
+    )
+    page.form.submit()
+
+    resources = client.get('/resources')
+    page = resources.click('Tageskarte', index=0)
+    page.form['title'] = 'Daypass'
+    page.form.submit()
+
+    def count_allocations() -> int:
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return sum(
+            1
+            for slot in client.get(
+                f'/resource/daypass/slots?start={s}&end={e}'
+            ).json
+            if slot['kind'] == 'allocation'
+        )
+
+    def run_cronjob() -> None:
+        client.get('/resource/daypass/process-rules')
+
+    page = (
+        client.get('/resource/daypass')
+        .click('Verfügbarkeitszeiträume')
+        .click('Verfügbarkeitszeitraum')
+    )
+    page.form['title'] = 'Jährlich'
+    page.form['extend'] = 'yearly_scheduled'
+    page.form['extend_on'] = '2019-10-31'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-12-31'
+    page.form['daypasses'] = '1'
+    page.form['daypasses_limit'] = '1'
+    page.form['during_school_holidays'] = 'no'
+    with freeze_time('2019-01-31 22:00:00'):
+        page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 350
+
+    # running the cronjob on an ordinary day will not change anything
+    with freeze_time('2019-01-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 350
+
+    # only run just before the scheduled date does work
+    with freeze_time('2019-10-30 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 701
+
+
 @freeze_time('2019-08-01', tick=True)
 def test_zipcode_block(client: Client) -> None:
     client.login_admin()

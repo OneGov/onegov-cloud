@@ -627,6 +627,7 @@ class ExtendedDirectoryEntryCollection(
         published_only: bool = False,
         past_only: bool = False,
         upcoming_only: bool = False,
+        exclude_mtan_protected: bool = False,
         # FIXME: Consider making this required, since it's more reliable
         #        than filtering access after the fact, for now we'll only
         #        use it in the API.
@@ -638,6 +639,7 @@ class ExtendedDirectoryEntryCollection(
         self.published_only = published_only
         self.past_only = past_only
         self.upcoming_only = upcoming_only
+        self.exclude_mtan_protected = exclude_mtan_protected
 
     if TYPE_CHECKING:
         directory: ExtendedDirectory
@@ -684,6 +686,8 @@ class ExtendedDirectoryEntryCollection(
                 *(
                     self.model_class.meta['access'].astext == access
                     for access in available_accesses
+                    if not self.exclude_mtan_protected
+                    or access != 'mtan'
                 ),
                 self.model_class.meta['access'].is_(None)
             ))

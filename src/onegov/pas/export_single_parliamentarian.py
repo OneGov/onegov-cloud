@@ -146,6 +146,9 @@ def generate_parliamentarian_settlement_pdf(
     }
 
     for entry in data['entries']:
+        # By requirement, zero bookings appear only in the Excel control list.
+        if entry.adjusted_rate == 0:
+            continue
         html += f"""
             <tr>
                 <td>{entry.date.strftime('%d.%m.%Y')}</td>
@@ -166,6 +169,9 @@ def generate_parliamentarian_settlement_pdf(
             allowance.amount,
             rate_set.cost_of_living_adjustment,
         )
+        # The PDF exclusion of zero bookings also applies to allowances.
+        if compensation.adjusted == 0:
+            continue
         allowance_total += compensation.adjusted
         html += f"""
             <tr>

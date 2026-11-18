@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-10-22 13:13+0200\n"
+"POT-Creation-Date: 2026-10-29 16:05+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -428,6 +428,12 @@ msgstr "Prolonger d'un mois à la fin du mois"
 
 msgid "Extend by one year at the end of the year"
 msgstr "Prolonger d'un an à la fin de l'année"
+
+msgid "Extend by one year at a given date"
+msgstr "Prolonger d'un an à une date donnée"
+
+msgid "Extend on"
+msgstr "Prolonger à"
 
 msgid "Start"
 msgstr "Début"
@@ -3826,9 +3832,6 @@ msgstr "Des réservations existantes sont associées à cette ressource"
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
 
-msgid "This event has been imported. Once saved, it will no longer be updated by the import."
-msgstr "Cet événement a été importé. Une fois enregistré, il ne sera plus mis à jour par l'importation."
-
 msgid "Do you really want to delete this event?"
 msgstr "Voulez-vous vraiment supprimer cet événement ?"
 
@@ -5091,6 +5094,9 @@ msgstr "Chargement des sujets..."
 msgid "Skip navigation"
 msgstr "Ignorez la navigation"
 
+msgid "Close menu"
+msgstr "Fermer le menu"
+
 msgid "Straight to ..."
 msgstr "Directement à ..."
 
@@ -5106,6 +5112,9 @@ msgstr "Chercher"
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
+
+msgid "Sidebar"
+msgstr "Encadré"
 
 msgid "Healthy"
 msgstr "Santé"
@@ -7365,6 +7374,13 @@ msgstr "Votre demande n'a pas pu être traitée automatiquement."
 msgid "Thank you for your submission!"
 msgstr "Merci pour votre contribution !"
 
+msgid ""
+"This event has been imported. Once saved, it will no longer be updated by "
+"the import."
+msgstr ""
+"Cet événement a été importé. Une fois enregistré, il ne sera plus mis à jour "
+"par l'importation."
+
 msgid "Your event was rejected"
 msgstr "Votre événement a été rejeté"
 
@@ -8071,8 +8087,8 @@ msgstr ""
 "Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
 "qu'elle aura été traitée."
 
-#. We adjust the wording for users that do not know what a ticket is
 #.
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Demand"
 

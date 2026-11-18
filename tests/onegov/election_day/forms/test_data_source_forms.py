@@ -7,6 +7,7 @@ from onegov.election_day.models import Election
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -48,7 +49,7 @@ def test_data_source_item_form() -> None:
     form = DataSourceItemForm(
         DummyPostData({'district': '1', 'number': '2', 'item': 'item'})
     )
-    form.item.choices = [('item', 'Item')]
+    form.item.choices = [SelectChoice('item', 'Item')]
     assert form.validate()
 
     # Update model/form
@@ -117,12 +118,12 @@ def test_data_source_item_form_populate(session: Session) -> None:
 
     form.populate(dsv)
     assert not form.callout
-    assert form.item.choices == [('v', '14.06.2015 SC v')]
+    assert form.item.choices == [SelectChoice('v', '14.06.2015 SC v')]
 
     form.populate(dsm)
     assert not form.callout
-    assert form.item.choices == [('m', '14.06.2015 m')]
+    assert form.item.choices == [SelectChoice('m', '14.06.2015 m')]
 
     form.populate(dsp)
     assert not form.callout
-    assert form.item.choices == [('p', '14.06.2015 p')]
+    assert form.item.choices == [SelectChoice('p', '14.06.2015 p')]

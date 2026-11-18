@@ -36,6 +36,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import FieldList
 from wtforms.fields import FormField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -53,7 +54,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Mapped
     from typing import type_check_only, Protocol
     from wtforms import Field
-    from wtforms.fields.choices import _Choice
     from wtforms.fields.core import _Filter
     from wtforms.meta import _MultiDictLikeWithGetlist
 
@@ -172,17 +172,17 @@ class AccessExtension(ContentExtension):
     ) -> type[T]:
 
         access_choices = [
-            (value, ACCESS_LABELS[value])
+            SelectChoice(value, ACCESS_LABELS[value])
             for value in ('public', 'secret', 'private', 'member')
         ]
 
         if request.app.can_deliver_sms:
             # allowing mtan restricted models makes only sense
             # if we can deliver SMS
-            access_choices.append(('mtan', ACCESS_LABELS['mtan']))
-            access_choices.append(
-                ('secret_mtan', ACCESS_LABELS['secret_mtan'])
-            )
+            access_choices.extend((
+                SelectChoice('mtan', ACCESS_LABELS['mtan']),
+                SelectChoice('secret_mtan', ACCESS_LABELS['secret_mtan'])
+            ))
 
         fields: dict[str, Field] = {
             'access': RadioField(
@@ -336,16 +336,20 @@ class ContactExtension(ContentExtension):
             if page.content.get('contact')
         } if isinstance(self, Page) else {}
 
-        choices: list[_Choice] = [
-            (page_id, title)
+        choices = [
+            SelectChoice(str(page_id), title)
             for page_id, title in query.with_entities(Page.id, Page.title)
             if page_id not in pinned
         ]
 
         if pinned:
-            choices.insert(0, (-1, '-'*32, {'disabled': 'disabled'}))
-            for choice in reversed(pinned.items()):
-                choices.insert(0, choice)
+            choices.insert(0, SelectChoice(
+                '-1',
+                '-'*32,
+                {'disabled': 'disabled'}
+            ))
+            for value, label in reversed(pinned.items()):
+                choices.insert(0, SelectChoice(str(value), label))
 
         class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
@@ -549,7 +553,7 @@ class PersonLinkExtension(ContentExtension):
 
         selected = dict((self.content or {}).get('people', []))
 
-        def choice(person: Person) -> _Choice:
+        def choice(person: Person) -> SelectChoice:
             if self.western_name_order:
                 name = f'{person.first_name} {person.last_name}'
             else:
@@ -564,12 +568,10 @@ class PersonLinkExtension(ContentExtension):
             elif function := getattr(person, 'function', None):
                 render_kw['data-function'] = function
 
-            return person.id.hex, name, render_kw
+            return SelectChoice(person.id.hex, name, render_kw)
 
-        choices: list[_Choice] = [
-            choice(person) for person in selectable_people
-        ]
-        choices.insert(0, ('', ''))
+        choices = [choice(person) for person in selectable_people]
+        choices.insert(0, SelectChoice(''))
 
         class PersonForm(Form):
             person = SelectField(
@@ -604,7 +606,7 @@ class PersonLinkExtension(ContentExtension):
             request.get_translate(for_chameleon=False)
         )
         meta.locales = [request.locale, 'en'] if request.locale else []
-        PersonForm.Meta = meta
+        PersonForm.Meta = meta  # type: ignore[misc]
 
         if TYPE_CHECKING:
             FieldBase = FieldList[FormField[PersonForm]]  # ruff:ignore[non-lowercase-variable-in-function]
@@ -1290,13 +1292,16 @@ class InlinePhotoAlbumExtension(ContentExtension):
 
         class PhotoAlbumForm(form_class):  # type:ignore
 
-            choices = [('', '')] + [
-                (album.id, album.title) for album in albums
-            ]
             photo_album_id = SelectField(
                 label=_('Photo album'),
                 fieldset=_('Photo album'),
-                choices=choices,
+                choices=[
+                    SelectChoice('', ''),
+                    *(
+                        SelectChoice(album.id, album.title)
+                        for album in albums
+                    )
+                ],
                 name='photo_album_id',
             )
 

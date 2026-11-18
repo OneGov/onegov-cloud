@@ -7,6 +7,7 @@ from onegov.election_day.models import ProporzElection
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
+from wtforms import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -23,20 +24,22 @@ def test_notification_form() -> None:
 
     form.request.app.principal.email_notification = True
     form.on_request()
-    assert form.notifications.choices == [('email', 'Email')]
+    assert form.notifications.choices == [SelectChoice('email', 'Email')]
     assert 'email' in form.notifications.default  # type: ignore[operator]
 
     form.request.app.principal.sms_notification = 'http://example.com'
     form.on_request()
-    assert form.notifications.choices == [('email', 'Email'), ('sms', 'SMS')]
+    assert form.notifications.choices == [
+        SelectChoice('email', 'Email'), SelectChoice('sms', 'SMS')
+    ]
     assert 'sms' in form.notifications.default  # type: ignore[operator]
 
     form.request.app.principal.webhooks = {'https://example.org/1': {}}
     form.on_request()
     assert form.notifications.choices == [
-        ('email', 'Email'),
-        ('sms', 'SMS'),
-        ('webhooks', 'Webhooks')
+        SelectChoice('email', 'Email'),
+        SelectChoice('sms', 'SMS'),
+        SelectChoice('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == ['email', 'sms', 'webhooks']
     assert 'webhooks' in form.notifications.default  # type: ignore[operator]
@@ -120,7 +123,9 @@ def test_notifications_form(session: Session) -> None:
     # Test on_request
     form.on_request()
     assert form.notifications.choices == [
-        ('email', 'Email'), ('sms', 'SMS'), ('webhooks', 'Webhooks')
+        SelectChoice('email', 'Email'),
+        SelectChoice('sms', 'SMS'),
+        SelectChoice('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == [
         'email', 'sms', 'webhooks'
@@ -131,15 +136,15 @@ def test_notifications_form(session: Session) -> None:
     assert 'webhooks' in form.notifications.default
     assert form.latest_date(session) == date(2015, 2, 1)
     assert form.votes.choices == [
-        ('vote-3', 'Vote 3'),
-        ('vote-2', 'Vote 2')
+        SelectChoice('vote-3', 'Vote 3'),
+        SelectChoice('vote-2', 'Vote 2')
     ]
     assert form.elections.choices == [
-        ('majorz-election-2', 'Majorz Election 2'),
-        ('majorz-election-1', 'Majorz Election 1')
+        SelectChoice('majorz-election-2', 'Majorz Election 2'),
+        SelectChoice('majorz-election-1', 'Majorz Election 1')
     ]
     assert form.election_compounds.choices == [
-        ('elections', 'Elections'),
+        SelectChoice('elections', 'Elections'),
     ]
     assert form.vote_models(session) == []
     assert form.election_models(session) == []

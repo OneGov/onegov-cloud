@@ -1,9 +1,11 @@
 from typing import Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
     from decimal import Decimal
     from onegov.form import Form
     from webob.request import _FieldStorageWithFile
     from wtforms.fields.core import _Filter, _Validator, _Widget, Field
+    from wtforms.fields.choices import SelectChoice
     from wtforms.form import BaseForm
 
     class FieldCondition[BaseFormT: BaseForm, FieldT: Field](Protocol):
@@ -28,6 +30,13 @@ if TYPE_CHECKING:
     type PricingRules = dict[str | range, RawPricing]
     # this matches what webob.request.POST returns as value type
     type RawFormValue = str | _FieldStorageWithFile
+    type SelectChoicesCallback[FieldT: Field] = (
+        Callable[[Any, FieldT], Sequence[SelectChoice]]
+        | Callable[[], Sequence[SelectChoice]]
+    )
+    type SelectChoices[FieldT: Field] = (
+        Iterable[SelectChoice] | SelectChoicesCallback[FieldT]
+    )
 
 type SubmissionState = Literal['pending', 'complete']
 type RegistrationState = Literal[

@@ -296,15 +296,18 @@ def reset_billing(
     request: FeriennetRequest
 ) -> Response | None:
 
-    if not self.period.active:
+    if not (
+        self.period.active
+        and self.period.confirmed
+        and self.period.finalizable
+        and not self.period.finalized
+    ):
         request.warning(
             _('The period must be active in order to reset billing'))
         return request.redirect(request.link(self))
 
-    session = request.session
-
     for invoice in self.invoices.query():
-        session.delete(invoice)
+        self.invoices.delete(invoice, raise_on_payment_links=True)
 
     request.success(_('The billing was successfully reset.'))
     return None

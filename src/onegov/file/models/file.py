@@ -286,7 +286,7 @@ class File(Base, Associable, TimestampMixin):
                 """)
             ),
             else_=text('NULL')
-        ), UTCDateTime)  # type: ignore[arg-type]
+        ), UTCDateTime)
 
     # NOTE: Technically we could scope these observers to DepotApp, but
     #       then we would need to instantiate a DepotApp for testing

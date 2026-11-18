@@ -2,7 +2,7 @@ from onegov.feriennet import _
 from onegov.form import Form
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.utils import format_donation_amounts
-from wtforms.fields import SelectField
+from wtforms.fields import SelectChoice, SelectField
 from wtforms.validators import InputRequired, ValidationError
 
 
@@ -29,7 +29,10 @@ class DonationForm(Form):
         readable = format_donation_amounts(amounts).split('\n')
         parsable = (f'{a:.2f}' for a in amounts)
 
-        self.amount.choices = list(zip(parsable, readable))
+        self.amount.choices = [
+            SelectChoice(value, label)
+            for value, label in zip(parsable, readable)
+        ]
 
     def validate_amount(self, field: SelectField) -> None:
         # let's prevent shenanigans, like negative donations
