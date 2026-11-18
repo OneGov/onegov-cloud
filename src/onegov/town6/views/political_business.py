@@ -1,4 +1,3 @@
-from markupsafe import Markup
 from sqlalchemy import func, exc, or_
 from webob.exc import HTTPNotFound
 
@@ -269,7 +268,7 @@ def view_political_business(
         'layout': layout,
         'business': self,
         'meetings': meetings,
-        'chronology': Markup(sanitize_html(self.chronology or '')),
+        'chronology': sanitize_html(self.chronology or ''),
         'images': [
             {'url': request.link(file), 'alt': image['alt']}
             for image in self.meta.get('ogi_images', [])

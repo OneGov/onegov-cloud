@@ -2,7 +2,6 @@ import morepath
 import os
 import zipfile
 
-from markupsafe import Markup
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -241,8 +240,8 @@ def view_meeting(
     return {
         'layout': layout,
         'page': self,
-        'address': Markup(sanitize_html(self.address or '')),
-        'description': Markup(sanitize_html(self.description or '')),
+        'address': sanitize_html(self.address or ''),
+        'description': sanitize_html(self.description or ''),
         'text': '',
         'lead': '',
         'people': getattr(self, 'people', None),
