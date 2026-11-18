@@ -8956,3 +8956,21 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 #~ "reserved yet."
 #~ msgstr ""
 #~ "Alle Einteilungen der Regel werden entfernt, sofern nicht reserviert."
+
+msgid "Decision"
+msgstr "Beschluss"
+
+msgid "Urgent Motion"
+msgstr "Dringliche Motion"
+
+msgid "Urgent Postulate"
+msgstr "Dringliches Postulat"
+
+msgid "Petition"
+msgstr "Petition"
+
+msgid "Protocol"
+msgstr "Protokoll"
+
+msgid "Draft"
+msgstr "Vorlage"

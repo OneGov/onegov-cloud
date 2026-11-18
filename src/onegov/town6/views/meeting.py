@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+from sqlalchemy import or_
 from webob.exc import HTTPNotFound
 from webob.response import Response
 
@@ -26,7 +27,7 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
 from onegov.town6.layout import MeetingLayout
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
@@ -167,18 +168,33 @@ def view_meeting(
     meeting_items_with_links = []
     businesses = PoliticalBusinessCollection(request)
     for item in self.meeting_items or []:
-        item_data = {
+        item_data: dict[str, Any] = {
             'number': item.number,
             'title': item.title,
             'business_type': None,
             'political_business_link': None
         }
 
-        business = get_meeting_item_business(item, request)
-
+        primary = get_meeting_item_business(item, request)
+        candidates = list(
+            dict.fromkeys(
+                ([primary] if primary is not None else [])
+                + item.political_businesses
+            )
+        )
+        visible = [
+            business
+            for business in candidates
+            if businesses.is_listed(business)
+        ]
+        if candidates and not visible:
+            continue
+        item_data['additional_businesses'] = [
+            {'title': business.title, 'url': request.link(business)}
+            for business in visible[1:]
+        ]
+        business = visible[0] if visible else None
         if business is not None:
-            if not businesses.is_listed(business):
-                continue
             item_data['political_business_link'] = request.link(business)
             item_data['business_type'] = POLITICAL_BUSINESS_TYPE[
                 business.political_business_type
@@ -189,6 +205,28 @@ def view_meeting(
     meeting_items_with_links.sort(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
+
+    conditions = [
+        PoliticalBusiness.meta['self_id'].astext.in_(
+            self.meta.get('ogi_business_ids', [])
+        )
+    ]
+    source = self.meta.get('meeting_id')
+    if source:
+        conditions.append(
+            PoliticalBusiness.meta['ogi_meeting_ids'].contains([source])
+        )
+    agenda_ids = {item.political_business_id for item in self.meeting_items}
+    agenda_ids.update(
+        business.id
+        for item in self.meeting_items
+        for business in item.political_businesses
+    )
+    related_businesses = [
+        business
+        for business in businesses.query().filter(or_(*conditions))
+        if business.id not in agenda_ids and businesses.is_listed(business)
+    ]
 
     links: list[tuple[str, str]] = []
     if self.audio_link.strip():
@@ -202,6 +240,8 @@ def view_meeting(
     return {
         'layout': layout,
         'page': self,
+        'address': sanitize_html(self.address or ''),
+        'description': sanitize_html(self.description or ''),
         'text': '',
         'lead': '',
         'people': getattr(self, 'people', None),
@@ -210,6 +250,7 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'related_businesses': related_businesses,
         'show_side_panel': True if links else False,
         'sidepanel_links': links,
     }

@@ -19,13 +19,13 @@
                 <div class="side-panel">
                     <div tal:condition="page.address">
                         <h2 i18n:translate class="h3">Location</h2>
-                        <div tal:content="page.address"></div>
+                        <div tal:content="address"></div>
                     </div>
                 </div>
                 <div class="side-panel">
                     <div tal:condition="page.description">
                         <h2 i18n:translate class="h3">Description</h2>
-                        <div tal:content="page.description"></div>
+                        <div tal:content="description"></div>
                     </div>
                 </div>
             </tal:b>
@@ -45,6 +45,13 @@
                                 ${item.number} ${item.title}
                             </span>
                         </a>
+                        <ul tal:condition="item.additional_businesses">
+                            <li tal:repeat="business item.additional_businesses">
+                                <a href="${business['url']}">
+                                    ${business['title']}
+                                </a>
+                            </li>
+                        </ul>
                         <span class="list-lead preview">
                             <span tal:condition="item.business_type">
                                 ${item.business_type}
@@ -53,6 +60,16 @@
                     </li>
                 </ul>
             </dd>
+        </div>
+        <div tal:condition="related_businesses">
+            <h2 class="h3" i18n:translate>Political Businesses</h2>
+            <ul class="more-list">
+                <li tal:repeat="business related_businesses">
+                    <a href="${request.link(business)}" class="list-link">
+                        <span class="list-title">${business.title}</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </tal:b>
 </div>

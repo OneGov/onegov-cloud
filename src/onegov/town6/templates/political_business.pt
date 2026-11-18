@@ -28,9 +28,12 @@
                         </div>
                         <div tal:condition="business.chronology">
                             <dt i18n:translate>Chronology</dt>
-                            <dd><div tal:content="business.chronology"></div></dd>
+                            <dd><div tal:content="chronology"></div></dd>
                         </div>
                     </dl>
+                    <div tal:repeat="image images">
+                        <img src="${image['url']}" alt="${image['alt']}">
+                    </div>
                 </div>
             </tal:b>
             <tal:b metal:fill-slot="after-panels">
@@ -66,17 +69,17 @@
             </ul>
         </div>
 
-        <div tal:condition="business.meeting_items">
+        <div tal:condition="meetings">
             <h2 class="h3" i18n:translate>Meetings</h2>
-            <ul tal:repeat="meeting_item business.meeting_items" class="more-list">
+            <ul tal:repeat="meeting meetings" class="more-list">
                 <li>
-                    <a tal:attributes="href request.link(meeting_item.meeting)" class="list-link">
+                    <a tal:attributes="href request.link(meeting)" class="list-link">
                         <span class="list-title">
-                            ${meeting_item.meeting.title}
+                            ${meeting.title}
                         </span>
                     </a>
-                    <span tal:condition="meeting_item.meeting.start_datetime|None" class="list-lead preview">
-                        ${layout.format_date(meeting_item.meeting.start_datetime, 'datetime')}
+                    <span tal:condition="meeting.start_datetime|None" class="list-lead preview">
+                        ${layout.format_date(meeting.start_datetime, 'datetime')}
                     </span>
                 </li>
             </ul>
