@@ -104,10 +104,11 @@ class FeriennetSettingsForm(Form):
     )
 
     carpooling_enabled = BooleanField(
-        label=_('Enable carpooling'),
+        label=_('Enable parents to connect with one another'),
         description=_(
-            'Parents can share contact details with other parents in the '
-            'same occasion if they allow it in their user profile.'
+            'Parents can share their contact information (email, phone '
+            'number and municipality) with other parents in the same '
+            'occurrence.'
         ),
         fieldset=_('Privacy'),
         default=True

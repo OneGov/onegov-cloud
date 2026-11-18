@@ -43,11 +43,12 @@ class UserProfileForm(Form):
     )
 
     show_contact_data_to_others = BooleanField(
-        label=_('Allow contact for carpooling'),
+        label=_('Allow Contact'),
         description=_(
-            'The email address and phone number are displayed to parents '
-            'whose child has signed up for the same program. This makes it '
-            'possible to get in touch, for example, to organize carpools..'
+            'If this is selected, email address, phone number and '
+            'municipality are displayed to parents whose child has signed up '
+            'for the same occurrence. This makes it possible to get in touch, '
+            'for example, to organize carpools.'
         ),
         fieldset=_('Privacy'),
         default=False
