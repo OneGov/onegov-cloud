@@ -1058,7 +1058,13 @@ class OGIImporter:
         if section in (None, 'meetings'):
             self.import_meetings()
         connect_relationships(
-            self.session, set(self.people) if self.archive.manifest else None
+            self.session,
+            set(self.people) if self.archive.manifest else None,
+            (
+                set(self.archive.pages['political-business'])
+                if self.archive.manifest
+                else None
+            ),
         )
         self.session.flush()
         self.counts['unavailable_documents'] = len(self.archive.unavailable)
@@ -1068,6 +1074,7 @@ class OGIImporter:
 def connect_relationships(
     session: Session,
     allowed_people: set[str] | None = None,
+    business_ids: set[str] | None = None,
 ) -> None:
     people = {
         person.meta['parliamentarian_id']: person
@@ -1139,7 +1146,10 @@ def connect_relationships(
                 if function in ('Präsident', 'Präsidentin')
                 else 'member'
             )
-    for business in businesses.values():
+    for business_id, business in businesses.items():
+        # Businesses of other archives keep the participants of their import
+        if business_ids is not None and business_id not in business_ids:
+            continue
         for source, function in business.meta.get('people_ids', []):
             person = people.get(source)
             if person is None:
