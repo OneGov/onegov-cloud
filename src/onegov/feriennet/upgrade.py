@@ -14,6 +14,7 @@ from onegov.org.initial_content import load_content
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from onegov.user import UserCollection, User
+from sqlalchemy.orm import undefer
 
 
 from typing import TYPE_CHECKING
@@ -243,3 +244,21 @@ def convert_text_to_html_for_notification_templates(
             template.text = Markup('\n').join(as_paragraphs(template.text))
 
         context.session.flush()
+
+
+@upgrade_task('Make TOS acceptance period specific')
+def make_tos_acceptance_period_specific(context: UpgradeContext) -> None:
+    # The TOS used to be accepted once (`True`), now they need to be
+    # accepted per period (list of period ids). As we don't know for which
+    # period the legacy value was given, we drop it and ask again.
+    users = (
+        UserCollection(context.session).query()
+        .options(undefer(User.data))
+    )
+
+    for user in users:
+        if user.data and 'tos_accepted' in user.data:
+            if not isinstance(user.data['tos_accepted'], list):
+                del user.data['tos_accepted']
+
+    context.session.flush()
