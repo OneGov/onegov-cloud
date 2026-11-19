@@ -1,8 +1,22 @@
 # Changes
 
+## 2026.62
+
+`2026-11-19` | [8c4adac7ea...8c4adac7ea](https://github.com/OneGov/onegov-cloud/compare/8c4adac7ea^...8c4adac7ea)
+
+### Feriennet
+
+##### Add option to disable sharing contact data
+
+Option for admins to disable contact sharing altogether
+    Text changes
+    Move contact sharing option up on userprofile
+
+`Feature` | [PRO-1616](https://linear.app/projuventute/issue/PRO-1616) | [8c4adac7ea](https://github.com/onegov/onegov-cloud/commit/8c4adac7eafdd5ecb47fd69e225f0967948f9a4d)
+
 ## 2026.61
 
-`2026-11-19` | [340e1f06aa...0e61805214](https://github.com/OneGov/onegov-cloud/compare/340e1f06aa^...0e61805214)
+`2026-11-19` | [340e1f06aa...d1b3eb2dad](https://github.com/OneGov/onegov-cloud/compare/340e1f06aa^...d1b3eb2dad)
 
 ### Feriennet
 
@@ -5409,42 +5423,4 @@ Display private address if available, otherwise show place of residence
 ##### Adds filter for future/past meetings (#1913)
 
 `Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [4fea222a0b](https://github.com/onegov/onegov-cloud/commit/4fea222a0b0eb79b7b5cf4123352b38df154280b)
-
-## 2025.33
-
-`2025-07-16` | [32fb87a343...83af613185](https://github.com/OneGov/onegov-cloud/compare/32fb87a343^...83af613185)
-
-### Org
-
-##### Fixes attribute error in KABA settings
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [32fb87a343](https://github.com/onegov/onegov-cloud/commit/32fb87a34341370667cbc6db9bf4f67f61efc019)
-
-##### Decodes bytes in KABA settings
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [b97a5413ca](https://github.com/onegov/onegov-cloud/commit/b97a5413ca6dbcb65eb202a9beb8b77c5ef7acd1)
-
-##### Checks whether KABA visit has already been revoked.
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [917dcf5439](https://github.com/onegov/onegov-cloud/commit/917dcf54391ff020a5b17106daa3f9c66814eb1a)
-
-##### Replace label for submit event
-
-Replace Veranstaltung vorschlagen with Veranstaltung erfassen
-
-`Other` | [3bda867ff2](https://github.com/onegov/onegov-cloud/commit/3bda867ff202787bedc0bc7ac4033645b6d3ddad)
-
-### Ris
-
-##### Refactor project structure and add political business management views
-
-RIS: Adds political business management views
-
-Refactors project structure
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [41133c87fa](https://github.com/onegov/onegov-cloud/commit/41133c87fa3bdac94e2bf1c5f93fa6b7e5fe6ac4)
-
-##### Comments out broken management link
-
-`Bugfix` | [bceaa64103](https://github.com/onegov/onegov-cloud/commit/bceaa64103d0307699b7cc79d98d0dbfe37de058)
 
