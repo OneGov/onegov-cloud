@@ -4,8 +4,10 @@ from onegov.activity.models.invoice import BookingPeriodInvoice
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import UserLayout
+from onegov.org.views.usermanagement import get_manage_user_form
 from onegov.pay.models import InvoiceItem
-from onegov.town6.views.usermanagement import town_view_user
+from onegov.town6.views.usermanagement import (
+    town_handle_manage_user, town_view_user)
 from onegov.user import User
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -14,6 +16,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
+    from onegov.org.forms import ManageUserForm
+    from webob import Response
 
 
 @FeriennetApp.html(model=User, template='user.pt', permission=Secret)
@@ -28,6 +32,26 @@ def view_user(
 
     return town_view_user(
         self, request, layout)
+
+
+@FeriennetApp.form(
+    model=User,
+    template='form.pt',
+    form=get_manage_user_form,
+    permission=Secret,
+    name='edit'
+)
+def handle_manage_user(
+    self: User,
+    request: FeriennetRequest,
+    form: ManageUserForm
+) -> RenderData | Response:
+
+    # The admin form's on_request hook overrides the profile form's hook.
+    if not request.app.carpooling_enabled:
+        form.delete_field('show_contact_data_to_others')
+
+    return town_handle_manage_user(self, request, form)
 
 
 @FeriennetApp.view(

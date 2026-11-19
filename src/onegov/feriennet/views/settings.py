@@ -103,6 +103,17 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 10}
     )
 
+    carpooling_enabled = BooleanField(
+        label=_('Enable parents to connect with one another'),
+        description=_(
+            'Parents can share their contact information (email, phone '
+            'number and municipality) with other parents in the same '
+            'occurrence.'
+        ),
+        fieldset=_('Privacy'),
+        default=False
+    )
+
     public_organiser_data = MultiCheckboxField(
         label=_('Public organiser data'),
         choices=(
@@ -287,6 +298,7 @@ class FeriennetSettingsForm(Form):
             ('require_swisspass', False),
             ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
+            ('carpooling_enabled', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
             ('bank_beneficiary', ''),
@@ -328,6 +340,7 @@ class FeriennetSettingsForm(Form):
             'require_swisspass',
             'cancellation_conditions',
             'require_full_age_for_registration',
+            'carpooling_enabled',
             'public_organiser_data',
             'bank_account',
             'bank_beneficiary',

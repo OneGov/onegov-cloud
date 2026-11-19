@@ -42,6 +42,18 @@ class UserProfileForm(Form):
         'show_contact_data_to_others',
     )
 
+    show_contact_data_to_others = BooleanField(
+        label=_('Allow Contact'),
+        description=_(
+            'If this is selected, email address, phone number and '
+            'municipality are displayed to parents whose child has signed up '
+            'for the same occurrence. This makes it possible to get in touch, '
+            'for example, to organize carpools.'
+        ),
+        fieldset=_('Privacy'),
+        default=False
+    )
+
     ticket_statistics = RadioField(
         label=_('Send a periodic status e-mail.'),
         fieldset=_('General'),
@@ -155,12 +167,6 @@ class UserProfileForm(Form):
         fieldset=_('Personal'),
     )
 
-    show_contact_data_to_others = BooleanField(
-        label=_('Allow contact for carpooling'),
-        fieldset=_('Privacy'),
-        default=False
-    )
-
     @property
     def name(self) -> str:
         assert self.first_name.data is not None
@@ -177,6 +183,11 @@ class UserProfileForm(Form):
     def on_request(self) -> None:
         self.toggle_political_municipality()
         self.toggle_ticket_statistics()
+        self.toggle_carpooling()
+
+    def toggle_carpooling(self) -> None:
+        if not self.request.app.carpooling_enabled:
+            self.delete_field('show_contact_data_to_others')
 
     @property
     def show_political_municipality(self) -> bool | None:
@@ -222,6 +233,10 @@ class UserProfileForm(Form):
 
         if key == 'ticket_statistics':
             if not self.show_ticket_statistics:
+                return True
+
+        if key == 'show_contact_data_to_others':
+            if not self.request.app.carpooling_enabled:
                 return True
 
         return False

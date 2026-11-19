@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-11-02 09:28+0100\n"
+"POT-Creation-Date: 2026-11-18 14:47+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -867,7 +867,7 @@ msgid ""
 "considered organizers."
 msgstr ""
 "Seules les personnes proposant au moins une manifestation au cours de la "
-"période actuelle sont considérées comme organisateurs.
+"période actuelle sont considérées comme organisateurs."
 
 msgid "Prefer the following children:"
 msgstr "Priorité aux enfants suivants :"
@@ -1339,6 +1339,22 @@ msgstr ""
 "Il n'est pas possible de définir un temps de transfert vu que les "
 "participant·e·s sont limité·e·s à une activité par jour."
 
+msgid "Allow Contact"
+msgstr "Autoriser la prise de contact"
+
+msgid ""
+"If this is selected, email address, phone number and municipality are "
+"displayed to parents whose child has signed up for the same occurrence. This "
+"makes it possible to get in touch, for example, to organize carpools."
+msgstr ""
+"Si cette option est sélectionnée, l'adresse e-mail, le numéro de téléphone "
+"et la commune sont affichés aux parents dont l'enfant est inscrit au même "
+"événement. Cela permet de prendre contact, par exemple pour organiser du "
+"covoiturage."
+
+msgid "Privacy"
+msgstr "Confidentialité"
+
 msgid "Send a periodic status e-mail."
 msgstr "Envoyer un e-mail d'état périodique."
 
@@ -1383,12 +1399,6 @@ msgstr "Compte bancaire (IBAN)"
 
 msgid "Beneficiary"
 msgstr "Bénéficiaire"
-
-msgid "Allow contact for carpooling"
-msgstr "Autoriser la prise de contact pour le covoiturage"
-
-msgid "Privacy"
-msgstr "Confidentialité"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Veuillez entrer un numéro de téléphone et un nom"
@@ -1906,11 +1916,19 @@ msgstr "Inclus ou gratuit"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Cet événement n'a pas encore assez de participant·e·s."
 
-msgid "carpool"
-msgstr "faire du covoiturage"
+msgid "Contact information"
+msgstr "Coordonnées"
 
-msgid "The following persons can be asked to form carpools."
-msgstr "Les personnes suivantes peuvent être sollicitées pour du covoiturage."
+msgid ""
+"This is not a complete list of participants. This list contains the contact "
+"information of parents whose children are participating in the same "
+"occurrence and who have consented to being contacted, e.g. for carpools. "
+"This setting can be changed in the userprofile."
+msgstr ""
+"Il ne s'agit pas d'une liste complète des participant·e·s. Cette liste "
+"contient les coordonnées des parents dont les enfants participent au même "
+"événement et qui ont accepté d'être contactés, p. ex. pour du covoiturage. "
+"Ce paramètre peut être modifié dans le profil d'utilisateur·trice."
 
 msgid "Parent"
 msgstr "Parent"
@@ -3288,6 +3306,16 @@ msgstr ""
 "Le texte sera affiché sous le texte de confirmation d'une activité dans le "
 "mail"
 
+msgid "Enable parents to connect with one another"
+msgstr "Permettre aux parents de prendre contact entre eux"
+
+msgid ""
+"Parents can share their contact information (email, phone number and "
+"municipality) with other parents in the same occurrence."
+msgstr ""
+"Les parents peuvent partager leurs coordonnées (adresse e-mail, numéro de "
+"téléphone et commune) avec les autres parents du même événement."
+
 msgid "Public organiser data"
 msgstr "Données contacts des prestataires"
 
@@ -3483,6 +3511,33 @@ msgstr "${count} e-mails envoyés avec succès"
 
 msgid "The submitter email is not available"
 msgstr "L'e-mail de l'expéditeur n'est pas disponible"
+
+#~ msgid "carpool"
+#~ msgstr "faire du covoiturage"
+
+#~ msgid "Allow contact for carpooling"
+#~ msgstr "Autoriser la prise de contact pour le covoiturage"
+
+#~ msgid ""
+#~ "Make it possible for parents whose children are enrolled in the same "
+#~ "course to get in touch, for example, to organize carpool arrangements."
+#~ msgstr ""
+#~ "Permettre aux parents dont l'enfant est inscrit au même cours de vous "
+#~ "contacter, par exemple pour organiser des covoiturages."
+
+#~ msgid "The following persons can be asked to form carpools."
+#~ msgstr ""
+#~ "Les personnes suivantes peuvent être sollicitées pour du covoiturage."
+
+#~ msgid "Enable carpooling"
+#~ msgstr "Activer le covoiturage"
+
+#~ msgid ""
+#~ "Parents can share contact details with other parents in the same occasion "
+#~ "if they allow it in their user profile."
+#~ msgstr ""
+#~ "Les parents peuvent partager leurs coordonnées avec les autres parents du "
+#~ "même événement s'ils l'autorisent dans leur profil d'utilisateur·trice."
 
 #~ msgid "These wishes overlap accepted bookings and are therefore blocked."
 #~ msgstr ""

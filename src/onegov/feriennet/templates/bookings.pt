@@ -175,14 +175,14 @@
                                                         <div class="actions" tal:define="actions actions_by_booking(booking)">
                                                             <tal:b tal:repeat="action actions" tal:content="action(layout)" />
                                                         </div>
-                                                        <div class="attendees-toggle" data-ogc-toggle="#attendees-table-${booking.id}" tal:condition="state == 'accepted'" tal:define="count len(related[booking.occasion_id])|0" style="visibility: ${count and 'visible' or 'hidden'}">
-                                                            <span>${count}</span> <span i18n:translate>carpool</span>
+                                                        <div class="attendees-toggle" data-ogc-toggle="#attendees-table-${booking.id}" tal:condition="state == 'accepted' and layout.app.carpooling_enabled" tal:define="count len(related[booking.occasion_id])|0" style="visibility: ${count and 'visible' or 'hidden'}">
+                                                            <span>${count}</span> <span i18n:translate>Contact information</span>
                                                             <i class="fa fa-chevron-down rotate"></i>
                                                         </div>
                                                     </div>
                                                     <tal:b condition="state == 'accepted'" tal:define="count related[booking.occasion_id][0].attendee_count|0">
                                                         <div class="attendees-table hidden" id="attendees-table-${booking.id}" tal:condition="count">
-                                                            <div class="panel"><i class="fa fa-info"></i><span i18n:translate>The following persons can be asked to form carpools.</span></div>
+                                                            <div class="panel callout warning"><i class="fa fa-info"></i><span i18n:translate>This is not a complete list of participants. This list contains the contact information of parents whose children are participating in the same occurrence and who have consented to being contacted, e.g. for carpools. This setting can be changed in the userprofile.</span></div>
                                                             <table>
                                                                 <thead>
                                                                     <tr>
@@ -202,7 +202,7 @@
                                                                             <tal:b tal:define="attendees occasion_attendees(request, row.parent_username, booking.occasion_id)">
                                                                                 <a data-toggle="#attendee-${row.parent_username.replace('@', '_').replace('.', '_')}-${booking.occasion_id}">
                                                                                     <tal:b tal:repeat="attendee attendees">
-                                                                                        <span title="${attendee.name}">
+                                                                                        <span>
                                                                                             <i class="fa fa-child" aria-hidden="true"></i>
                                                                                         </span>
                                                                                     </tal:b>
