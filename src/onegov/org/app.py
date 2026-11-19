@@ -35,6 +35,7 @@ from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
+from onegov.user.audit import register_user_auditing
 from onegov.websockets import WebsocketsApp
 from purl import URL
 from webob import Response
@@ -107,6 +108,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     def configure_application(self, **cfg: Any) -> None:
         super().configure_application(**cfg)
         register_page_auditing()
+        register_user_auditing()
         self.known_schemas = set()
 
         if self.has_database_connection:

@@ -197,6 +197,41 @@ def test_directory_entry_iframe_back_button(client: 'Client[TestApp]') -> None:
     assert back.request.path == '/directories/clubs'
 
 
+def test_directory_entry_deep_link(client: Client[TestApp]) -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Clubs'
+    page.form['structure'] = 'Name *= ___'
+    page.form['content_fields'] = 'Name'
+    page.form['title_format'] = '[Name]'
+    clubs = page.form.submit().follow()
+
+    page = clubs.click('Eintrag', index=0)
+    page.form['name'] = 'Pilatus'
+    page.form.submit().follow()
+
+    page = clubs.click('Eintrag', index=0)
+    page.form['name'] = 'Rigi'
+    page.form['access'] = 'private'
+    page.form.submit().follow()
+
+    client.logout()
+
+    entry = client.get('/directories/clubs?redirect=pilatus').follow()
+    assert entry.request.path == '/directories/clubs/pilatus'
+    assert 'Pilatus' in entry
+    back = client.get(entry.pyquery('.framed-only a').attr('href')).follow()
+    assert back.request.path == '/directories/clubs'
+
+    # unknown and invisible entries fall back to the directory
+    for name in ('matterhorn', 'rigi', ''):
+        page = client.get(f'/directories/clubs?redirect={name}')
+        assert page.status_code == 200
+        assert page.request.path == '/directories/clubs'
+        assert 'Pilatus' in page
+
+
 def test_occurrence_iframe_back_button(client: 'Client[TestApp]') -> None:
     transaction.begin()
 

@@ -16,13 +16,17 @@ if TYPE_CHECKING:
 def beneficiary_to_creditor(value: str | None) -> dict[str, str] | None:
     value = value or ''
     lines = [line.strip() for line in value.split(',') if line.strip()]
-    if len(lines) == 3:
-        return {
-            'name': lines[0],
-            'line1': lines[1],
-            'line2': lines[2],
-        }
-    return None
+    if len(lines) != 3:
+        return None
+    pcode, _, city = lines[2].partition(' ')
+    if not pcode or not city.strip():
+        return None
+    return {
+        'name': lines[0],
+        'street': lines[1],
+        'pcode': pcode,
+        'city': city.strip(),
+    }
 
 
 def swiss_iban(value: str) -> bool:

@@ -8875,3 +8875,21 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
+
+msgid "Decision"
+msgstr "Decisione"
+
+msgid "Urgent Motion"
+msgstr "Mozione urgente"
+
+msgid "Urgent Postulate"
+msgstr "Postulato urgente"
+
+msgid "Petition"
+msgstr "Petizione"
+
+msgid "Protocol"
+msgstr "Verbale"
+
+msgid "Draft"
+msgstr "Proposta"
