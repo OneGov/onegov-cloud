@@ -20,6 +20,7 @@ from onegov.core.errors import (
     AmbiguousColumnsError,
     DuplicateColumnNamesError,
     EmptyLineInFileError,
+    MissingValuesInLineError,
     MissingColumnsError,
 )
 from openpyxl import load_workbook
@@ -207,6 +208,22 @@ def test_empty_line_csv_file() -> None:
         'datum', 'reale_temperatur', 'gefuhlte_temperatur'
     ]
     assert list(csv.lines)
+
+
+def test_missing_values_in_line_csv_file() -> None:
+    data = (
+        b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
+        b'01.01.2015, 1, warm\n'
+        b'02.01.2015, 0\n'
+    )
+
+    csv = CSVFile(
+        BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    )
+
+    with pytest.raises(MissingValuesInLineError) as e:
+        list(csv.lines)
+    assert e.value.line == 3
 
 
 def test_match_headers_duplicate() -> None:

@@ -33,5 +33,10 @@ class EmptyLineInFileError(CSVError):
     pass
 
 
+class MissingValuesInLineError(CSVError):
+    def __init__(self, line: int):
+        self.line = line
+
+
 class AlreadyLockedError(Exception):
     """ Raised if :func:`onegov.core.utils.lock` fails to acquire a lock. """

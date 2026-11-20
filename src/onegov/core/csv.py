@@ -191,6 +191,7 @@ class CSVFile[RowT = DefaultRow]:
         self.csvfile.seek(0)
 
         encountered_empty_line = False
+        required_length = max(self.headers.values(), default=-1) + 1
 
         for ix, line in enumerate(csv_reader(self.csvfile, self.dialect)):
 
@@ -206,6 +207,10 @@ class CSVFile[RowT = DefaultRow]:
             # the first line is the header
             if ix == 0:
                 continue
+
+            # rows must contain a value for each column
+            if len(line) < required_length:
+                raise errors.MissingValuesInLineError(line=ix + 1)
 
             yield self.rowtype(
                 rownumber=ix + 1,  # row numbers are for customers, not coders
