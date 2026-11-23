@@ -4,7 +4,6 @@ from functools import cached_property
 from markupsafe import Markup
 from onegov.activity import Occasion, Volunteer
 from onegov.chat import Message, MessageCollection
-from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
@@ -37,7 +36,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
     from decimal import Decimal
-    from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
     from onegov.form import Form, FormSubmission
@@ -1785,70 +1783,6 @@ class DirectoryEntryHandler(Handler):
         ))
 
         return links
-
-
-class ChatTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'CHT'}
-
-    def reference_group(self, request: OrgRequest) -> str:
-        return self.handler.title
-
-
-@handlers.registered_handler('CHT')
-class ChatHandler(Handler):
-
-    handler_title = _('Chats')
-    code_title = _('Chats')
-
-    @cached_property
-    def collection(self) -> ChatCollection:
-        return ChatCollection(self.session)
-
-    @cached_property
-    def chat(self) -> Chat | None:
-        return self.collection.by_id(UUID(self.id))
-
-    @property
-    def deleted(self) -> bool:
-        return self.chat is None
-
-    @property
-    def title(self) -> str:
-        if self.chat is not None:
-            return f'Chat - {self.chat.customer_name}'
-        else:
-            return ''
-
-    @property
-    def subtitle(self) -> None:
-        return None
-
-    @property
-    def group(self) -> str | None:
-        return self.chat.topic if self.chat is not None else None
-
-    @property
-    def email(self) -> str:
-        return self.chat.email if self.chat is not None else ''
-
-    def get_summary(
-        self,
-        request: OrgRequest  # type: ignore[override]
-    ) -> Markup:
-
-        layout = DefaultLayout(self.collection, request)
-        if self.chat is not None:
-            return render_macro(layout.macros['display_chat'], request, {
-                'chat': self.chat,
-                'layout': layout
-            })
-        return Markup('')
-
-    def get_links(  # type: ignore[override]
-        self,
-        request: OrgRequest  # type: ignore[override]
-    ) -> list[Link | LinkGroup]:
-        return []
 
 
 class VolunteerTicket(OrgTicketMixin, Ticket):

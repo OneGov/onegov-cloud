@@ -12,8 +12,8 @@ def param_from_path(name: str, path: str) -> str:
 
     Example::
 
-        >>> schema_from_path("schema", "/chats?schema=onegov_town6-meggen")
-        'onegov_town6-meggen
+        >>> param_from_path("schema", "/?schema=onegov_town6-meggen")
+        'onegov_town6-meggen'
 
     """
     url = urlparse(path)

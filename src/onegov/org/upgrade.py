@@ -1124,3 +1124,37 @@ def add_horw_political_business_enums(context: UpgradeContext) -> bool:
             )
             changed = True
     return changed
+
+
+@upgrade_task('Remove client chat tickets and settings')
+def remove_client_chat_tickets_and_settings(context: UpgradeContext) -> None:
+    if context.has_table('tickets'):
+        if context.has_table('messages'):
+            context.operations.execute(text("""
+                DELETE FROM messages
+                 WHERE channel_id IN (
+                    SELECT number FROM tickets WHERE handler_code = 'CHT'
+                 );
+            """))
+
+        context.operations.execute(text("""
+            DELETE FROM tickets WHERE handler_code = 'CHT';
+        """))
+
+    if not context.has_table('organisations'):
+        return
+
+    org = context.session.query(Organisation).first()
+    if org is None:
+        return
+
+    for key in (
+        'chat_staff',
+        'chat_topics',
+        'specific_opening_hours',
+        'opening_hours_chat',
+    ):
+        org.meta.pop(key, None)
+
+    if org.meta.get('enable_chat') == 'people_chat':
+        org.meta['enable_chat'] = 'disabled'

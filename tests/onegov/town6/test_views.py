@@ -1,7 +1,5 @@
 import onegov.org
-import transaction
 
-from onegov.chat.collections import ChatCollection
 from tests.shared import utils
 
 from typing import TYPE_CHECKING
@@ -262,65 +260,6 @@ def test_header_links(client: Client) -> None:
 
     assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
-
-
-def test_chat_archive(client: Client) -> None:
-    client.login_admin()
-
-    settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = 'people_chat'
-    settings.form.submit()
-
-    page = client.get('/chats/+initiate')
-    page.form['name'] = 'Andrew Lieu'
-    page.form['email'] = 'andrew@lieu.org'
-    page.form['confirmation'] = True
-    page.form.submit()
-
-    transaction.begin()
-    chat = ChatCollection(client.app.session()).query().one()
-
-    chat.chat_history = [
-        {"text": "Heyhey", "time": "18:22",
-         "user": "Chantal Trutmann", "userId": "customer"},
-        {"text": "Guten Tag, wie kann ich Ihnen helfen?", "time": "18:25",
-         "user": "admin@example.org", "userId":
-             "7f9f7fb2a56f4c0eb1e63f667e0e64dc"},
-        {"text": "Ich habe eine Frage zu Thema XYZ. ", "time": "18:26", "user":
-            "Chantal Trutmann", "userId": "customer"}]
-    chat.active = False
-    transaction.commit()
-
-    page = client.get('/chats/archive?state=archived')
-
-    assert 'Andrew' in page
-
-
-def test_chat_topics(client: Client) -> None:
-    client.login_admin()
-
-    settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = 'people_chat'
-    settings.form['chat_topics'] = 'Steuern, Bau'
-    settings.form.submit()
-
-    page = client.get('/chats/+initiate')
-    page.form['name'] = 'Andrew Lieu'
-    page.form['email'] = 'andrew@lieu.org'
-    page.form['topic'] = 'Steuern'
-    page.form['confirmation'] = True
-    page.form.submit()
-
-    assert 'Kundenchat' in page
-
-    anon = client.spawn()
-
-    settings = client.get('/chat-settings')
-    settings.form['chat_topics'] = ''
-    settings.form.submit()
-
-    page = anon.get('/chats/+initiate')
-    assert 'Thema' not in page
 
 
 def test_view_iframe_button_on_page(client: Client) -> None:

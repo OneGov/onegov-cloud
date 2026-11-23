@@ -6,8 +6,6 @@ from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
-from onegov.chat.collections import ChatCollection
-from onegov.chat.models import Chat
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
@@ -478,24 +476,6 @@ def get_people(app: OrgApp) -> PersonCollection:
 @OrgApp.path(model=Person, path='/person/{id}', converters={'id': UUID})
 def get_person(app: OrgApp, id: UUID) -> Person | None:
     return PersonCollection(app.session()).by_id(id)
-
-
-@OrgApp.path(model=ChatCollection, path='/chats')
-def get_chats(
-    app: OrgApp,
-    page: int = 0,
-    state: str = 'active'
-) -> ChatCollection:
-    return ChatCollection(
-        app.session(),
-        page=page,
-        state=state,
-    )
-
-
-@OrgApp.path(model=Chat, path='/chat/{id}', converters={'id': UUID})
-def get_chat(app: OrgApp, id: UUID) -> Chat | None:
-    return ChatCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}',

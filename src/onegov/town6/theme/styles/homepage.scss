@@ -467,3 +467,14 @@
         margin-bottom: 0;
     }
 }
+
+.dropdown-pane {
+    max-width: calc(100vw - 2rem);
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    visibility: visible;
+
+    &.is-open {
+        opacity: 1;
+    }
+}

@@ -1,8 +1,3 @@
-from datetime import datetime
-
-import pytz
-from sedate import replace_timezone
-
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
@@ -47,27 +42,6 @@ class TownApp(OrgApp, FoundationApp):
     @property
     def font_family(self) -> str | None:
         return self.theme_options.get('body-font-family-ui')
-
-    def chat_open(self, request: TownRequest) -> bool:
-        if not request.app.org.specific_opening_hours:
-            return True
-        opening_hours = request.app.org.opening_hours_chat
-        tz = pytz.timezone('Europe/Zurich')
-        now = datetime.now(tz=tz)
-        if opening_hours:
-            for day, start, end in opening_hours:
-                if str(now.weekday()) == day:
-                    open = replace_timezone(
-                        datetime(now.year, now.month, now.day,
-                                 int(start.split(':')[0]),
-                                 int(start.split(':')[1])), tz)
-                    close = replace_timezone(
-                        datetime(now.year, now.month, now.day,
-                                 int(end.split(':')[0]),
-                                 int(end.split(':')[1])), tz)
-                    if now > open and now < close:
-                        return True
-        return False
 
 
 @TownApp.webasset_path()
@@ -324,18 +298,6 @@ def get_fullcalendar_asset() -> Iterator[str]:
 def get_occupancycalendar_asset() -> Iterator[str]:
     yield 'occupancycalendar.jsx'
     yield 'occupancycalendar_custom.js'
-
-
-@TownApp.webasset('staff-chat')
-def get_staff_chat_asset() -> Iterator[str]:
-    yield 'chat-shared.js'
-    yield 'chat-staff.js'
-
-
-@TownApp.webasset('client-chat')
-def get_staff_client_asset() -> Iterator[str]:
-    yield 'chat-shared.js'
-    yield 'chat-client.js'
 
 
 @TownApp.webasset('d3-charts')

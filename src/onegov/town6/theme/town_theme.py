@@ -140,7 +140,6 @@ class TownTheme(BaseTheme):
             'leaflet',
             'tags',
             'print',
-            'chat',
             'bar-graph',
             'dashboard',
             'audit',

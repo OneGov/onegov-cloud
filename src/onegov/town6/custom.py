@@ -1,4 +1,3 @@
-from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_api_endpoints as get_api_endpoints_base
 from onegov.org.custom import get_global_tools as get_global_tools_base
@@ -24,31 +23,6 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
             continue
 
         yield item
-
-    if request.is_logged_in and request.app.org.meta.get(
-        'enable_chat', 'disabled') == 'people_chat':
-        chat_staff = request.app.org.meta.get('chat_staff', [])
-        assert request.current_user is not None
-        if request.current_user.id.hex in chat_staff:
-            yield LinkGroup(_('Chats'), classes=('chats', ), links=(
-                Link(
-                    _('My Chats'), request.link(
-                        request.app.org, name='chats'
-                    ), attrs={'class': 'chats'}
-                ),
-                Link(
-                    _('Archived Chats'),
-                    request.class_link(
-                        ChatCollection, {
-                            'state': 'archived',
-                        },
-                        name='archive'
-                    ),
-                    attrs={
-                        'class': ('chats-archive'),
-                    }
-                )
-            ))
 
 
 def get_modules(request: TownRequest) -> LinkGroup:

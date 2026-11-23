@@ -194,8 +194,6 @@ $settings-icon: '\f1de';
     .invoice::before { @include icon($invoice-icon); }
     .profile::before { @include icon("\f2bd"); }
     .management::before { @include icon-bold('\f013'); }
-    .chats::before { @include icon-bold('\f086'); }
-    .chats-archive::before { @include icon-bold('\f4ad'); }
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon("\f15c"); }
     .settings::before { @include icon-bold('\f1de'); }

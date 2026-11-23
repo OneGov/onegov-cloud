@@ -33,8 +33,6 @@ class MockRequest:
         org=Bunch(
             geo_provider='geo-mapbox',
             open_files_target_blank=True,
-            disable_chat=None,
-            chat_customer_id=None
         ),
         version='1.0',
         sentry_dsn=None
@@ -173,9 +171,6 @@ def test_template_layout(
 
     class Mock:
         homepage_structure = ''
-        chat_type = None
-        chat_customer_id = None
-        disable_chat = False
 
     class App(TownApp):
         theme_options = {}

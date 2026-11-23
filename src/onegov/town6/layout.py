@@ -1,4 +1,3 @@
-import secrets
 from functools import cached_property
 
 from onegov.core import Framework
@@ -6,8 +5,6 @@ from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.framework import layout_predicate
 from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
-from onegov.chat.collections import ChatCollection
-from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection, DirectoryEntry, Directory
 from onegov.event import Event
 from onegov.event import OccurrenceCollection, Occurrence
@@ -1043,102 +1040,6 @@ class HomepageLayout(OrgHomepageLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest
-
-
-class ChatLayout(DefaultLayout):
-
-    def __init__(self, model: Any, request: TownRequest) -> None:
-        super().__init__(model, request)
-
-        token = self.make_websocket_token()
-
-        # Make token available to JavaScript when creating the WebSocket
-        # connection.
-        self.custom_body_attributes['data-websocket-token'] = token
-
-        # Store the WebSocket token in the session check when the connection is
-        # initiated.
-        request.browser_session['websocket_token'] = token
-
-    def make_websocket_token(self) -> str:
-        """
-        A user (authenticated or anonymous) attempts to create a chat
-        connection. For the connection to succeed, they must present a one-time
-        token to the WebSocket server.
-
-        TODO: Add lifespan to the token?
-        """
-        return secrets.token_hex(16)
-
-
-class StaffChatLayout(ChatLayout):
-
-    def __init__(self, model: Any, request: TownRequest) -> None:
-        super().__init__(model, request)
-        self.request.include('websockets')
-        self.request.include('staff-chat')
-
-        self.custom_body_attributes['data-websocket-endpoint'] = (
-            self.app.websockets_client_url(request))
-
-        self.custom_body_attributes['data-websocket-schema'] = (
-            self.app.schema)
-
-    @cached_property
-    def breadcrumbs(self) -> list[Link]:
-        return [
-            Link(_('Homepage'), self.homepage_url),
-            Link(_('Chats'), self.request.link(
-                self.request.app.org, name='chats'
-            ))
-        ]
-
-
-class ClientChatLayout(ChatLayout):
-
-    def __init__(self, model: Any, request: TownRequest) -> None:
-        super().__init__(model, request)
-        self.request.include('websockets')
-        self.request.include('client-chat')
-
-        self.custom_body_attributes['data-websocket-endpoint'] = (
-            self.app.websockets_client_url(request))
-        self.custom_body_attributes['data-websocket-schema'] = (
-            self.app.schema)
-
-
-class ChatInitiationFormLayout(DefaultLayout):
-    pass
-
-
-class ArchivedChatsLayout(DefaultLayout):
-
-    @cached_property
-    def breadcrumbs(self) -> list[Link]:
-        bc = [
-            Link(_('Homepage'), self.homepage_url),
-            Link(
-                _('Chat Archive'),
-                self.request.class_link(
-                    ChatCollection, {
-                        'state': 'archived',
-                    },
-                    name='archive'
-                ),
-                attrs={
-                    'class': ('chats'),
-                }
-            )
-        ]
-
-        if isinstance(self.model, Chat):
-            bc.append(
-                Link(self.model.customer_name, self.request.link(
-                    self.model, 'staff-view'
-                ))
-            )
-
-        return bc
 
 
 class MeetingCollectionLayout(DefaultLayout):

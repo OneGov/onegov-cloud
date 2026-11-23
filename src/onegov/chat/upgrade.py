@@ -38,3 +38,9 @@ def make_message_type_not_nullable(context: UpgradeContext) -> None:
              WHERE type IS NULL;
         """))
         context.operations.alter_column('messages', 'type', nullable=False)
+
+
+@upgrade_task('Drop chats table')
+def drop_chats_table(context: UpgradeContext) -> None:
+    if context.has_table('chats'):
+        context.operations.drop_table('chats')

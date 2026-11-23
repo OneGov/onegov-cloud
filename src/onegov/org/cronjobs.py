@@ -9,8 +9,6 @@ from inspect import isabstract
 from itertools import groupby, chain
 from markupsafe import Markup
 from niquests.adapters import HTTPAdapter
-from onegov.chat.collections import ChatCollection
-from onegov.chat.models import Chat
 from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.audit import AuditEntry
@@ -27,7 +25,6 @@ from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     ResourceRecipient,
     ResourceRecipientCollection,
@@ -40,11 +37,10 @@ from onegov.org.models.extensions import (
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
 from onegov.org.models import (
-    ExtendedDirectoryEntry, TicketMessage)
+    ExtendedDirectoryEntry)
 from onegov.org.notification_service import (
     get_notification_service,
 )
-from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
     send_admin_expiry_notification_for_directory_entry,
@@ -815,56 +811,6 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
             receivers=(email, ),
             content=content
         )
-
-
-@OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
-def end_chats_and_create_tickets(request: OrgRequest) -> None:
-    half_hour_ago = utcnow() - timedelta(minutes=30)
-
-    chats = ChatCollection(request.session).query().filter(
-        Chat.active == True).filter(Chat.chat_history != []).filter(
-            Chat.last_change < half_hour_ago)
-
-    for chat in chats:
-        chat.active = False
-        with chats.session.no_autoflush:
-            ticket = TicketCollection(request.session).open_ticket(
-                handler_code='CHT', handler_id=chat.id.hex
-            )
-            TicketMessage.create(ticket, request, 'opened')
-
-            send_ticket_mail(
-                request=request,
-                template='mail_turned_chat_into_ticket.pt',
-                subject=_('Your Chat has been turned into a ticket'),
-                receivers=(chat.email, ),
-                ticket=ticket,
-                content={
-                    'model': chats,
-                    'ticket': ticket,
-                    'chat': chat,
-                    'organisation': request.app.org.title,
-                }
-            )
-            for email in emails_for_new_ticket(request, ticket):
-                send_ticket_mail(
-                    request=request,
-                    template='mail_ticket_opened_info.pt',
-                    subject=_('New ticket'),
-                    ticket=ticket,
-                    receivers=(email, ),
-                    content={'model': ticket},
-                )
-
-            request.app.send_websocket(
-                channel=request.app.websockets_private_channel,
-                message={
-                    'event': 'browser-notification',
-                    'title': request.translate(_('New ticket')),
-                    'created': ticket.created.isoformat()
-                },
-                groupids=request.app.groupids_for_ticket(ticket),
-            )
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
