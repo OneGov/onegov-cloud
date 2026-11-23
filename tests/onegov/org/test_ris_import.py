@@ -9,6 +9,8 @@ from typing import Any, TYPE_CHECKING, cast
 import pytest
 import yaml
 
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
 from click.testing import CliRunner
 from tests.shared.utils import create_image
 from onegov.org.cli import cli
@@ -507,6 +509,7 @@ def test_ogi_enum_upgrade(org_app: TestOrgApp) -> None:
     )
     session.add(business)
     session.flush()
+    assert session.bind is not None
     session.execute(
         sql_text(
             '''
@@ -526,6 +529,9 @@ def test_ogi_enum_upgrade(org_app: TestOrgApp) -> None:
             session=session,
             schema=org_app.session_manager.current_schema,
             has_table=lambda name: name == 'par_political_businesses',
+            operations=Operations(MigrationContext.configure(
+                session._connection_for_bind(session.bind)
+            )),
         ),
     )
     assert add_horw_political_business_enums(context)
