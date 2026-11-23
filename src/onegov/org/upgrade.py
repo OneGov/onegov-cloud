@@ -33,7 +33,6 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from zope.sqlalchemy import mark_changed
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
@@ -1112,15 +1111,19 @@ def add_horw_political_business_enums(context: UpgradeContext) -> bool:
             ).scalars()
         )
         missing = set(values) - existing
-        if missing:
-            mark_changed(context.session)
+        if not missing:
+            continue
+
+        # ALTER TYPE ... ADD VALUE breaks on Postgres < 12
+        context.operations.execute(text('COMMIT'))
         for value in sorted(missing):
             quoted = value.replace("'", "''")
-            context.session.execute(
+            context.operations.execute(
                 text(
                     f'ALTER TYPE {enum_name} ADD VALUE IF NOT EXISTS '
                     f"'{quoted}'"
                 )
             )
-            changed = True
+        context.operations.execute(text('BEGIN'))
+        changed = True
     return changed
