@@ -1735,6 +1735,11 @@ def test_directory_search_widget(client_with_fts: Client) -> None:
     assert not client.get(
         '/directories/bars?search=inline').pyquery('#inline-search')
 
+    # ...and a forced search does not filter a disabled directory
+    assert 'Pilatus Bars' in client.get(
+        '/directories/bars?search=inline'
+        '&search_query={"term"%3A"zzz"}')
+
     # results are limited to the searched directory
     page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
