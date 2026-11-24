@@ -424,6 +424,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     marker_color: dict_property[str | None] = content_property()
 
     overview_two_columns: dict_property[bool | None] = content_property()
+    # search field limited to this directory
+    enable_search: dict_property[bool | None] = content_property()
     numbering: dict_property[str | None] = content_property()
     numbers: dict_property[str | None] = content_property()
 

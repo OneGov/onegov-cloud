@@ -1708,3 +1708,31 @@ def test_directory_settings_field_dependencies(
         'required_publication/y;enable_change_requests/!y')
     assert depends_on('[name="change_requests_guideline"]') == (
         'enable_change_requests/y')
+
+
+def test_directory_search_widget(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    def create_directory(title: str, enable_search: bool) -> None:
+        page = client.get('/directories').click('^Verzeichnis$')
+        page.form['title'] = title
+        page.form['structure'] = 'Name *= ___'
+        page.form['title_format'] = '[Name]'
+        page.form['enable_search'] = enable_search
+        page = page.form.submit().follow()
+        page = page.click('Eintrag', index=0)
+        page.form['name'] = f'Pilatus {title}'
+        page.form.submit().follow()
+
+    create_directory('Clubs', enable_search=True)
+    create_directory('Bars', enable_search=False)
+
+    assert client.get('/directories/clubs').pyquery('#inline-search')
+    assert not client.get('/directories/bars').pyquery('#inline-search')
+
+    # results are limited to the searched directory
+    page = client.get(
+        '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
+    assert 'Pilatus Clubs' in page
+    assert 'Pilatus Bars' not in page

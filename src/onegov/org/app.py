@@ -664,6 +664,11 @@ def get_default_directory_search_widget() -> None:
     return None
 
 
+@OrgApp.setting(section='org', name='always_enable_directory_search')
+def get_always_enable_directory_search() -> bool:
+    return False
+
+
 @OrgApp.setting(section='org', name='default_event_search_widget')
 def get_default_event_search_widget() -> None:
     return None
@@ -787,6 +792,11 @@ def get_webasset_output() -> str:
 def get_sortable_asset() -> Iterator[str]:
     yield 'sortable.js'
     yield 'sortable_custom.js'
+
+
+@OrgApp.webasset('inline-search')
+def get_inline_search_asset() -> Iterator[str]:
+    yield 'inline-search.js'
 
 
 @OrgApp.webasset('fullcalendar')

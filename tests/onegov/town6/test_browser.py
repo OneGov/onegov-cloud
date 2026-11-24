@@ -294,3 +294,55 @@ def monkey_patch_visit_to_ignore_console_errors(
     browser.visit = functools.partial(  # type: ignore[method-assign]
         original_visit, ignore_all_console_errors=True
     )
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_directory_inline_search(
+    browser_with_fts: ExtendedBrowser,
+    fts_town_app: TestTownApp,
+) -> None:
+    from onegov.directory import DirectoryCollection, DirectoryConfiguration
+    from onegov.org.models import ExtendedDirectory
+
+    session = fts_town_app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus'})
+    directory.add(values={'name': 'Rigi'})
+    transaction.commit()
+
+    browser = browser_with_fts
+    browser.visit('/directories/clubs')
+
+    assert browser.find_by_text('Pilatus')
+    assert browser.find_by_text('Rigi')
+
+    # town6 clones the sidebar into the off-canvas menu, so the search form
+    # exists twice; drive the visible one in the sidebar
+    search = browser.page.locator('.sidebar #inline-search #search-term')
+    search.fill('Pilatus')
+    browser.page.locator(
+        '.sidebar #inline-search button[type="submit"]').click()
+
+    # the term reached search_query (not the empty off-canvas clone)
+    assert 'search=inline' in browser.url
+    assert 'Pilatus' in browser.url
+    assert browser.find_by_text('Pilatus')
+    assert not browser.find_by_text('Rigi')
+
+    # submitting an empty term resets to the unfiltered directory with a
+    # clean url (no search params) and shows all entries again
+    browser.page.locator('.sidebar #inline-search #search-term').fill('')
+    browser.page.locator(
+        '.sidebar #inline-search button[type="submit"]').click()
+
+    assert browser.url.endswith('/directories/clubs')
+    assert browser.find_by_text('Pilatus')
+    assert browser.find_by_text('Rigi')

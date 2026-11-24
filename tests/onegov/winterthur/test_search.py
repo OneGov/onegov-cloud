@@ -77,3 +77,16 @@ def test_search_malicious_term(client_with_fts: Client[TestApp]) -> None:
         '{"term"%3A"----------------------------------Pilatus"}'
     )
     assert "Keine Einträge gefunden." in search_page
+
+
+def test_directory_search_always_enabled(client: Client[TestApp]) -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Clubs'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_search'] = False
+    page.form.submit().follow()
+
+    assert client.get('/directories/clubs').pyquery('#inline-search')

@@ -204,6 +204,11 @@ class DirectoryBaseForm(Form):
         fieldset=_('Display'),
         default=False)
 
+    enable_search = BooleanField(
+            label=_('Show search field restricted to directory entries'),
+        fieldset=_('Directory Search'),
+        default=True)
+
     address_block_title_type = RadioField(
         label=_('Address Block Title'),
         fieldset=_('Address Block'),

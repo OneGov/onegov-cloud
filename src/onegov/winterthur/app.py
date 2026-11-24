@@ -248,6 +248,11 @@ def get_default_directory_search_widget() -> str:
     return 'inline'
 
 
+@WinterthurApp.setting(section='org', name='always_enable_directory_search')
+def get_always_enable_directory_search() -> bool:
+    return True
+
+
 @WinterthurApp.setting(section='org', name='default_event_search_widget')
 def get_default_event_search_widget() -> str:
     return 'inline'
@@ -267,11 +272,6 @@ def get_js_path() -> str:
 @WinterthurApp.webasset_output()
 def get_webasset_output() -> str:
     return 'assets/bundles'
-
-
-@WinterthurApp.webasset('inline-search')
-def get_inline_search_asset() -> Iterator[str]:
-    yield 'inline-search.js'
 
 
 @WinterthurApp.webasset('street-search')
