@@ -518,8 +518,9 @@ def view_find_your_spot(
                         start, end, days=form.weekdays.data, strict=True
                     )
                 )
-                if not allocations:
-                    continue
+
+            if not allocations:
+                continue
 
             reserved, blocked = scheduler.reserved_slots_by_range(
                 min(a._start for a in allocations),
