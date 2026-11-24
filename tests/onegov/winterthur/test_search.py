@@ -159,4 +159,8 @@ def test_directory_search_enabled_by_migration(
     enable_directory_search(cast('UpgradeContext', Bunch(session=session)))
     transaction.commit()
 
+    directories = DirectoryCollection(session, type='extended')
+    migrated = directories.by_name('clubs')
+    assert migrated is not None
+    assert migrated.enable_search is True
     assert client.get('/directories/clubs').pyquery('#inline-search')
