@@ -10,8 +10,11 @@ $(document).on('submit', '[id="inline-search"]', function() {
     return true;
 });
 
-// the reset button clears the search and returns to the unfiltered directory
+// the reset button clears the search term but keeps any active filters
 $(document).on('click', '[id="inline-search"] .reset-button', function(e) {
     e.preventDefault();
-    window.location = $(this).closest('form')[0].action.split('?')[0];
+    var url = new URL(window.location.href);
+    url.searchParams.delete('search');
+    url.searchParams.delete('search_query');
+    window.location = url.toString();
 });

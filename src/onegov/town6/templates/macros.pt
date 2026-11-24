@@ -3538,6 +3538,11 @@
 
                 <input type="hidden" name="search" value="inline" />
                 <input type="hidden" name="search_query" />
+
+                <tal:b tal:repeat="param request.GET.items()">
+                    <input type="hidden" name="${param[0]}" value="${param[1]}"
+                           tal:condition="param[0] not in ('search', 'search_query', 'page')" />
+                </tal:b>
             </div>
             <div class="input-group-button">
                 <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">

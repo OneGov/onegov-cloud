@@ -1736,3 +1736,48 @@ def test_directory_search_widget(client_with_fts: Client) -> None:
         '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
     assert 'Pilatus Clubs' in page
     assert 'Pilatus Bars' not in page
+
+
+def test_directory_search_preserves_filter(client_with_fts: Client) -> None:
+    client = client_with_fts
+
+    session = client.app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure=dedent("""
+            Name *= ___
+            Choice =
+                (x) yes
+                ( ) no
+        """),
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name'],
+            keywords=['Choice']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus', 'choice': 'yes'})
+    directory.add(values={'name': 'Rigi', 'choice': 'yes'})
+    directory.add(values={'name': 'Napf', 'choice': 'no'})
+    transaction.commit()
+
+    client.login_admin()
+
+    # an active category filter is preserved as a hidden field, so submitting
+    # a search keeps the filter instead of dropping it
+    searched = client.get(
+        '/directories/clubs?keywords=choice:yes'
+        '&search=inline&search_query={"term"%3A"Pilatus"}')
+    assert searched.pyquery(
+        '#inline-search input[name="keywords"]')[0].attrib['value'] \
+        == 'choice:yes'
+    assert 'Pilatus' in searched
+    assert 'Rigi' not in searched  # excluded by the search term
+    assert 'Napf' not in searched  # excluded by the category filter
+
+    # the reset target (filter kept, search dropped) keeps the filter active
+    reset = client.get('/directories/clubs?keywords=choice:yes')
+    assert 'Pilatus' in reset
+    assert 'Rigi' in reset  # search cleared
+    assert 'Napf' not in reset  # filter kept

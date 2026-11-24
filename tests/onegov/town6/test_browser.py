@@ -363,3 +363,49 @@ def test_directory_inline_search(
     browser.visit('/directories/bars?search=inline')
     assert browser.page.locator('#inline-search').count() == 0
     assert browser.find_by_text('Jamaica')
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_directory_search_keeps_filter(
+    browser_with_fts: ExtendedBrowser,
+    fts_town_app: TestTownApp,
+) -> None:
+    from textwrap import dedent
+    from onegov.directory import DirectoryCollection, DirectoryConfiguration
+    from onegov.org.models import ExtendedDirectory
+
+    session = fts_town_app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure=dedent("""
+            Name *= ___
+            Choice =
+                (x) yes
+                ( ) no
+        """),
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name'],
+            keywords=['Choice']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus', 'choice': 'yes'})
+    directory.add(values={'name': 'Rigi', 'choice': 'yes'})
+    transaction.commit()
+
+    browser = browser_with_fts
+    browser.visit('/directories/clubs?keywords=choice:yes')
+
+    # searching keeps the active category filter in the url
+    browser.page.locator(
+        '.sidebar #inline-search #search-term').fill('Pilatus')
+    browser.page.locator(
+        '.sidebar #inline-search button[type="submit"]').click()
+    assert 'keywords=choice' in browser.url
+    assert 'search=inline' in browser.url
+
+    # resetting clears the search term but keeps the filter
+    browser.page.locator('.sidebar #inline-search .reset-button').click()
+    assert 'keywords=choice' in browser.url
+    assert 'search=inline' not in browser.url
