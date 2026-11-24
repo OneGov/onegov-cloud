@@ -337,11 +337,9 @@ def test_directory_inline_search(
     assert browser.find_by_text('Pilatus')
     assert not browser.find_by_text('Rigi')
 
-    # submitting an empty term resets to the unfiltered directory with a
-    # clean url (no search params) and shows all entries again
-    browser.page.locator('.sidebar #inline-search #search-term').fill('')
-    browser.page.locator(
-        '.sidebar #inline-search button[type="submit"]').click()
+    # the reset button returns to the unfiltered directory with a clean url
+    # (no search params) and shows all entries again
+    browser.page.locator('.sidebar #inline-search .reset-button').click()
 
     assert browser.url.endswith('/directories/clubs')
     assert browser.find_by_text('Pilatus')
