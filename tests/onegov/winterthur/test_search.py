@@ -1,9 +1,16 @@
+import transaction
+
 from webtest import Upload
+from onegov.core.utils import Bunch
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
+from onegov.org.models import ExtendedDirectory
+from onegov.org.upgrade import enable_directory_search
 from tests.shared.utils import create_image
 
 
-from typing import TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
     from tests.shared.client import Client
     from .conftest import TestApp
 
@@ -127,3 +134,29 @@ def test_directory_search_reset(client_with_fts: Client[TestApp]) -> None:
     reset = client.get('/directories/clubs')
     assert 'Pilatus' in reset
     assert 'Rigi' in reset
+
+
+def test_directory_search_enabled_by_migration(
+    client: Client[TestApp],
+) -> None:
+    session = client.app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='[Name]'),
+    )
+    # a directory created before the feature has no enable_search flag
+    assert directory.enable_search is None
+    transaction.commit()
+
+    # without the flag the search box is hidden
+    assert not client.get('/directories/clubs').pyquery('#inline-search')
+
+    # the migration enables search on all existing directories
+    session = client.app.session()
+    enable_directory_search(cast('UpgradeContext', Bunch(session=session)))
+    transaction.commit()
+
+    assert client.get('/directories/clubs').pyquery('#inline-search')
