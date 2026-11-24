@@ -1,6 +1,7 @@
 import collections
 import hashlib
 import icalendar
+import math
 import morepath
 import secrets
 import sedate
@@ -552,7 +553,10 @@ def view_find_your_spot(
                         (
                             allocation.quota
                             if slot in blocked
-                            else reserved.get(slot, 0)
+                            else math.ceil(
+                                allocation.quota
+                                * reserved.get(slot, 0)
+                            )
                             for slot, __ in rasterizer.iterate_span(
                                 allocation._start,
                                 allocation._end,
