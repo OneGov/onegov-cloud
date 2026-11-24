@@ -79,14 +79,51 @@ def test_search_malicious_term(client_with_fts: Client[TestApp]) -> None:
     assert "Keine Einträge gefunden." in search_page
 
 
-def test_directory_search_always_enabled(client: Client[TestApp]) -> None:
+def test_directory_search_toggle(client: Client[TestApp]) -> None:
     client.login_admin()
 
+    def create_directory(title: str, enable_search: bool) -> None:
+        page = client.get('/directories').click('^Verzeichnis$')
+        page.form['title'] = title
+        page.form['structure'] = 'Name *= ___'
+        page.form['title_format'] = '[Name]'
+        page.form['enable_search'] = enable_search
+        page.form.submit().follow()
+
+    create_directory('Clubs', enable_search=True)
+    create_directory('Bars', enable_search=False)
+
+    assert client.get('/directories/clubs').pyquery('#inline-search')
+    assert not client.get('/directories/bars').pyquery('#inline-search')
+
+    # the search box stays hidden even when search is forced into the url
+    assert not client.get(
+        '/directories/bars?search=inline').pyquery('#inline-search')
+
+
+def test_directory_search_reset(client_with_fts: Client[TestApp]) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    # Create directory with two entries
     page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = 'Clubs'
     page.form['structure'] = 'Name *= ___'
     page.form['title_format'] = '[Name]'
-    page.form['enable_search'] = False
     page.form.submit().follow()
 
-    assert client.get('/directories/clubs').pyquery('#inline-search')
+    for name in ('Pilatus', 'Rigi'):
+        page = client.get('/directories/clubs').click('Eintrag', index=0)
+        page.form['name'] = name
+        page.form.submit().follow()
+
+    # a search filters down to the matching entry
+    filtered = client.get(
+        '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
+    assert 'Pilatus' in filtered
+    assert 'Rigi' not in filtered
+
+    # the reset button navigates to the unfiltered directory, showing all
+    reset = client.get('/directories/clubs')
+    assert 'Pilatus' in reset
+    assert 'Rigi' in reset

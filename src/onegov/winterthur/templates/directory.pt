@@ -23,7 +23,7 @@
 
         <p tal:condition="directory.lead" tal:content="layout.linkify(directory.lead)" />
         <div class="sidebar-wrapper">
-            <div class="row search-widget" tal:condition="search_widget">
+            <div class="row search-widget" tal:condition="search_widget and directory.enable_search">
                 <div class="columns medium-6">
                     <tal:b replace="search_widget.html(layout)" />
                 </div>

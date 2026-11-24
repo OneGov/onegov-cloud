@@ -1246,10 +1246,7 @@ def get_directory_entries(
     if not isinstance(directory, ExtendedDirectory):
         return None
 
-    if not search and (
-        directory.enable_search
-        or app.settings.org.always_enable_directory_search
-    ):
+    if not search and directory.enable_search:
         search = app.settings.org.default_directory_search_widget or 'inline'
 
     if search and search in app.config.directory_search_widget_registry:

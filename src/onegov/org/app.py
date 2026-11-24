@@ -664,11 +664,6 @@ def get_default_directory_search_widget() -> None:
     return None
 
 
-@OrgApp.setting(section='org', name='always_enable_directory_search')
-def get_always_enable_directory_search() -> bool:
-    return False
-
-
 @OrgApp.setting(section='org', name='default_event_search_widget')
 def get_default_event_search_widget() -> None:
     return None

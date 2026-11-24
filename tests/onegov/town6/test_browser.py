@@ -316,6 +316,16 @@ def test_directory_inline_search(
     directory.enable_search = True
     directory.add(values={'name': 'Pilatus'})
     directory.add(values={'name': 'Rigi'})
+
+    # a directory with search disabled shows no search box
+    disabled = directories.add(
+        title='Bars',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name']),
+    )
+    disabled.enable_search = False
+    disabled.add(values={'name': 'Jamaica'})
     transaction.commit()
 
     browser = browser_with_fts
@@ -344,3 +354,12 @@ def test_directory_inline_search(
     assert browser.url.endswith('/directories/clubs')
     assert browser.find_by_text('Pilatus')
     assert browser.find_by_text('Rigi')
+
+    # the disabled directory has no search box, even when search is forced
+    # into the url
+    browser.visit('/directories/bars')
+    assert browser.page.locator('#inline-search').count() == 0
+
+    browser.visit('/directories/bars?search=inline')
+    assert browser.page.locator('#inline-search').count() == 0
+    assert browser.find_by_text('Jamaica')
