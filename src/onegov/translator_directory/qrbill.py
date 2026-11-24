@@ -1,5 +1,6 @@
-from io import BytesIO
+from io import BytesIO, StringIO
 from onegov.translator_directory import log
+from onegov.pdf.fetcher import AllowlistURLFetcher
 from onegov.translator_directory.constants import FINANZSTELLE
 from qrbill.bill import QRBill
 from stdnum import iban as iban_validator
@@ -111,9 +112,6 @@ def generate_translator_qr_bill(
         log.exception(e)
         return None
 
-    # Generate SVG
-    from io import StringIO
-
     svg = StringIO()
     bill.as_svg(svg)
     svg_content = svg.getvalue()
@@ -151,7 +149,9 @@ def generate_translator_qr_bill(
         """
 
         pdf_file = BytesIO()
-        HTML(string=html_content).write_pdf(pdf_file)
+        HTML(string=html_content, url_fetcher=AllowlistURLFetcher()).write_pdf(
+            pdf_file
+        )
         return pdf_file.getvalue()
 
     except Exception as e:

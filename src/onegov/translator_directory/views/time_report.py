@@ -10,6 +10,8 @@ from decimal import Decimal
 from uuid import uuid4
 from onegov.core.mail import Attachment
 from onegov.core.utils import module_path
+from onegov.pdf.fetcher import AllowlistURLFetcher
+from markupsafe import escape
 from onegov.translator_directory.qrbill import (
     generate_translator_qr_bill,
     is_valid_iban,
@@ -700,8 +702,10 @@ def generate_time_report_pdf_bytes(
         case _:
             title = 'Herr/Frau'
 
-    salutation = f'{gendered_greeting(translator)} {translator.last_name}'
-    translator_name = f'{translator.first_name} {translator.last_name}'
+    salutation = escape(
+        f'{gendered_greeting(translator)} {translator.last_name}'
+    )
+    translator_name = escape(f'{translator.first_name} {translator.last_name}')
 
     duration_text = (
         f'{time_report.duration_hours} Stunde'
@@ -731,7 +735,7 @@ def generate_time_report_pdf_bytes(
 
     if logo_url:
         html_content += f"""
-                    <img src="{logo_url}" alt="Logo" />
+                    <img src="{escape(logo_url)}" alt="Logo" />
         """
 
     html_content += f"""
@@ -763,11 +767,10 @@ def generate_time_report_pdf_bytes(
     """
 
     if translator.address:
-        html_content += f'                    {translator.address}<br>\n'
+        html_content += f'{escape(translator.address)}<br>\n'
     if translator.zip_code and translator.city:
         html_content += (
-            f'                    {translator.zip_code} '
-            f'{translator.city}<br>\n'
+            f'{escape(translator.zip_code)} {escape(translator.city)}<br>\n'
         )
 
     html_content += f"""
@@ -794,7 +797,7 @@ def generate_time_report_pdf_bytes(
                     <strong>
                         {request.translate(_('Assignment Date'))}:
                     </strong>
-                    {assignment_date_display}
+                    {escape(assignment_date_display)}
                 </p>
     """
 
@@ -804,7 +807,7 @@ def generate_time_report_pdf_bytes(
                     <strong>
                         {request.translate(_('Ticket Number'))}:
                     </strong>
-                    {ticket_number}
+                    {escape(ticket_number)}
                 </p>
     """
 
@@ -1036,7 +1039,7 @@ def generate_time_report_pdf_bytes(
 
         html_content += f"""
                         <tr>
-                            <td class="label">{travel_label}:</td>
+                            <td class="label">{escape(travel_label)}:</td>
                             <td class="amount">
                                 {layout.format_currency(
                                     time_report.travel_compensation
@@ -1100,7 +1103,7 @@ def generate_time_report_pdf_bytes(
     if accountant_name:
         closing_text = (
             f'Mit freundlichen Grüssen<br><br>Rechnungsbüro<br>'
-            f'{accountant_name}'
+            f'{escape(accountant_name)}'
         )
 
     html_content += f"""
@@ -1123,7 +1126,8 @@ def generate_time_report_pdf_bytes(
         </html>
     """
 
-    pdf_bytes = HTML(string=html_content).write_pdf(
+    url_fetcher = AllowlistURLFetcher([logo_url] if logo_url else [])
+    pdf_bytes = HTML(string=html_content, url_fetcher=url_fetcher).write_pdf(
         stylesheets=[css], font_config=font_config
     )
 

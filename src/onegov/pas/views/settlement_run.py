@@ -3,6 +3,8 @@ from pdfrw import PdfReader, PdfWriter  # type: ignore[import-untyped]
 from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
+from onegov.pdf.fetcher import AllowlistURLFetcher
+from markupsafe import escape
 from decimal import Decimal
 from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
@@ -605,7 +607,7 @@ def generate_settlement_pdf(
         subtitle=subtitle,
     )
 
-    return HTML(string=html).write_pdf(
+    return HTML(string=html, url_fetcher=AllowlistURLFetcher()).write_pdf(
         stylesheets=[css], font_config=font_config
     )
 
@@ -669,7 +671,7 @@ def _generate_settlement_html(
        <html>
        <head><meta charset="utf-8"></head>
        <body>
-           <div class="table-title">{subtitle}</div>
+           <div class="table-title">{escape(subtitle)}</div>
            <table class="journal-table">
                <thead>
                    <tr>
@@ -685,12 +687,12 @@ def _generate_settlement_html(
    """
 
     for settlement_row in settlement_data:
-        name = settlement_row[1].title
+        name = escape(settlement_row[1].title)
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
                <td>{name}</td>
-               <td>{settlement_row[2]}</td>
+               <td>{escape(settlement_row[2])}</td>
                <td class="numeric">{format_swiss_number(
                    settlement_row[3])}</td>
                <td class="numeric">{format_swiss_number(
@@ -720,7 +722,7 @@ def _generate_settlement_html(
     for total_row in totals[:-1]:  # All but last
         html += f"""
            <tr>
-               <td>{total_row[0]}</td>
+               <td>{escape(total_row[0])}</td>
                <td class="numeric">{format_swiss_number(
                    total_row[1])}</td>
                <td class="numeric">{format_swiss_number(
@@ -739,7 +741,7 @@ def _generate_settlement_html(
         final_row = totals[-1]
         html += f"""
            <tr class="total-row">
-               <td>{final_row[0]}</td>
+               <td>{escape(final_row[0])}</td>
                <td class="numeric">{format_swiss_number(
                    final_row[1])}</td>
                <td class="numeric">{format_swiss_number(
