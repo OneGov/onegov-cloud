@@ -343,6 +343,10 @@ def test_directory_search_widget(client_with_fts: Client) -> None:
     assert client.get('/directories/clubs').pyquery('#inline-search')
     assert not client.get('/directories/bars').pyquery('#inline-search')
 
+    # the box stays hidden even when search is forced into the url
+    assert not client.get(
+        '/directories/bars?search=inline').pyquery('#inline-search')
+
     # results are limited to the searched directory
     page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
