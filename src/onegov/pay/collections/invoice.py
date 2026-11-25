@@ -147,5 +147,5 @@ class InvoiceCollection[
             # unlink the invoice item from any payments
             item.payments = []
             self.session.delete(item)
-        self.session.delete(item)
+        self.session.delete(invoice)
         self.session.flush()
