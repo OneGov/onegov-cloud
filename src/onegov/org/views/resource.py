@@ -2093,8 +2093,8 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
 
     blocking_resources = request.params.get('blocking-resources') == '1'
 
-    start = utcnow() - timedelta(days=30)
-    end = utcnow() + timedelta(days=730)
+    range_start = utcnow() - timedelta(days=30)
+    range_end = utcnow() + timedelta(days=730)
 
     cal = icalendar.Calendar()
     cal.add('prodid', '-//OneGov//onegov.org//')
@@ -2124,7 +2124,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         for ical_field in resource.ical_fields
     }
 
-    # add allocations/reservations
+    # add reservations
     date = utcnow()
     query = (
         request.session.query(Reservation)
@@ -2149,10 +2149,10 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         )
         .filter(Reservation.status == 'approved')
         .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
-        .filter(Reservation.start >= start)
-        .filter(Reservation.start <= end)
+        .filter(Reservation.start >= range_start)
+        .filter(Reservation.start <= range_end)
+        .filter(Reservation.resource.in_(resources.keys()))
     )
-    query = query.filter(Reservation.resource.in_(resources.keys()))
     if all_ical_fields:
         query = query.outerjoin(
             FormSubmission,
@@ -2187,6 +2187,37 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
         evt.add('url', url)
+
+        cal.add_component(evt)
+
+    # add blockers
+    blocker_label = request.translate(_('Blocker'))
+    for blocker_id, resource_id, title, start, end in (
+        request.session.query(
+            ReservationBlocker.id.label('id'),
+            ReservationBlocker.resource.label('resource_id'),
+            ReservationBlocker.reason.label('title'),
+            ReservationBlocker.start.label('start'),
+            ReservationBlocker.end.label('end'),
+        )
+        .filter(ReservationBlocker.start >= range_start)
+        .filter(ReservationBlocker.start <= range_end)
+        .filter(ReservationBlocker.resource.in_(resources.keys()))
+    ):
+        assert start and end
+        end += timedelta(microseconds=1)
+        if not title:
+            title = blocker_label
+
+        resource = resources.get(resource_id, self)
+        evt = icalendar.Event()
+        evt.add('uid', f'blocker-{blocker_id}')
+        evt.add('summary', title)
+        evt.add('location', resource.title)
+        evt.add('description', title)
+        evt.add('dtstart', standardize_date(start, 'UTC'))
+        evt.add('dtend', standardize_date(end, 'UTC'))
+        evt.add('dtstamp', date)
 
         cal.add_component(evt)
 
