@@ -4,8 +4,10 @@ import pytest
 
 from onegov.winterthur.roadwork import (
     Roadwork,
+    RoadworkClient,
     RoadworkCollection,
     RoadworkConfig,
+    RoadworkConnectionError,
     RoadworkError,
 )
 
@@ -180,3 +182,85 @@ def test_roadwork_collection_by_id_section_fallback() -> None:
     assert section.id == 10
 
     assert collection.by_id(999) is None
+
+
+# --- RoadworkClient caching state machine -------------------------------
+
+
+class FakeCache:
+    def __init__(self) -> None:
+        self.store: dict[str, Any] = {}
+
+    def get(self, key: str) -> Any:
+        from dogpile.cache.api import NO_VALUE
+        return self.store.get(key, NO_VALUE)
+
+    def set(self, key: str, value: Any) -> None:
+        self.store[key] = value
+
+
+class FakeClient(RoadworkClient):
+    def __init__(self) -> None:
+        super().__init__(
+            cache=FakeCache(),  # type: ignore[arg-type]
+            hostname='pdb.example.org',
+            username='u',
+            password='p',
+        )
+        self.response: tuple[int, Any] | Exception = (200, {'ok': True})
+        self.calls = 0
+
+    def get_uncached(self, path: str) -> tuple[int, Any]:
+        self.calls += 1
+        if isinstance(self.response, Exception):
+            raise self.response
+        return self.response
+
+
+def test_roadwork_client_caches_result() -> None:
+    client = FakeClient()
+
+    assert client.get('data') == {'ok': True}
+    assert client.calls == 1
+
+    # within lifetime the cached value is returned without a new call
+    assert client.get('data') == {'ok': True}
+    assert client.calls == 1
+
+
+def test_roadwork_client_non_200_raises() -> None:
+    client = FakeClient()
+    client.response = (404, 'not found')
+    with pytest.raises(RoadworkError):
+        client.get('data')
+
+
+def test_roadwork_client_server_error_raises_connection_error() -> None:
+    client = FakeClient()
+    client.response = (503, 'unavailable')
+    with pytest.raises(RoadworkConnectionError):
+        client.get('data')
+
+
+def test_roadwork_client_connection_error() -> None:
+    import pycurl
+    client = FakeClient()
+    client.response = pycurl.error('boom')
+    with pytest.raises(RoadworkConnectionError):
+        client.get('data')
+
+
+def test_roadwork_client_serves_stale_within_downtime() -> None:
+    from datetime import timedelta
+    from sedate import utcnow
+
+    client = FakeClient()
+    assert client.get('data') == {'ok': True}
+
+    # age the cache entry past the lifetime but within the downtime window
+    entry = client.cache.store['data']  # type: ignore[attr-defined]
+    entry['created'] = utcnow() - timedelta(minutes=10)
+
+    # the backend is now down -> the stale value is served
+    client.response = (503, 'unavailable')
+    assert client.get('data') == {'ok': True}
