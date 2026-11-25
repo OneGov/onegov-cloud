@@ -1,6 +1,7 @@
 import collections
 import hashlib
 import icalendar
+import math
 import morepath
 import secrets
 import sedate
@@ -518,8 +519,9 @@ def view_find_your_spot(
                         start, end, days=form.weekdays.data, strict=True
                     )
                 )
-                if not allocations:
-                    continue
+
+            if not allocations:
+                continue
 
             reserved, blocked = scheduler.reserved_slots_by_range(
                 min(a._start for a in allocations),
@@ -551,7 +553,10 @@ def view_find_your_spot(
                         (
                             allocation.quota
                             if slot in blocked
-                            else reserved.get(slot, 0)
+                            else math.ceil(
+                                allocation.quota
+                                * reserved.get(slot, 0)
+                            )
                             for slot, __ in rasterizer.iterate_span(
                                 allocation._start,
                                 allocation._end,

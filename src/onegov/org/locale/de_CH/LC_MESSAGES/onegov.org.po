@@ -676,6 +676,12 @@ msgstr "Bilder für Darstellung als Thumbnail auf dem Eintrag"
 msgid "Overview layout with tiles"
 msgstr "Übersicht mit Kacheln"
 
+msgid "Directory Search"
+msgstr "Verzeichnissuche"
+
+msgid "Show search field restricted to directory entries"
+msgstr "Suchfeld für Verzeichniseinträge anzeigen"
+
 msgid "Address Block Title"
 msgstr "Addressblock Titel"
 

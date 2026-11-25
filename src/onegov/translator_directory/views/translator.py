@@ -18,7 +18,8 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory.utils import (
-    get_accountant_emails_for_finanzstelle
+    get_accountant_emails_for_finanzstelle,
+    get_finanzstellen_without_accountants,
 )
 from onegov.translator_directory.constants import (
     PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
@@ -534,11 +535,9 @@ def add_time_report(
     if not request.app.enable_time_tracking:
         raise HTTPForbidden()
 
-    if form.submitted(request):
-
-        session = request.session
-        current_user = request.current_user
-
+    submitted = form.submitted(request)
+    accountant_emails: set[str] | None = None
+    if submitted:
         try:
             accountant_emails = set(
                 get_accountant_emails_for_finanzstelle(
@@ -546,8 +545,11 @@ def add_time_report(
                 )
             )
         except ValueError as e:
-            request.warning(str(e))
-            return redirect(request.link(self))
+            request.alert(str(e))
+
+    if submitted and accountant_emails is not None:
+        session = request.session
+        current_user = request.current_user
 
         report = TranslatorTimeReport(
             translator=self,
@@ -632,6 +634,18 @@ def add_time_report(
 
         request.success(_('Time report submitted for review'))
         return redirect(request.link(ticket, 'status'))
+
+    if not submitted:
+        missing = get_finanzstellen_without_accountants(request)
+        if missing:
+            request.warning(
+                _(
+                    'No accountant emails configured for the following '
+                    'cost centers: ${names}. Time reports for these '
+                    'cannot be submitted.',
+                    mapping={'names': ', '.join(missing)},
+                )
+            )
 
     layout = TranslatorLayout(self, request)
 

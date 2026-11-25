@@ -304,6 +304,50 @@ def test_import_internal_majorz_missing_headers(session: Session) -> None:
     ]
 
 
+def test_import_internal_majorz_missing_values(session: Session) -> None:
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='sg')
+
+    errors = import_election_internal_majorz(
+        election, principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'election_absolute_majority',
+                    'election_status',
+                    'entity_id',
+                    'entity_counted',
+                    'entity_eligible_voters',
+                    'entity_received_ballots',
+                    'entity_blank_ballots',
+                    'entity_invalid_ballots',
+                    'entity_blank_votes',
+                    'entity_invalid_votes',
+                    'candidate_family_name',
+                    'candidate_first_name',
+                    'candidate_id',
+                    'candidate_elected',
+                    'candidate_party',
+                    'candidate_votes',
+                )),
+                ',final,3201,True,1,0,0,0,0,0,Zogg Thomas,1,True,,0',
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
+        'Line 2 contains fewer values than there are columns.'
+    ]
+
+
 def test_import_internal_majorz_invalid_values(session: Session) -> None:
     session.add(
         Election(

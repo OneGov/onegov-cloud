@@ -1,8 +1,49 @@
 # Changes
 
+## 2026.63
+
+`2026-11-23` | [9febe046e8...0a949511ae](https://github.com/OneGov/onegov-cloud/compare/9febe046e8^...0a949511ae)
+
+### Core
+
+##### Set users.data when adding admins on transfer
+
+Since the SQLAlchemy 2.0 upgrade, users.data is created as NOT NULL in
+new schemas, while older schemas still allow NULL. The admin INSERT of
+`transfer --add-admins` omitted the column and failed on newer schemas
+such as onegov_town6-horw.
+
+`Other` | [9febe046e8](https://github.com/onegov/onegov-cloud/commit/9febe046e8ba6a2cf52a109df34e52e2ed89eef9)
+
+### Election-Day
+
+##### Improves error message for CSV with too few values on a line.
+
+`Feature` | [06d340f92c](https://github.com/onegov/onegov-cloud/commit/06d340f92ce0abad8b00b4227fa76ee547c66140)
+
+### Org
+
+##### Fix exc shadowing `webob.exc` in `accept_reservation`.
+
+`Bugfix` | [3c0b20fd0e](https://github.com/onegov/onegov-cloud/commit/3c0b20fd0e9f57e022625cbb626254fce994b720)
+
+### Ris
+
+##### Fix import of second archive failing on missing participant.
+
+connect_relationships() relinked participants for every business in
+the database, but only knew the people of the archive being imported.
+Importing the pre-2010 archive after the 2010+ one therefore failed on
+historical people referenced by already imported businesses.
+
+Restrict participant linking to the businesses of the current archive;
+businesses from earlier imports keep their participants.
+
+`Bugfix` | [OGC-3523](https://linear.app/onegovcloud/issue/OGC-3523) | [78f1dbf53c](https://github.com/onegov/onegov-cloud/commit/78f1dbf53c7e8264e65e1b7eb8c4f38f7f533498)
+
 ## 2026.62
 
-`2026-11-19` | [8c4adac7ea...8c4adac7ea](https://github.com/OneGov/onegov-cloud/compare/8c4adac7ea^...8c4adac7ea)
+`2026-11-19` | [8c4adac7ea...68aafb7caf](https://github.com/OneGov/onegov-cloud/compare/8c4adac7ea^...68aafb7caf)
 
 ### Feriennet
 
@@ -5409,18 +5450,4 @@ Display private address if available, otherwise show place of residence
 ##### Update political business types
 
 `Bugfix` | [OGC-2465, OGC-2466](https://linear.app/onegovcloud/issue/OGC-2465, OGC-2466) | [f88d24869c](https://github.com/onegov/onegov-cloud/commit/f88d24869ca6cbdf75684746acd72b1bd2c9e201)
-
-## 2025.34
-
-`2025-07-18` | [86456cadbf...57a3644696](https://github.com/OneGov/onegov-cloud/compare/86456cadbf^...57a3644696)
-
-### Ris
-
-##### Menu to add, edit and remove meetings
-
-`Feature` | [OGC-2453](https://linear.app/onegovcloud/issue/OGC-2453) | [7990d46167](https://github.com/onegov/onegov-cloud/commit/7990d461674eaff84f1dc5e342c4b7e54296f4e5)
-
-##### Adds filter for future/past meetings (#1913)
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [4fea222a0b](https://github.com/onegov/onegov-cloud/commit/4fea222a0b0eb79b7b5cf4123352b38df154280b)
 

@@ -702,3 +702,39 @@ def test_ogi_misspelled_signatory_role(
     person = importer.people[source]
     assert person.first_name == 'Pia'
     assert person.last_name == 'Koefoed'
+
+
+def test_ogi_second_archive_keeps_other_participants(
+    org_app: TestOrgApp, tmp_path: Path
+) -> None:
+    (tmp_path / 'recent').mkdir()
+    (tmp_path / 'older').mkdir()
+    session = org_app.session()
+    OGIArchive(make_archive(tmp_path / 'recent')).importer(session).run()
+    business = session.query(PoliticalBusiness).one()
+    participants = len(business.participants)
+
+    root = make_archive(tmp_path / 'older')
+    path = root / 'political-business/unknown_10.json'
+    data = json.loads(
+        path.read_text()
+        .replace('2010-1', '2009-1')
+        .replace('1. Januar 2010', '1. Januar 2009')
+        .replace('Ruth Strässle-Erismann', 'Pia Koefoed')
+    )
+    path.unlink()
+    (root / 'political-business/unknown_11.json').write_text(json.dumps(data))
+    path = root / 'lists/businesses.json'
+    path.write_text(
+        path.read_text().replace('information/10', 'information/11')
+    )
+    manifest_path = root / 'manifest.json'
+    manifest = json.loads(manifest_path.read_text())
+    manifest['since'] = '1984-01-01'
+    manifest_path.write_text(json.dumps(manifest))
+    seal(root)
+
+    counts = OGIArchive(root).importer(session).run()
+    assert counts['political-business'] == 1
+    assert session.query(PoliticalBusiness).count() == 2
+    assert len(business.participants) == participants

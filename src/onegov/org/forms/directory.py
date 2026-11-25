@@ -263,6 +263,11 @@ class DirectoryBaseForm(Form):
         ],
         default='asc')
 
+    enable_search = BooleanField(
+        label=_('Show search field restricted to directory entries'),
+        fieldset=_('Directory Search'),
+        default=True)
+
     link_pattern = StringField(
         label=_('Pattern'),
         fieldset=_('External Link'),

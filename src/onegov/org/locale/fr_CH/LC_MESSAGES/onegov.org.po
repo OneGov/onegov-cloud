@@ -676,6 +676,12 @@ msgstr "Images à afficher sous forme de vignettes sur une entrée"
 msgid "Overview layout with tiles"
 msgstr "Vue d'ensemble avec les tuiles"
 
+msgid "Directory Search"
+msgstr "Recherche dans le répertoire"
+
+msgid "Show search field restricted to directory entries"
+msgstr "Afficher un champ de recherche limité aux entrées du répertoire"
+
 msgid "Address Block Title"
 msgstr "Titre du bloc d'adresses"
 
