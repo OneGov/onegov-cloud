@@ -10,13 +10,12 @@ from decimal import Decimal
 from uuid import uuid4
 from onegov.core.mail import Attachment
 from onegov.core.utils import module_path
-from onegov.pdf.fetcher import AllowlistURLFetcher
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
 from markupsafe import escape
 from onegov.translator_directory.qrbill import (
     generate_translator_qr_bill,
     is_valid_iban,
 )
-from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
@@ -664,7 +663,7 @@ def generate_time_report_pdf_bytes(
         'onegov.translator_directory', 'views/templates/time_report_pdf.css'
     )
     with open(css_path) as f:
-        css = CSS(string=f.read(), font_config=font_config)
+        css = SafeCSS(string=f.read(), font_config=font_config)
 
     # Get ticket number for display
     ticket = time_report.get_ticket(request.session)
@@ -1126,10 +1125,9 @@ def generate_time_report_pdf_bytes(
         </html>
     """
 
-    url_fetcher = AllowlistURLFetcher([logo_url] if logo_url else [])
-    pdf_bytes = HTML(string=html_content, url_fetcher=url_fetcher).write_pdf(
-        stylesheets=[css], font_config=font_config
-    )
+    pdf_bytes = SafeHTML(
+        string=html_content, allowed_urls=[logo_url] if logo_url else []
+    ).write_pdf(stylesheets=[css], font_config=font_config)
 
     return pdf_bytes
 

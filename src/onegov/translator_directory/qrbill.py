@@ -1,10 +1,9 @@
 from io import BytesIO, StringIO
 from onegov.translator_directory import log
-from onegov.pdf.fetcher import AllowlistURLFetcher
+from onegov.pdf.fetcher import SafeHTML
 from onegov.translator_directory.constants import FINANZSTELLE
 from qrbill.bill import QRBill
 from stdnum import iban as iban_validator
-from weasyprint import HTML  # type: ignore[import-untyped]
 
 from typing import TYPE_CHECKING
 
@@ -149,9 +148,7 @@ def generate_translator_qr_bill(
         """
 
         pdf_file = BytesIO()
-        HTML(string=html_content, url_fetcher=AllowlistURLFetcher()).write_pdf(
-            pdf_file
-        )
+        SafeHTML(string=html_content).write_pdf(pdf_file)
         return pdf_file.getvalue()
 
     except Exception as e:

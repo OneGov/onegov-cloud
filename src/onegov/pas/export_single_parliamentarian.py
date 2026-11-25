@@ -18,9 +18,8 @@ from onegov.pas.models.presidential_allowance import (
 from onegov.pas.utils import is_president_for_attendance
 from onegov.pas.utils import format_swiss_number
 from onegov.core.utils import module_path
-from onegov.pdf.fetcher import AllowlistURLFetcher
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
 from markupsafe import escape
-from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
@@ -72,10 +71,10 @@ def generate_parliamentarian_settlement_pdf(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
     with open(css_path) as f:
-        css = CSS(string=f.read())
+        css = SafeCSS(string=f.read())
     logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
     logo_url = f'file://{logo_path}'
-    logo_css = CSS(
+    logo_css = SafeCSS(
         string=f"""
         @page {{
             @top-left {{
@@ -251,9 +250,9 @@ def generate_parliamentarian_settlement_pdf(
     </body>
     </html>
     """
-    return HTML(
-        string=html, url_fetcher=AllowlistURLFetcher([logo_url])
-    ).write_pdf(stylesheets=[css, logo_css], font_config=font_config)
+    return SafeHTML(string=html, allowed_urls=[logo_url]).write_pdf(
+        stylesheets=[css, logo_css], font_config=font_config
+    )
 
 
 def _get_parliamentarian_settlement_data(

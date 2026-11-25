@@ -9,7 +9,7 @@ from onegov.core.security import Private
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.core.utils import normalize_for_filename
-from onegov.pdf.fetcher import AllowlistURLFetcher
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
@@ -41,7 +41,6 @@ from onegov.pas.utils import (
     get_attendance_parliamentarians,
 )
 from onegov.user import User
-from weasyprint import CSS, HTML  # type: ignore[import-untyped]
 from uuid import UUID
 from webob import Response
 from webob.exc import HTTPNotFound
@@ -328,10 +327,10 @@ def view_bulk_attendence_pdf(
         'onegov.pas', 'views/templates/bulk_attendence_pdf.css'
     )
     with open(css_path) as css_file:
-        css = CSS(string=css_file.read())
+        css = SafeCSS(string=css_file.read())
     logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
     logo_url = f'file://{logo_path}'
-    logo_css = CSS(
+    logo_css = SafeCSS(
         string=f"""
         @page {{
             @top-left {{
@@ -341,9 +340,7 @@ def view_bulk_attendence_pdf(
         }}
     """
     )
-    pdf = HTML(
-        string=str(html), url_fetcher=AllowlistURLFetcher([logo_url])
-    ).write_pdf(
+    pdf = SafeHTML(string=str(html), allowed_urls=[logo_url]).write_pdf(
         stylesheets=[css, logo_css],
         font_config=font_config,
     )

@@ -3,11 +3,10 @@ from pdfrw import PdfReader, PdfWriter  # type: ignore[import-untyped]
 from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
-from onegov.pdf.fetcher import AllowlistURLFetcher
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
 from markupsafe import escape
 from decimal import Decimal
 from operator import itemgetter
-from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
 
@@ -531,7 +530,7 @@ def generate_settlement_pdf(
     font_config = FontConfiguration()
     css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
     with open(css_path) as f:
-        css = CSS(string=f.read())
+        css = SafeCSS(string=f.read())
 
     subtitle = 'Einträge Journal'
     group_by: Literal['party', 'person']
@@ -607,7 +606,7 @@ def generate_settlement_pdf(
         subtitle=subtitle,
     )
 
-    return HTML(string=html, url_fetcher=AllowlistURLFetcher()).write_pdf(
+    return SafeHTML(string=html).write_pdf(
         stylesheets=[css], font_config=font_config
     )
 
