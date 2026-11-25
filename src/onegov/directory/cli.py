@@ -181,6 +181,9 @@ def import_directory_from_ogi_scraper(
                 if fid not in values:
                     continue
                 if fid in file_fields:
+                    # NOTE: only single-file fields are supported; a multiple
+                    # file field would need a list value, which update() reads
+                    # as pre-stored file dicts (and crashes on an upload)
                     upload = _file_upload(rec.get(key), base_dir)
                     if upload and file_fields[fid].type == 'multiplefileinput':
                         values[fid] = [upload]

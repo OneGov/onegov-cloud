@@ -3,17 +3,38 @@ from __future__ import annotations
 import json
 
 from click.testing import CliRunner
-from onegov.people.cli import cli
+from onegov.core.utils import Bunch
+from onegov.people.cli import cli, _build_valid_orgs
 from onegov.people.models import Person
+from os import path
 from pathlib import Path
 from sqlalchemy import text
 import transaction
 from transaction import commit
+from yaml import dump
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
+
+
+def test_build_valid_orgs() -> None:
+    # dict items map a top org to its sub-orgs; bare strings have no subs
+    app = Bunch(org=Bunch(organisation_hierarchy=[
+        {'Verwaltung': ['Kanzlei', 'Personal']},
+        {'Behörden': None},
+        'Kommissionen',
+    ]))
+    assert _build_valid_orgs(app) == {  # type: ignore[arg-type]
+        'Verwaltung': {'Kanzlei', 'Personal'},
+        'Behörden': set(),
+        'Kommissionen': set(),
+    }
+
+    # no org / no hierarchy -> empty mapping (validation then disabled)
+    assert _build_valid_orgs(Bunch(org=None)) == {}  # type: ignore[arg-type]
+    assert _build_valid_orgs(Bunch()) == {}  # type: ignore[arg-type]
 
 
 def test_cli(
@@ -315,3 +336,87 @@ def test_import_from_ogi_scraper(
     session.expunge_all()
     hans = session.query(Person).filter_by(last_name='Muster').one()
     assert hans.phone == '000 000 00 02', 'dry-run must not commit'
+
+
+def test_import_validates_org_hierarchy(
+    postgres_dsn: str,
+    redis_url: str,
+    session_manager: SessionManager,
+    temporary_directory: str
+) -> None:
+    # org validation needs an OrgApp whose org carries an
+    # organisation_hierarchy; seed one into the schema directly
+    from onegov.org.models import Organisation
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foo/*',
+                'application': 'onegov.org.OrgApp',
+                'namespace': 'foo',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'filestorage': 'fs.osfs.OSFS',
+                    'filestorage_options': {
+                        'root_path': '{}/file-storage'.format(
+                            temporary_directory),
+                        'create': 'true'
+                    },
+                    'redis_url': redis_url,
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': '<redacted>'
+                    }
+                }
+            }
+        ]
+    }
+    session_manager.ensure_schema_exists('foo-bar')
+    session_manager.set_current_schema('foo-bar')
+    session = session_manager.session()
+    session.add(Organisation(
+        name='Govikon',
+        organisation_hierarchy=[{'Verwaltung': ['Kanzlei']}],
+    ))
+    commit()
+
+    cfg_path = path.join(temporary_directory, 'onegov.yml')
+    with open(cfg_path, 'w') as f:
+        f.write(dump(cfg))
+
+    records: list[dict[str, Any]] = [
+        {
+            'first_name': 'Hans',
+            'last_name': 'Muster',
+            # 'Verwaltung' is valid, '-Kanzlei' is a valid sub-org
+            'organisations_multiple': ['Verwaltung', '-Kanzlei'],
+        },
+        {
+            'first_name': 'Erika',
+            'last_name': 'Beispiel',
+            # 'Behörden' is not in the hierarchy; '-Unbekannt' not under it;
+            # a leading sub-org (no top org yet) is also an error
+            'organisations_multiple': ['-Vorweg', 'Behörden', '-Unbekannt'],
+        },
+        # a record without any name is skipped silently
+        {'first_name': '', 'last_name': ''},
+    ]
+    file = Path(temporary_directory) / 'people.json'
+    file.write_text(json.dumps(records), encoding='utf-8')
+
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/foo/bar',
+        'import-from-ogi-scraper', str(file)
+    ])
+    assert result.exit_code == 0
+    # both the unknown top org and its sub-org are reported
+    assert "org 'Behörden' not in hierarchy" in result.output
+    assert "sub-org 'Unbekannt' not under 'Behörden'" in result.output
+    assert "sub-org 'Vorweg' not under None in hierarchy" in result.output
+    assert '3 org/sub-org error(s)' in result.output
+    # the two named people are still imported (validation warns, not blocks)
+    assert 'Imported 2 person(s)' in result.output
+    assert session.query(Person).count() == 2
