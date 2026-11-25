@@ -901,7 +901,6 @@ def add_plenary_attendence(self: AttendenceCollection,
                 }
 
         data = form.get_useful_data()
-        # Remove static field; choices are set dynamically via JS
         if parl_ids := data.pop('parliamentarian_id', None):
             bulk_edit_id = uuid.uuid4()
             for parliamentarian_id in parl_ids:
