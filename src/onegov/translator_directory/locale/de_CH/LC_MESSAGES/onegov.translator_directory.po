@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-22 15:17+0200\n"
+"POT-Creation-Date: 2026-11-23 13:36+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -434,7 +434,7 @@ msgid "Yes"
 msgstr "Ja"
 
 #.
-#. noqa: N806
+#. ruff:ignore[non-lowercase-variable-in-function]
 msgid "No"
 msgstr "Nein"
 
@@ -534,8 +534,8 @@ msgid ""
 "Shows the \"Add Time Report\" button and allows translators to record their "
 "working time."
 msgstr ""
-"Zeigt die Schaltfläche «Zeit erfassen» an und erlaubt Übersetzer/innen, "
-"ihre Arbeitszeit zu erfassen."
+"Zeigt die Schaltfläche «Zeit erfassen» an und erlaubt Übersetzer/innen, ihre "
+"Arbeitszeit zu erfassen."
 
 msgid "Time tracking"
 msgstr "Zeiterfassung"
@@ -1234,6 +1234,14 @@ msgstr "Neue Zeiterfassung zur Überprüfung"
 
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
+
+#, python-format
+msgid ""
+"No accountant emails configured for the following cost centers: ${names}. "
+"Time reports for these cannot be submitted."
+msgstr ""
+"Für folgende Finanzstellen sind keine Buchhaltungs-E-Mails konfiguriert: "
+"${names}. Zeiterfassungen für diese können nicht eingereicht werden."
 
 msgid "Submit Time Report"
 msgstr "Zeiterfassung einreichen"

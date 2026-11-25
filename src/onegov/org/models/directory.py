@@ -416,14 +416,12 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     minimum_price_total: dict_property[float | None] = meta_property()
     payment_method: dict_property[PaymentMethod | None] = meta_property()
 
-    search_widget_config: dict_property[dict[str, Any] | None] = (
-        content_property()
-    )
-
     marker_icon: dict_property[str | None] = content_property()
     marker_color: dict_property[str | None] = content_property()
 
     overview_two_columns: dict_property[bool | None] = content_property()
+    # search field limited to this directory
+    enable_search: dict_property[bool | None] = content_property()
     numbering: dict_property[str | None] = content_property()
     numbers: dict_property[str | None] = content_property()
 

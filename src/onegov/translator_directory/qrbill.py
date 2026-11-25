@@ -1,9 +1,9 @@
-from io import BytesIO
+from io import BytesIO, StringIO
 from onegov.translator_directory import log
+from onegov.pdf.fetcher import SafeHTML
 from onegov.translator_directory.constants import FINANZSTELLE
 from qrbill.bill import QRBill
 from stdnum import iban as iban_validator
-from weasyprint import HTML  # type: ignore[import-untyped]
 
 from typing import TYPE_CHECKING
 
@@ -24,6 +24,15 @@ def is_valid_iban(value: str | None) -> bool:
         return True
     except Exception:
         return False
+
+
+def translator_to_creditor(translator: Translator) -> dict[str, str | None]:
+    return {
+        'name': f'{translator.first_name} {translator.last_name}',
+        'street': translator.address,
+        'pcode': translator.zip_code,
+        'city': translator.city,
+    }
 
 
 def generate_translator_qr_bill(
@@ -53,12 +62,7 @@ def generate_translator_qr_bill(
         log.error(f'Incomplete address for translator {translator.id}')
         return None
 
-    # Creditor (translator)
-    creditor = {
-        'name': f'{translator.first_name} {translator.last_name}',
-        'line1': translator.address,
-        'line2': f'{translator.zip_code} {translator.city}',
-    }
+    creditor = translator_to_creditor(translator)
 
     debtor_name = 'Polizei Schaffhausen'
     debtor_street = 'Beckenstube 1'
@@ -107,9 +111,6 @@ def generate_translator_qr_bill(
         log.exception(e)
         return None
 
-    # Generate SVG
-    from io import StringIO
-
     svg = StringIO()
     bill.as_svg(svg)
     svg_content = svg.getvalue()
@@ -147,7 +148,7 @@ def generate_translator_qr_bill(
         """
 
         pdf_file = BytesIO()
-        HTML(string=html_content).write_pdf(pdf_file)
+        SafeHTML(string=html_content).write_pdf(pdf_file)
         return pdf_file.getvalue()
 
     except Exception as e:

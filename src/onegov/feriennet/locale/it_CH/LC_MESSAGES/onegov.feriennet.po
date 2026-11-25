@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-11-02 09:28+0100\n"
+"POT-Creation-Date: 2026-11-18 14:47+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1328,6 +1328,22 @@ msgstr ""
 "Non è possibile registrare un tempo di blocco se i partecipanti sono "
 "limitati a un'offerta al giorno."
 
+msgid "Allow Contact"
+msgstr "Consentire di essere contattati"
+
+msgid ""
+"If this is selected, email address, phone number and municipality are "
+"displayed to parents whose child has signed up for the same occurrence. This "
+"makes it possible to get in touch, for example, to organize carpools."
+msgstr ""
+"Se questa opzione è selezionata, l'indirizzo e-mail, il numero di telefono e "
+"il comune vengono mostrati ai genitori il cui figlio è iscritto allo stesso "
+"evento. In questo modo è possibile mettersi in contatto, ad esempio per "
+"organizzare viaggi condivisi."
+
+msgid "Privacy"
+msgstr "Privacy"
+
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
 
@@ -1372,12 +1388,6 @@ msgstr "Conto bancario (IBAN)"
 
 msgid "Beneficiary"
 msgstr "Beneficiario"
-
-msgid "Allow contact for carpooling"
-msgstr "Permettere il contatto per condividere il viaggio"
-
-msgid "Privacy"
-msgstr "Privacy"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Inserisci un numero di telefono e un nome"
@@ -1892,13 +1902,19 @@ msgstr "Gratuito"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Questo evento non ha ancora abbastanza partecipanti."
 
-msgid "carpool"
-msgstr "condivisione dell'auto"
+msgid "Contact information"
+msgstr "Dati di contatto"
 
-msgid "The following persons can be asked to form carpools."
+msgid ""
+"This is not a complete list of participants. This list contains the contact "
+"information of parents whose children are participating in the same "
+"occurrence and who have consented to being contacted, e.g. for carpools. "
+"This setting can be changed in the userprofile."
 msgstr ""
-"Le seguenti persone possono essere contattate per richieste di tragitti "
-"condivisi."
+"Non si tratta di un elenco completo dei partecipanti. Questo elenco contiene "
+"i recapiti dei genitori i cui figli partecipano allo stesso evento e che "
+"hanno acconsentito a essere contattati, ad es. per viaggi condivisi. Questa "
+"impostazione può essere modificata nel profilo utente."
 
 msgid "Parent"
 msgstr "Genitore"
@@ -3266,6 +3282,16 @@ msgid ""
 msgstr ""
 "Il testo sarà mostrato sotto il testo di conferma dell'attività nell'email"
 
+msgid "Enable parents to connect with one another"
+msgstr "Consentire ai genitori di mettersi in contatto tra loro"
+
+msgid ""
+"Parents can share their contact information (email, phone number and "
+"municipality) with other parents in the same occurrence."
+msgstr ""
+"I genitori possono condividere i propri recapiti (indirizzo e-mail, numero "
+"di telefono e comune) con gli altri genitori dello stesso evento."
+
 msgid "Public organiser data"
 msgstr "Dati pubblici dell'organizzatore"
 
@@ -3459,6 +3485,35 @@ msgstr "${count} email inviate con successo"
 
 msgid "The submitter email is not available"
 msgstr "L'email del mittente non è disponibile"
+
+#~ msgid "carpool"
+#~ msgstr "condivisione dell'auto"
+
+#~ msgid "Allow contact for carpooling"
+#~ msgstr "Permettere il contatto per condividere il viaggio"
+
+#~ msgid ""
+#~ "Make it possible for parents whose children are enrolled in the same "
+#~ "course to get in touch, for example, to organize carpool arrangements."
+#~ msgstr ""
+#~ "Garantire la visibilità affinché i genitori i cui figli sono iscritti "
+#~ "allo stesso corso possano eventualmente contattarvi, ad esempio per "
+#~ "organizzare il carpooling."
+
+#~ msgid "The following persons can be asked to form carpools."
+#~ msgstr ""
+#~ "Le seguenti persone possono essere contattate per richieste di tragitti "
+#~ "condivisi."
+
+#~ msgid "Enable carpooling"
+#~ msgstr "Consentire i viaggi condivisi"
+
+#~ msgid ""
+#~ "Parents can share contact details with other parents in the same occasion "
+#~ "if they allow it in their user profile."
+#~ msgstr ""
+#~ "I genitori possono condividere i propri recapiti con gli altri genitori "
+#~ "dello stesso evento, se lo autorizzano nel proprio profilo utente."
 
 #~ msgid "These wishes overlap accepted bookings and are therefore blocked."
 #~ msgstr ""

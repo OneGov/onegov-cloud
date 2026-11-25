@@ -23,13 +23,17 @@ from onegov.newsletter import Newsletter
 from onegov.org import log
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
-from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
+from onegov.org.models.political_business import (
+    POLITICAL_BUSINESS_STATUS,
+    POLITICAL_BUSINESS_TYPE,
+)
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
+from zope.sqlalchemy import mark_changed
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
@@ -1079,6 +1083,59 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
             'refreshed (non-manual or non-open payment): %s',
             len(skipped), ', '.join(skipped)
         )
+
+
+@upgrade_task(
+    'Add Horw political business types and statuses', always_run=True
+)
+def add_horw_political_business_enums(context: UpgradeContext) -> bool:
+    if not context.has_table('par_political_businesses'):
+        return False
+
+    changed = False
+    for enum_name, values in (
+        ('par_political_business_type', POLITICAL_BUSINESS_TYPE),
+        ('par_political_business_status', POLITICAL_BUSINESS_STATUS),
+    ):
+        existing = set(
+            context.session.execute(
+                text(
+                    """
+            SELECT e.enumlabel
+            FROM pg_enum e
+            JOIN pg_type t ON t.oid = e.enumtypid
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE t.typname = :name AND n.nspname = :schema
+        """
+                ),
+                {'name': enum_name, 'schema': context.schema},
+            ).scalars()
+        )
+        missing = set(values) - existing
+        if missing:
+            mark_changed(context.session)
+        for value in sorted(missing):
+            quoted = value.replace("'", "''")
+            context.session.execute(
+                text(
+                    f'ALTER TYPE {enum_name} ADD VALUE IF NOT EXISTS '
+                    f"'{quoted}'"
+                )
+            )
+            changed = True
+    return changed
+
+
+@upgrade_task('Enable directory search on existing directories')
+def enable_directory_search(context: UpgradeContext) -> None:
+    directories = (
+        context.session.query(ExtendedDirectory)
+        .options(undefer(ExtendedDirectory.content))
+    )
+
+    for directory in directories:
+        if directory.enable_search is None:
+            directory.enable_search = True
 
 
 @upgrade_task('Clear deprecated exivo credentials and kaba components')

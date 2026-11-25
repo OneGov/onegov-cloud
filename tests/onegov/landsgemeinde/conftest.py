@@ -159,6 +159,7 @@ def browser(
     browser.websocket_server = websocket_server
     browser.wsgi_server = wsgi_server
     yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope="session", autouse=True)

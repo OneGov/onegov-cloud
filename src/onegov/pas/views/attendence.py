@@ -9,6 +9,7 @@ from onegov.core.security import Private
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.core.utils import normalize_for_filename
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
@@ -25,8 +26,9 @@ from onegov.pas.custom import (
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
-from onegov.pas.forms.attendence import (AttendenceCommissionBulkEditForm,
-                                         AttendencePlenaryBulkEditForm)
+from onegov.pas.forms.attendence import AttendenceAddFileStudyBulkForm
+from onegov.pas.forms.attendence import AttendenceCommissionBulkEditForm
+from onegov.pas.forms.attendence import AttendencePlenaryBulkEditForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
@@ -39,7 +41,6 @@ from onegov.pas.utils import (
     get_attendance_parliamentarians,
 )
 from onegov.user import User
-from weasyprint import CSS, HTML  # type: ignore[import-untyped]
 from uuid import UUID
 from webob import Response
 from webob.exc import HTTPNotFound
@@ -326,19 +327,20 @@ def view_bulk_attendence_pdf(
         'onegov.pas', 'views/templates/bulk_attendence_pdf.css'
     )
     with open(css_path) as css_file:
-        css = CSS(string=css_file.read())
+        css = SafeCSS(string=css_file.read())
     logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
-    logo_css = CSS(
+    logo_url = f'file://{logo_path}'
+    logo_css = SafeCSS(
         string=f"""
         @page {{
             @top-left {{
-                content: url('file://{logo_path}');
+                content: url('{logo_url}');
                 width: 3cm;
             }}
         }}
     """
     )
-    pdf = HTML(string=str(html)).write_pdf(
+    pdf = SafeHTML(string=str(html), allowed_urls=[logo_url]).write_pdf(
         stylesheets=[css, logo_css],
         font_config=font_config,
     )
@@ -419,25 +421,22 @@ def add_attendence(
     }
 
 
-@PasApp.form(
-    model=AttendenceCollection,
-    name='new-commission-bulk',
-    template='form.pt',
-    permission=Private,
-    form=AttendenceAddCommissionBulkForm
-)
-def add_bulk_attendence(
+def handle_commission_bulk_add(
     self: AttendenceCollection,
     request: PasRequest,
-    form: AttendenceAddCommissionBulkForm
+    form: AttendenceAddCommissionBulkForm,
+    title: str,
 ) -> RenderData | Response:
+    """ Shared handler for the bulk add forms which are bound to a single
+    commission (commission sessions and file studies).
+
+    """
+
     request.include('custom')
 
     if not request.is_admin and not request.has_commission_president_role:
         request.alert(_('Only admins can add bulk attendance records.'))
         return request.redirect(request.class_link(AttendenceCollection))
-
-    title = _('New commission session (bulk)')
 
     if form.submitted(request):
         if form.date.data:
@@ -562,6 +561,40 @@ def add_bulk_attendence(
         'form': form,
         'form_width': 'large',
     }
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-commission-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddCommissionBulkForm
+)
+def add_bulk_attendence(
+    self: AttendenceCollection,
+    request: PasRequest,
+    form: AttendenceAddCommissionBulkForm
+) -> RenderData | Response:
+    return handle_commission_bulk_add(
+        self, request, form, _('New commission session (bulk)')
+    )
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-file-study-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddFileStudyBulkForm
+)
+def add_file_study_bulk_attendence(
+    self: AttendenceCollection,
+    request: PasRequest,
+    form: AttendenceAddFileStudyBulkForm
+) -> RenderData | Response:
+    return handle_commission_bulk_add(
+        self, request, form, _('New file study (bulk)')
+    )
 
 
 @PasApp.form(
@@ -729,6 +762,8 @@ def edit_commission_bulk_attendence(
                 }
 
         data = form.get_useful_data()
+        # Newly added attendences inherit the type of the bulk group
+        data['type'] = self.type
         if parl_ids := form.parliamentarian_id.data:
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)

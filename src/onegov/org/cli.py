@@ -4,8 +4,6 @@ import click
 import html
 import isodate
 import json
-import locale
-import niquests
 import pytz
 import re
 import shutil
@@ -39,7 +37,6 @@ from onegov.event import Event
 from onegov.event import Occurrence
 from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
-from onegov.file.collection import FileCollection
 from onegov.file.models import File, SigningRequest
 from onegov.form import (
     FormCollection,
@@ -56,6 +53,7 @@ from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.management import LinkMigration
+from onegov.org.ris_import import OGIArchive, SECTIONS, connect_relationships
 from onegov.org.models.file import ImageFileCollection
 from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
@@ -64,19 +62,13 @@ from onegov.org.models.resource import Resource
 from onegov.org.models import (
     MeetingCollection,
     Meeting,
-    MeetingItem,
     MeetingItemCollection,
     PoliticalBusiness,
     PoliticalBusinessCollection,
     PoliticalBusinessParticipationCollection,
-    RISCommissionCollection,
-    RISCommissionMembership,
-    RISCommissionMembershipCollection,
     RISParliamentarian,
     RISParliamentarianCollection,
     RISParliamentarianRole,
-    RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection,
 )
 from onegov.page.collection import PageCollection
 from onegov.page.restore import PageRestore
@@ -114,7 +106,6 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from uuid import UUID
     from onegov.org.models.political_business import (
-        PoliticalBusinessStatus,
         PoliticalBusiness
     )
 
@@ -1982,6 +1973,26 @@ def content_to_markup(element: dict[str, Any]) -> str:
     return element_markup
 
 
+def import_ogi_section(
+    path: str,
+    dry_run: bool,
+    section: str,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    try:
+        archive = OGIArchive(Path(path), section)
+    except (ValueError, KeyError, OSError) as error:
+        raise click.ClickException(str(error)) from error
+
+    def import_section(request: OrgRequest, app: OrgApp) -> None:
+        if dry_run:
+            click.echo(f'OGI validated (no changes): {section}')
+            return
+        counts = archive.importer(request.session).run(section)
+        click.echo(f'OGI imported: {counts}')
+
+    return import_section
+
+
 @cli.command(name='import-meetings')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
@@ -1989,187 +2000,8 @@ def import_meetings(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports meetings from archive of json files
-
-    Example:
-    .. code-block:: bash
-
-        onegov-org --select '/foo/bar' import-meetings /path/to/items
-    """
-
-    # Read all json files in the given directory
-    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
-        for file in Path(path).iterdir():
-
-            if file.suffix == '.json':
-                with open(file) as f:
-                    yield (json.load(f), file.name)
-
-    def create_meetings(request: OrgRequest, app: OrgApp) -> None:
-        meeting_collection = MeetingCollection(request.session)
-        file_coll = FileCollection(request.session)
-        meeting_item_collection = MeetingItemCollection(request.session)
-
-        meetings = read_json_files(path)
-        import_counter = 0
-        overwrite_counter = 0
-
-        start_dt: datetime | None
-        end_dt: datetime | None
-        for meeting, article_name in meetings:
-            date = meeting['elements'][0]['children'][0]['text']
-            # Set locale to German for month parsing
-            try:
-                locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
-            except locale.Error:
-                locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
-
-            date_str = date  # e.g. "7. Nov. 2024, 17.00 Uhr - 20.05 Uhr"
-
-            # Regex to extract parts
-            match = re.match(
-                r'(\d{1,2})\. (\w+)\.? (\d{4}), '
-                r'(\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
-                date_str
-            )
-            if match:
-                day, month_str, year, sh, sm, eh, em = match.groups()
-                # Parse month name to month number
-                # month string can be:
-                # month_str = month_str.strip('.')
-                if month_str == 'März':
-                    month_str = 'Mär'
-                elif month_str == 'Juni':
-                    month_str = 'Jun'
-                elif month_str == 'Juli':
-                    month_str = 'Jul'
-                elif month_str == 'Sept':
-                    month_str = 'Sep'
-
-                try:
-                    month = datetime.strptime(month_str, '%b').month
-                    start_dt = datetime(
-                        int(year), month, int(day), int(sh), int(sm)
-                    )
-                    end_dt = datetime(
-                        int(year), month, int(day), int(eh), int(em)
-                    )
-                    # Add timezone
-                    start_dt = pytz.timezone('Europe/Zurich').localize(
-                        start_dt)
-                    end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
-                except ValueError as e:
-                    click.secho(f'Error parsing date: {e}', fg='red')
-                    start_dt = end_dt = None
-                    meta_date = (f'{day} {month_str} {year} '
-                                  f'{sh}:{sm} - {eh}:{em}')
-            else:
-                start_dt = end_dt = None
-
-            click.echo(f'Importing {article_name}')
-            import_counter += 1
-
-            if not dry_run:
-                location = Markup(  # nosec: B704
-                    content_to_markup(meeting['elements'][1]))
-                documents = False
-                desc = False
-                meeting_items = False
-                meetings_items_list = []
-                description = ''
-
-                files = []
-                for element in meeting['elements']:
-                    if element['type'] == 'Heading':
-                        if element['text'] == 'Informationen':
-                            desc = True
-                        elif element['text'] == 'Dokumente':
-                            documents = True
-                            desc = False
-                        elif element['text'] == 'Traktanden':
-                            meeting_items = True
-                            desc = False
-                            documents = False
-                        else:
-                            desc = False
-                            documents = False
-                            meeting_items = False
-                    if desc:
-                        if element['type'] == 'Paragraph':
-                            if element.get('children') and (
-                                element['children'][0].get(
-                                    'text') != 'Beschreibung'):
-                                description += content_to_markup(element)
-                    if documents:
-                        if element['type'] == 'Table':
-                            for row in element['rows']:
-                                try:
-                                    link = row['cells'][0]['url']
-                                except KeyError:
-                                    click.echo(
-                                        f'No link found in row'
-                                        f' {row["cells"][0]}'
-                                    )
-                                    continue
-                                resp = niquests.get(link, timeout=(5, 10))
-                                if resp.status_code == 200 and resp.content:
-                                    if existing_file := file_coll.by_content(
-                                        BytesIO(resp.content)
-                                    ).first():
-                                        files.append(existing_file)
-                                        click.echo(
-                                            f'File {existing_file} already '
-                                            'exists, skipping.'
-                                    )
-                                    else:
-                                        file = file_coll.add(
-                                            filename=row['cells'][0]['text'],
-                                            content=BytesIO(resp.content)
-                                        )
-                                        files.append(file)
-                    if meeting_items:
-                        if element['type'] == 'Table':
-                            for row in element['rows']:
-                                cells = row['cells']
-                                if cells[1]['type'] != 'Link':
-                                    continue
-                                political_business_id = cells[2]['url'].split(
-                                    '/')[-1]
-                                meetings_items_list.append(
-                                    {
-                                        'number': cells[0]['text'],
-                                        'title': cells[1]['text'],
-                                        'political_business_id':
-                                        political_business_id
-                                    }
-                                )
-
-                added = meeting_collection.add(
-                    title='Sitzung des Stadtparlaments',
-                    type='generic',
-                    start_datetime=start_dt,
-                    end_datetime=end_dt,
-                    address=location,
-                )
-
-                for meeting in meetings_items_list:
-                    meeting_item_collection.add(
-                        number=meeting['number'],
-                        title=meeting['title'],
-                        meeting_id=added.id,
-                        meta={
-                            'meta_date': meta_date,
-                        },
-                        political_business_link_id=meeting[
-                                'political_business_id'],
-                    )
-                if files:
-                    added.files = files
-
-        click.echo(f'{import_counter} meetings imported')
-        click.echo(f'{overwrite_counter} meetings overwritten')
-
-    return create_meetings
+    """Import OGI meetings JSON, updating records by source ID."""
+    return import_ogi_section(path, dry_run, 'meetings')
 
 
 @cli.command(name='import-commissions')
@@ -2179,66 +2011,8 @@ def import_commissions(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports commissions from archive of json files
-
-    Example:
-    .. code-block:: bash
-
-        onegov-org --select '/foo/bar' import-commissions /path/to/items
-    """
-
-    # Read all json files in the given directory
-    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
-        for file in Path(path).iterdir():
-
-            if file.suffix == '.json':
-                with open(file) as f:
-                    yield (json.load(f), file.name)
-
-    def create_commissions(request: OrgRequest, app: OrgApp) -> None:
-        commission_collection = RISCommissionCollection(request.session)
-
-        commissions = read_json_files(path)
-        import_counter = 0
-        overwrite_counter = 0
-
-        for commission, article_name in commissions:
-            content = ''
-
-            click.echo(f'Importing {article_name}')
-            import_counter += 1
-
-            if not dry_run:
-
-                content = ''
-                people_ids = []
-                for element in commission['elements']:
-                    if element['type'] != 'Heading' and (
-                        element['type'] != 'Table'):
-                        content += content_to_markup(element)
-                    if element['type'] == 'Table':
-                        for row in element['rows']:
-                            link = row['cells'][0]['url']
-                            function = row['cells'][1]['text']
-                            id = link.split('/')[-1]
-                            people_ids.append((id, function))
-                        break
-
-                commission_collection.add(
-                    poly_type='ris_commission',
-                    name=commission['metadata']['title'],
-                    content={'description': Markup(content)},  # nosec: B704
-                    meta={
-                        'commission_id': article_name.split('_')[1].replace(
-                            '.json', ''
-                        ),
-                        'people_ids': people_ids},
-                )
-
-        click.echo(f'{import_counter} commissions imported')
-        click.echo(f'{overwrite_counter} commissions overwritten')
-
-    return create_commissions
+    """Import OGI commissions JSON, updating records by source ID."""
+    return import_ogi_section(path, dry_run, 'commissions')
 
 
 @cli.command(name='import-parliamentary_groups')
@@ -2248,63 +2022,8 @@ def import_parliamentary_groups(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports parliamentary_groups from archive of json files
-
-    Example:
-    .. code-block:: bash
-
-        onegov-org --select '/foo/bar' import-parliamentary_groups /path
-    """
-
-    # Read all json files in the given directory
-    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
-        for file in Path(path).iterdir():
-
-            if file.suffix == '.json':
-                with open(file) as f:
-                    yield (json.load(f), file.name)
-
-    def create_parliamentary_groups(request: OrgRequest, app: OrgApp) -> None:
-        parliamentary_group_collection = RISParliamentaryGroupCollection(
-            request.session)
-
-        parliamentary_groups = read_json_files(path)
-        import_counter = 0
-        overwrite_counter = 0
-
-        for parliamentary_group, article_name in parliamentary_groups:
-            content = ''
-
-            click.echo(f'Importing {article_name}')
-            import_counter += 1
-
-            if not dry_run:
-
-                content = ''
-                people_ids = []
-                for element in parliamentary_group['elements']:
-                    if element['type'] != 'Heading' and (
-                        element['type'] != 'Table'):
-                        content += content_to_markup(element)
-                    if element['type'] == 'Table':
-                        for row in element['rows']:
-                            link = row['cells'][0]['url']
-                            id = link.split('/')[-1]
-                            people_ids.append(id)
-                        break
-
-                parliamentary_group_collection.add(
-                    name=parliamentary_group['metadata']['title'],
-                    content={'description': Markup(content)},  # nosec: B704
-                    meta={
-                        'parliamentary_group_id': article_name.split('_')[1],
-                        'people_ids': people_ids},
-                )
-
-        click.echo(f'{import_counter} parliamentary_groups imported')
-        click.echo(f'{overwrite_counter} parliamentary_groups overwritten')
-
-    return create_parliamentary_groups
+    """Import OGI parliamentary_groups JSON, updating records by source ID."""
+    return import_ogi_section(path, dry_run, 'parliamentary_groups')
 
 
 @cli.command(name='import-political-business')
@@ -2314,308 +2033,8 @@ def import_political_business(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports political_businesses from archive of json files
-
-    Example:
-    .. code-block:: bash
-
-        onegov-org --select '/foo/bar' import-political_businesses ./json-path
-
-    Note this assumes the filename is named 'unknown_2416648.json' where the
-    number 2416648 can be used to find the object in the original url.
-    """
-
-    # Read all json files in the given directory
-    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
-        for file in Path(path).iterdir():
-
-            if file.suffix == '.json':
-                with open(file) as f:
-                    yield (json.load(f), file.name)
-
-    german_to_english_business_type_map: dict[str, str] = {
-        'Anfrage': 'inquiry',
-        'Antrag': 'proposal',
-
-        'Auftrag': 'mandate',
-        'Bericht': 'report',
-        'Bericht und Antrag': 'report and proposal',
-        'Beschluss': 'decision',
-        'Botschaft': 'message',
-        'Dringliche Interpellation': 'urgent interpellation',
-        'Einladung': 'invitation',
-        'Interpellation': 'interpelleation',  # Match existing enum typo
-        'Kommissionsbericht': 'commission report',
-        'Mitteilung': 'communication',
-        'Motion': 'motion',
-        'Postulat': 'postulate',
-        'Resolution': 'resolution',
-        'Verordnung': 'regulation',
-        'Verschiedenes': 'miscellaneous',
-        'Wahlen': 'elections',
-    }
-
-    german_to_english_status_map: dict[str, PoliticalBusinessStatus] = {
-        'Abgeschrieben': 'abgeschrieben',
-        'Beantwortet': 'beantwortet',
-        'Erheblich erklärt': 'erheblich_erklaert',
-        'Erledigt': 'erledigt',
-        'Nicht erheblich erklärt': 'nicht_erheblich_erklaert',
-        'Nicht zustandegekommen': 'nicht_zustandegekommen',
-        'Pendent Exekutive': 'pendent_exekutive',
-        'Pendent Legislative': 'pendent_legislative',
-        'Rückzug': 'rueckzug',
-        'Umgewandelt': 'umgewandelt',
-        'Zurückgewiesen': 'zurueckgewiesen',
-        'Überwiesen': 'ueberwiesen',
-    }
-
-    def parse_german_date(date_str: str | None) -> date | None:
-        # Set locale to German for month parsing
-        locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
-        return (datetime.strptime(date_str, '%d. %B %Y').date()
-                if date_str else None)
-
-    def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
-        session = request.session
-        political_business_collection = PoliticalBusinessCollection(request)
-
-        political_businesses = read_json_files(path)
-        import_counter = 0
-        overwrite_counter = 0
-        parliamentarian: RISParliamentarian | None
-        for political_business, article_name in political_businesses:
-            click.echo(f'Importing {article_name}')
-            import_counter += 1
-            if not dry_run:
-                elements = political_business.get('elements', [])
-                data_fields: dict[str, str | None] = {
-                    'Nummer': None,
-                    'Geschäftsart': None,
-                    'Status': None,
-                    'Datum': None
-                }
-                people_ids: list[tuple[str, str]] = []
-                parliamentary_group_ids: list[str] = []
-
-                i = 0
-                while i < len(elements):
-                    element = elements[i]
-                    if (
-                        element.get('type') == 'Paragraph'
-                        and element.get('children')
-                    ):
-                        child_text_element = element['children'][0]
-                        label_text = child_text_element.get('text', '').strip()
-
-                        if label_text in data_fields.keys():
-                            if i + 1 < len(elements):
-                                value_element = elements[i+1]
-                                if (
-                                    value_element.get('type') == 'Paragraph'
-                                    and value_element.get('children')
-                                ):
-                                    val_child = value_element['children'][0]
-                                    data_fields[label_text] = val_child.get(
-                                        'text', '').strip()
-                                i += 1  # Consumed value element
-                        elif label_text == 'Verfasser/Beteiligte':
-                            if i + 1 < len(elements):
-                                participants_el = elements[i+1]
-                                if (
-                                    participants_el.get('type') == 'Paragraph'
-                                    and participants_el.get('children')
-                                ):
-                                    for c, child in enumerate(
-                                        participants_el['children']
-                                    ):
-                                        if (
-                                            child.get('type') == 'Link'
-                                            and 'url' in child
-                                            and c > 0
-                                        ):
-                                            url_parts = child['url'].split('/')
-                                            type = participants_el['children'][
-                                                c-1].get('text', '').strip()
-                                            if url_parts:
-                                                people_ids.append(
-                                                    (url_parts[-1], type))
-                                i += 1  # Consumed participants element
-                        elif (
-                            label_text == 'Fraktionen'
-                            or label_text == 'Fraktion'
-                        ):
-                            if i + 1 < len(elements):
-                                fraktionen_el = elements[i+1]
-                                if (
-                                    fraktionen_el.get('type') == 'Paragraph'
-                                    and fraktionen_el.get('children')
-                                ):
-                                    for child in fraktionen_el['children']:
-                                        if (
-                                            child.get('type') == 'Link'
-                                            and 'url' in child
-                                        ):
-                                            url_parts = child['url'].split('/')
-                                            if url_parts:
-                                                parliamentary_group_ids.append(
-                                                    url_parts[-1])
-                                i += 1  # Consumed fraktionen element
-                        else:
-                            # Check if elements[i] itself is an unlinked
-                            # participant list
-                            is_unlinked_list = False
-                            if element.get('type') == 'Paragraph' and (
-                                element.get('children')):
-                                all_children_are_unlinked = True
-                                if not element['children']:
-                                    all_children_are_unlinked = False
-                                else:
-                                    for child_node_check in element[
-                                        'children']:
-                                        text_content_check = (
-                                            child_node_check.get('text', ''))
-                                        last_paren_open_check = (
-                                            text_content_check.rfind('('))
-                                        last_paren_close_check = (
-                                            text_content_check.rfind(')'))
-                                        is_valid_format = (
-                                            child_node_check.get('type') ==
-                                                'Text' and
-                                            text_content_check and
-                                            last_paren_open_check != -1 and
-                                            last_paren_close_check == len(
-                                                text_content_check) - 1 and
-                                            last_paren_open_check <
-                                                last_paren_close_check - 1 and
-                                                # role not empty
-                                            text_content_check[
-                                                :last_paren_open_check].strip()
-                                                # name not empty
-                                        )
-                                        if not is_valid_format:
-                                            all_children_are_unlinked = False
-                                            break
-                                if all_children_are_unlinked:
-                                    is_unlinked_list = True
-
-                            if is_unlinked_list:
-                                for child_node in element['children']:
-                                    text_content = child_node.get('text', '')
-                                    last_paren_open = text_content.rfind('(')
-                                    last_paren_close = text_content.rfind(')')
-
-                                    if (
-                                        last_paren_open != -1
-                                        and last_paren_close == (
-                                            len(text_content) - 1
-                                        )
-                                        and last_paren_open < last_paren_close
-                                    ):
-
-                                        full_name = text_content[
-                                            :last_paren_open].strip()
-                                        role = text_content[
-                                            last_paren_open+1:last_paren_close
-                                            ].strip()
-
-                                        name_parts = full_name.strip().split()
-                                        if not name_parts:
-                                            click.secho(f'Warning: Empty name '
-                                                        'found for role '
-                                                        f'{role} in '
-                                                        f'{article_name}. '
-                                                        'Skipping.',
-                                                        fg='yellow')
-                                            continue
-
-                                        last_name = name_parts[-1]
-                                        first_name = ' '.join(name_parts[:-1])
-
-                                        if not first_name:
-                                            # Handle single word name
-                                            first_name = last_name
-
-                                        click.echo(
-                                            'Creating new parliamentarian: '
-                                            f'{first_name} {last_name} for '
-                                            f'{article_name} (unlinked)')
-                                        savepoint = transaction.savepoint()
-                                        parliamentarian = RISParliamentarian(
-                                            first_name=first_name,
-                                            last_name=last_name)
-                                        session.add(parliamentarian)
-                                        try:
-                                            # Ensure ID is available
-                                            session.flush()
-                                        except Exception as e:
-                                            click.secho(
-                                                'Error creating '
-                                                f'parliamentarian {first_name}'
-                                                f' {last_name}: {e}', fg='red')
-                                            parliamentarian = None
-                                            # Failed to create
-                                            savepoint.rollback()
-
-                                        if (
-                                            parliamentarian
-                                            and parliamentarian.id
-                                        ):
-                                            people_ids.append(
-                                                (str(parliamentarian.id),
-                                                 role))
-                                            if not parliamentarian.meta:
-                                                parliamentarian.meta = {}
-                                            parliamentarian.meta[
-                                                'parliamentarian_id'] = str(
-                                                    parliamentarian.id)
-                    i += 1
-
-                german_business_type = data_fields.get('Geschäftsart')
-                english_business_type = None
-                if german_business_type:
-                    value = german_to_english_business_type_map.get(
-                        german_business_type
-                    )
-                    english_business_type = value
-                    if english_business_type is None:
-                        click.secho(f'Warning: Unknown business type '
-                                    f'"{german_business_type}" in '
-                                    f'{article_name}. Setting to None.',
-                                    fg='yellow')
-
-                german_status = data_fields.get('Status')
-                english_status = None
-                if german_status:
-                    english_status = german_to_english_status_map.get(
-                        german_status
-                    )
-                    if english_status is None:
-                        click.secho(f'Warning: Unknown status '
-                                    f'"{german_status}" in {article_name}. '
-                                    f'Setting to None.', fg='yellow')
-
-                if '_' not in article_name:
-                    continue
-                pol_business_id = article_name.split('_')[1].split('.')[0]
-                political_business_collection.add(
-                    title=political_business['metadata']['title'],
-                    number=data_fields.get('Nummer'),
-                    political_business_type=english_business_type,
-                    status=english_status,
-                    entry_date=parse_german_date(data_fields.get('Datum')),
-                    content={},
-                    meta={
-                        'people_ids': people_ids,
-                        'parliamentary_group_ids': parliamentary_group_ids,
-                        'self_id': pol_business_id
-                    }
-                )
-
-        click.echo(f'{import_counter} political_businesses imported')
-        click.echo(f'{overwrite_counter} political_businesses overwritten')
-
-    return create_political_businesses
+    """Import OGI political-business JSON, updating records by source ID."""
+    return import_ogi_section(path, dry_run, 'political-business')
 
 
 @cli.command(name='import-parliamentarians')
@@ -2625,353 +2044,51 @@ def import_parliamentarians(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports parliamentarians from archive of json files
-
-    Example:
-    .. code-block:: bash
-
-        onegov-org --select '/foo/bar' import-parliamentarians /path/to/items
-    """
-
-    # Read all json files in the given directory
-    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
-        for file in Path(path).iterdir():
-
-            if file.suffix == '.json':
-                with open(file) as f:
-                    yield (json.load(f), file.name)
-
-    def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
-        parliamentarian_collection = RISParliamentarianCollection(
-            request.session
-        )
-
-        parliamentarians = read_json_files(path)
-        import_counter = 0
-
-        for parliamentarian, article_name in parliamentarians:
-
-            click.echo(f'Importing {article_name}')
-            import_counter += 1
-
-            if not dry_run:
-
-                polit_business_ids = []
-                name = parliamentarian['metadata']['title']
-                first_name, last_name = name.split(' ', 1)
-                contact = {}
-                address = True
-                table_as_dict: dict[str, Any] = {
-                    'headers': [],
-                    'rows': []
-                }
-                for e, element in enumerate(parliamentarian['elements']):
-                    if element['type'] == 'Paragraph':
-                        for i, child in enumerate(element['children']):
-                            text = child.get('text', '')
-                            if text == 'Personalien' or not text:
-                                continue
-                            if address:
-                                if text.startswith('im Stadtparlament'):
-                                    contact['date'] = text
-                                elif re.search(r'^[^\d\s]*[^\d]+.*\d', text):
-                                    contact['address'] = text
-                                elif re.match(r'^\d{4}\s+.+', text):
-                                    contact['zip_code'] = text.split(' ')[0]
-                                    contact['city'] = ' '.join(text.split(
-                                        ' ')[1:])
-                                elif '@' in text:
-                                    contact['email'] = text
-                                elif text.startswith('Tel. P'):
-                                    text = element['children'][i+1].get(
-                                        'text', '')
-                                    contact['phone_private'] = text
-                                elif text.startswith('Tel.'):
-                                    text = element['children'][i+1].get(
-                                        'text', '')
-                                    contact['phone_business'] = text
-                                elif text.startswith('Mobile'):
-                                    text = element['children'][i+1].get(
-                                        'text', '')
-                                    contact['phone_mobile'] = text
-                                elif text.startswith('Funktion'):
-                                    address = False
-                                    text = parliamentarian['elements'][e+1][
-                                        'children'][0].get('text', '')
-                                    contact['function'] = text
-                                elif re.match(r'^[^\d]*$', text):
-                                    if text not in name:
-                                        contact['addition'] = text
-                            else:
-                                if text.startswith('Partei'):
-                                    text = parliamentarian['elements'][e+1][
-                                        'children'][0].get('text', '')
-                                    contact['party'] = text
-                                elif text.startswith('Beruf'):
-                                    text = parliamentarian['elements'][e+1][
-                                        'children'][0].get('text', '')
-                                    contact['profession'] = text
-
-                    if element['type'] == 'Heading':
-                        if element['text'] == 'Politische Vorstösse':
-                            table = parliamentarian['elements'][e+1]
-                            if table['type'] == 'Table':
-                                for row in table['rows']:
-                                    link = row['cells'][3]['url']
-                                    id = link.split('/')[-1]
-                                    polit_business_ids.append(id)
-                        if element['text'] == 'Interessenbindungen':
-                            try:
-                                table = parliamentarian['elements'][e+1]
-                            except IndexError:
-                                click.secho(
-                                    'No table found for Interessenbindungen',
-                                    fg='red')
-                                continue
-                            if table['type'] == 'Table':
-                                headers = [cell['text'] for cell in table[
-                                    'headers']]
-                                table_as_dict['headers'] = headers
-                                for row in table['rows']:
-                                    row_as_dict = {}
-                                    for i, cell in enumerate(row['cells']):
-                                        row_as_dict[headers[i]] = cell.get(
-                                            'text', '')
-                                    table_as_dict['rows'].append(row_as_dict)
-
-                parliamentarian_collection.add(
-                    first_name=first_name,
-                    last_name=last_name,
-                    phone_mobile=contact.get('phone_mobile', ''),
-                    phone_private=contact.get('phone_private', ''),
-                    phone_business=contact.get('phone_business', ''),
-                    email_primary=contact.get('email', ''),
-                    private_address=contact.get('address', ''),
-                    private_address_addition=contact.get('addition', ''),
-                    private_address_zip_code=contact.get('zip_code', ''),
-                    private_address_city=contact.get('city', ''),
-                    party=contact.get('party', ''),
-                    occupation=contact.get('profession', ''),
-                    # FIXME: I don't think this was correct, but I'll
-                    #        leave it here just in case
-                    # function=contact.get('function', ''),
-                    meta={
-                        'parliamentarian_id': article_name.split(
-                            '_')[1].replace('.json', ''),
-                        'polit_business_ids': polit_business_ids},
-                    content={
-                        'info': contact.get('date', ''),
-                        'interests': table_as_dict
-                        },
-                )
-
-        click.echo(f'{import_counter} parliamentarians imported')
-
-    return create_parliamentarians
+    """Import OGI parliamentarians JSON, updating records by source ID."""
+    return import_ogi_section(path, dry_run, 'parliamentarians')
 
 
 @cli.command(name='create-commission-memberships')
-def create_memberships(
-) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Creates Commission Memberships
+def create_commission_memberships() -> Callable[[OrgRequest, OrgApp], None]:
+    """Connect imported RIS records; safe to repeat."""
 
-    onegov-org --select '/foo/bar' create-commission-memberships
+    def connect(request: OrgRequest, app: OrgApp) -> None:
+        connect_relationships(request.session)
 
-    """
-
-    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
-
-        session = request.session
-        commission_memberships = RISCommissionMembershipCollection(session)
-        people = RISParliamentarianCollection(session)
-        commissions = RISCommissionCollection(session)
-
-        for commission in commissions.query():
-            connect_ids = {}
-            for person_id, function in commission.meta.get('people_ids', []):
-                for person in people.query():
-                    if person.meta.get('parliamentarian_id') == person_id:
-                        connect_ids[person.id] = function
-
-            if not connect_ids:
-                click.secho(
-                    f'No people found for commission {commission.name}',
-                     fg='yellow')
-                continue
-
-            # Check if membership already exists
-            existing_membership = commission_memberships.query().filter(
-                RISCommissionMembership.parliamentarian_id.in_(connect_ids.keys(
-
-                )),
-                RISCommissionMembership.commission_id == commission.id
-            ).first()
-
-            if existing_membership:
-                click.secho(f'Membership already exists for {commission.name}',
-                            fg='yellow')
-                continue
-
-            # Create new membership
-            for person_id, function in connect_ids.items():
-                commission_memberships.add(
-                    parliamentarian_id=person_id,
-                    commission_id=commission.id,
-                    function=function,
-                    role='member'
-                )
-                click.echo(
-                    f'Created membership for {person_id} in {commission.name}')
-
-    return connect_ids
+    return connect
 
 
 @cli.command(name='create-political-business-participants')
 def create_polical_business_participants(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Creates Political Business Participants
+    """Connect imported RIS records; safe to repeat."""
 
-    onegov-org --select '/foo/bar' create-political-business-participants
+    def connect(request: OrgRequest, app: OrgApp) -> None:
+        connect_relationships(request.session)
 
-    """
-
-    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
-
-        session = request.session
-        business_participants = PoliticalBusinessParticipationCollection(
-            session)
-        people = RISParliamentarianCollection(session)
-        political_businesses = PoliticalBusinessCollection(request)
-
-        for political_business in political_businesses.query():
-            connect_ids = {}
-            for person_id, function in political_business.meta.get(
-                'people_ids', []):
-                for person in people.query():
-                    if person.meta.get('parliamentarian_id') == person_id:
-                        connect_ids[person.id] = function
-
-            if not connect_ids:
-                click.secho(
-                    'No people found for political business '
-                    f'{political_business.title}', fg='yellow')
-                continue
-
-            # Check if participation already exists
-            existing_membership = business_participants.query().filter(
-                RISCommissionMembership.parliamentarian_id.in_(
-                    connect_ids.keys()),
-                RISCommissionMembership.commission_id == political_business.id
-            ).first()
-
-            if existing_membership:
-                click.secho(
-                    'participation already exists for '
-                    f'{political_business.title}', fg='yellow')
-                continue
-
-            # Create new participation
-            for person_id, function in connect_ids.items():
-                business_participants.add(
-                    parliamentarian_id=person_id,
-                    political_business_id=political_business.id,
-                    participant_type=function,
-                    # FIXME: I don't think this was correct
-                    # role='member'
-                )
-                click.echo(
-                    f'Created participation for {person_id} in '
-                    f'{political_business.title}')
-
-    return connect_ids
+    return connect
 
 
 @cli.command(name='create-parliamentarian-roles')
 def create_parliamentarian_roles(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Creates Parliamentarian Roles
+    """Connect imported RIS records; safe to repeat."""
 
-    onegov-org --select '/foo/bar' create-parliamentarian-roles
+    def connect(request: OrgRequest, app: OrgApp) -> None:
+        connect_relationships(request.session)
 
-    """
-
-    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
-
-        session = request.session
-        parliamentarian_roles = RISParliamentarianRoleCollection(session)
-        people = RISParliamentarianCollection(session)
-        parliamentary_groups = RISParliamentaryGroupCollection(session)
-
-        for parliamentary_group in parliamentary_groups.query():
-            connect_ids = [
-                person.id
-                for person_id in parliamentary_group.meta.get('people_ids', [])
-                for person in people.query()
-                if person.meta.get('parliamentarian_id') == person_id
-            ]
-
-            if not connect_ids:
-                click.secho(
-                    'No people found for parliamentary group '
-                    f'{parliamentary_group.name}', fg='yellow')
-                continue
-
-            # Check if participation already exists
-            existing_membership = parliamentarian_roles.query().filter(
-                RISCommissionMembership.parliamentarian_id.in_(connect_ids),
-                RISCommissionMembership.commission_id == parliamentary_group.id
-            ).first()
-
-            if existing_membership:
-                click.secho(
-                    'participation already exists for '
-                    f'{parliamentary_group.name}', fg='yellow')
-                continue
-
-            # Create new participation
-            for i, person_id in enumerate(connect_ids):
-                role = 'president' if i == 0 else 'member'
-                parliamentarian_roles.add(
-                    parliamentarian_id=person_id,
-                    parliamentary_group_id=parliamentary_group.id,
-                    role=role
-                )
-                click.echo(
-                    f'Created participation for {person_id} in '
-                    f'{parliamentary_group.name}')
-
-    return connect_ids
+    return connect
 
 
 @cli.command(name='connect-political-business-meeting-items')
 def connect_political_business_meeting_items(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Connects Political Business and Meeting Items
+    """Connect imported RIS records; safe to repeat."""
 
-    onegov-org --select '/foo/bar' connect-political-business-meeting-items
+    def connect(request: OrgRequest, app: OrgApp) -> None:
+        connect_relationships(request.session)
 
-    """
-
-    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
-
-        session = request.session
-        meeting_items = MeetingItemCollection(session)
-        political_businesses = PoliticalBusinessCollection(request)
-
-        for political_business in political_businesses.query():
-            self_id = political_business.meta.get('self_id')
-            if not self_id:
-                click.secho(
-                    'No self_id found for political business '
-                    f'{political_business.title}', fg='yellow')
-                continue
-            meeting_item = meeting_items.query().filter(
-                MeetingItem.political_business_link_id == self_id
-            ).first()
-            if meeting_item is not None:
-                meeting_item.political_business_id = political_business.id
-        transaction.commit()
-    return connect_ids
+    return connect
 
 
 @cli.command(name='ris-shipping-to-private-address')
@@ -3738,6 +2855,62 @@ def migrate_agency(
         """)
 
     return migrate_to_new_agency
+
+
+@cli.command(name='import-ris')
+@click.argument(
+    'path',
+    type=click.Path(
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+        path_type=Path,
+    ),
+)
+@click.option('--dry-run', is_flag=True, help='Validate without writes.')
+def import_ris(
+    path: Path,
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Import a complete OGI RIS download, including local documents.
+
+    Runs the same imports as the individual RIS commands, in dependency
+    order, committing each stage and batches of 100 businesses. Repeat
+    the command to resume.
+    Run org upgrades first. This command performs no HTTP requests.
+    """
+    try:
+        archive = OGIArchive(path)
+    except (ValueError, KeyError, OSError) as error:
+        raise click.ClickException(str(error)) from error
+
+    def import_archive(request: OrgRequest, app: OrgApp) -> None:
+        if dry_run:
+            counts = {
+                name: len(pages) for name, pages in archive.pages.items()
+            }
+            click.echo(f'OGI validated (no changes): {counts}')
+            return
+        totals: dict[str, int] = {}
+        for section in SECTIONS:
+            batches: list[set[str] | None] = [None]
+            if section == 'political-business':
+                ids = sorted(archive.pages[section])
+                batches = [
+                    set(ids[offset : offset + 100])
+                    for offset in range(0, len(ids), 100)
+                ]
+            for batch in batches:
+                counts = archive.importer(app.session()).run(section, batch)
+                transaction.commit()
+                for key, count in counts.items():
+                    if key != 'unavailable_documents':
+                        totals[key] = totals.get(key, 0) + count
+                click.echo(f'OGI {section} imported: {counts}')
+        totals['unavailable_documents'] = len(archive.unavailable)
+        click.echo(f'OGI RIS imported: {totals}')
+
+    return import_archive
 
 
 @cli.command(name='recreate-future-kaba-authorizations')

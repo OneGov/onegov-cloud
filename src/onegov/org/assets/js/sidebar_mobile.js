@@ -4,8 +4,8 @@ $(function () {
     var toggler = $('.sidebar-toggler');
     var source = $('.sidebar-wrapper').first();
 
-    // Toggler stays hidden unless there is a sidebar to copy
-    if (!source.length || !target.length || !offCanvasWrap.length) {
+    // Toggler stays hidden unless there is a sidebar to show
+    if (!source.children().length || !target.length || !offCanvasWrap.length) {
         return;
     }
 
@@ -27,35 +27,35 @@ $(function () {
         toggler.find('.text').text(title);
     }
 
-    var gridClass = /^(columns?|(small|medium|large|xlarge|xxlarge)-(\d+|offset-\d+|push-\d+|pull-\d+|centered|uncentered))$/;
-    var visibilityClass = /^(show|hide)-for-[\w-]+$/;
+    // The content is moved
+    var container = $('<div class="offcanvas-sidebar-content"></div>').appendTo(target);
+    var desktop = window.matchMedia(
+        (window.Foundation && Foundation.media_queries && Foundation.media_queries.medium) ||
+        'only screen and (min-width: 40.0625em)'
+    );
 
-    function removeClasses(el, patterns) {
-        var classes = (el.getAttribute('class') || '').split(/\s+/);
-        el.setAttribute('class', $.grep(classes, function (cls) {
-            return cls && !$.grep(patterns, function (p) { return p.test(cls); }).length;
-        }).join(' '));
+    function isOpen() {
+        return offCanvasWrap.hasClass('move-left');
     }
 
-    var content = source.clone(true);
+    function placeSidebar() {
+        if (desktop.matches) {
+            if (isOpen()) {
+                offCanvasWrap.foundation('offcanvas', 'hide', 'move-left');
+            }
+            container.children().appendTo(source);
+        } else {
+            source.children().appendTo(container);
+        }
+    }
 
-    // Root: drop grid and visibility classes; inside: only visibility classes
-    removeClasses(content[0], [gridClass, visibilityClass]);
-    content.find('[class*="show-for-"], [class*="hide-for-"]').each(function () {
-        removeClasses(this, [visibilityClass]);
-    });
+    placeSidebar();
 
-    content = $('<div class="offcanvas-sidebar-content"></div>').append(content);
-
-    // Avoid duplicate IDs
-    content.find('[id]').each(function () {
-        this.id = this.id + '-mobile';
-    });
-    content.find('label[for]').each(function () {
-        $(this).attr('for', $(this).attr('for') + '-mobile');
-    });
-
-    target.append(content);
+    if (desktop.addEventListener) {
+        desktop.addEventListener('change', placeSidebar);
+    } else {
+        desktop.addListener(placeSidebar);
+    }
 
     // The toggler sits outside the wrapper, so it toggles via the API
     toggler.on('click', function (e) {
@@ -72,10 +72,6 @@ $(function () {
         });
     }
 
-    function isOpen() {
-        return offCanvasWrap.hasClass('move-left');
-    }
-
     offCanvasWrap.on('open.fndtn.offcanvas', function () {
         fitToViewport();
         target.scrollTop(0);
@@ -87,7 +83,11 @@ $(function () {
         }
     });
 
+    // Links close the menu, except toggles that expand more items
     target.on('click', 'a, .offcanvas-sidebar-close', function () {
+        if ($(this).closest('.more-items').length) {
+            return;
+        }
         offCanvasWrap.foundation('offcanvas', 'hide', 'move-left');
     });
 

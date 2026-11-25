@@ -102,10 +102,9 @@
 
             <div class="cell medium-3 large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="grid-x" tal:condition="search_widget">
-                        <div class="cell medium-12">
-                            <tal:b replace="search_widget.html(layout)" />
-                        </div>
+                    <div class="side-panel" tal:condition="search_widget and directory.enable_search">
+                        <h3 i18n:translate>Search</h3>
+                        <tal:b replace="search_widget.html(layout)" />
                     </div>
 
                     <div class="side-panel" tal:condition="layout.publication_filters">

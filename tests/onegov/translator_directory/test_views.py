@@ -2530,6 +2530,68 @@ def test_admin_in_group_sees_trp_tickets(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_translator_cannot_confirm_own_time_report_by_post(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    session = client.app.session()
+    create_languages(session)
+    translator_id = (
+        TranslatorCollection(client.app)
+        .add(
+            first_name='Test',
+            last_name='Translator',
+            admission='certified',
+            email='translator@example.org',
+        )
+        .id
+    )
+    group = UserGroupCollection(session).add(name='Accounting')
+    group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_translator()
+    page = client.get(f'/translator/{translator_id}/add-time-report')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:00'
+    page.form['case_number'] = 'SELF-APPROVAL'
+    page = page.form.submit().follow()
+
+    report = session.query(TranslatorTimeReport).one()
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    assert ticket.handler.email == 'translator@example.org'
+    assert report.status == 'pending'
+    assert ticket.state != 'closed'
+
+    csrf_match = re.search(r'csrf-token=([a-zA-Z0-9._-]+)', page.text)
+    assert csrf_match is not None
+    url = f'/ticket/TRP/{ticket.id}/accept-time-report'
+    client.post(url, status=403)
+    client.post(url, {'csrf-token': csrf_match.group(1)}, status=403)
+
+    session.expire_all()
+    report = session.query(TranslatorTimeReport).one()
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    assert report.status == 'pending'
+    assert ticket.state == 'open'
+    assert ticket.closed_on is None
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_time_report_workflow(
     broadcast: MagicMock,
     authenticate: MagicMock,

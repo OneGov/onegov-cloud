@@ -269,11 +269,6 @@ def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
-@WinterthurApp.webasset('inline-search')
-def get_inline_search_asset() -> Iterator[str]:
-    yield 'inline-search.js'
-
-
 @WinterthurApp.webasset('street-search')
 def get_street_search_asset() -> Iterator[str]:
     yield 'wade.js'

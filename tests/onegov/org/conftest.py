@@ -297,6 +297,7 @@ def browser(
 ) -> Iterator[ExtendedBrowser]:
     browser.baseurl = org_app_url
     yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope='function')

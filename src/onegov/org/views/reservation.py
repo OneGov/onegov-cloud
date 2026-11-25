@@ -1369,8 +1369,8 @@ def accept_reservation(
                             end=end,
                             components=group,
                         )
-                    except (KeyError, KabaApiError) as exc:
-                        if isinstance(exc, KabaApiError):
+                    except (KeyError, KabaApiError) as error:
+                        if isinstance(error, KabaApiError):
                             log.info('Kaba API error', exc_info=True)
 
                         # roll back previous changes

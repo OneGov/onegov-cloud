@@ -47,6 +47,12 @@ type PoliticalBusinessType = Literal[
     'resolution',  # Resolution
     'election',  # Wahl
     'parliamentary statement',  # Parlamentarische Erklärung
+    'decision',
+    'urgent motion',
+    'urgent postulate',
+    'petition',
+    'protocol',
+    'draft',
     'miscellaneous',  # Verschiedenes
 ]
 
@@ -64,6 +70,13 @@ type PoliticalBusinessStatus = Literal[
     'umgewandelt',
     'zurueckgewiesen',
     'ueberwiesen',
+    'abgelehnt',
+    'angenommen',
+    'beschlossen',
+    'in_bearbeitung',
+    'nicht_ueberwiesen',
+    'teilweise_ueberwiesen',
+    'zur_kenntnis_genommen',
 ]
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
@@ -78,6 +91,12 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'resolution': _('Resolution'),
     'election': _('Election'),
     'parliamentary statement': _('Parliamentary Statement'),
+    'decision': _('Decision'),
+    'urgent motion': _('Urgent Motion'),
+    'urgent postulate': _('Urgent Postulate'),
+    'petition': _('Petition'),
+    'protocol': _('Protocol'),
+    'draft': _('Draft'),
     'miscellaneous': _('Miscellaneous'),
 }
 
@@ -96,6 +115,13 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
     'umgewandelt': 'Umgewandelt',
     'zurueckgewiesen': 'Zurückgewiesen',
     'ueberwiesen': 'Überwiesen',
+    'abgelehnt': 'Abgelehnt',
+    'angenommen': 'Angenommen',
+    'beschlossen': 'Beschlossen',
+    'in_bearbeitung': 'In Bearbeitung',
+    'nicht_ueberwiesen': 'Nicht überwiesen',
+    'teilweise_ueberwiesen': 'Teilweise überwiesen',
+    'zur_kenntnis_genommen': 'Zur Kenntnis genommen',
 }
 
 
@@ -223,6 +249,11 @@ class PoliticalBusiness(
 
     meeting_items: Mapped[list[MeetingItem]] = relationship(
         back_populates='political_business',
+    )
+
+    agenda_items: Mapped[list[MeetingItem]] = relationship(
+        secondary='par_meeting_item_political_businesses',
+        back_populates='political_businesses',
     )
 
     @hybrid_property

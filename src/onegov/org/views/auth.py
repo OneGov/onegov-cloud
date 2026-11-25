@@ -423,7 +423,11 @@ def handle_mtan_second_factor(
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
-    if user is None:
+    if user is None or not user.active:
+        request.browser_session.pop('pending_username')
+        request.browser_session.pop('mtan_setup_username')
+        request.browser_session.pop('mtan_setup')
+
         if request.current_user:
             # redirect already logged in users to the redirect_to
             return self.redirect(request, self.to)
@@ -584,7 +588,8 @@ def handle_totp_second_factor(
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
-    if user is None:
+    if user is None or not user.active:
+        request.browser_session.pop('pending_username')
         if request.current_user:
             # redirect already logged in users to the redirect_to
             return self.redirect(request, self.to)

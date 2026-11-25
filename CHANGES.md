@@ -1,8 +1,187 @@
 # Changes
 
+## 2026.63
+
+`2026-11-23` | [9febe046e8...0a949511ae](https://github.com/OneGov/onegov-cloud/compare/9febe046e8^...0a949511ae)
+
+### Core
+
+##### Set users.data when adding admins on transfer
+
+Since the SQLAlchemy 2.0 upgrade, users.data is created as NOT NULL in
+new schemas, while older schemas still allow NULL. The admin INSERT of
+`transfer --add-admins` omitted the column and failed on newer schemas
+such as onegov_town6-horw.
+
+`Other` | [9febe046e8](https://github.com/onegov/onegov-cloud/commit/9febe046e8ba6a2cf52a109df34e52e2ed89eef9)
+
+### Election-Day
+
+##### Improves error message for CSV with too few values on a line.
+
+`Feature` | [06d340f92c](https://github.com/onegov/onegov-cloud/commit/06d340f92ce0abad8b00b4227fa76ee547c66140)
+
+### Org
+
+##### Fix exc shadowing `webob.exc` in `accept_reservation`.
+
+`Bugfix` | [3c0b20fd0e](https://github.com/onegov/onegov-cloud/commit/3c0b20fd0e9f57e022625cbb626254fce994b720)
+
+### Ris
+
+##### Fix import of second archive failing on missing participant.
+
+connect_relationships() relinked participants for every business in
+the database, but only knew the people of the archive being imported.
+Importing the pre-2010 archive after the 2010+ one therefore failed on
+historical people referenced by already imported businesses.
+
+Restrict participant linking to the businesses of the current archive;
+businesses from earlier imports keep their participants.
+
+`Bugfix` | [OGC-3523](https://linear.app/onegovcloud/issue/OGC-3523) | [78f1dbf53c](https://github.com/onegov/onegov-cloud/commit/78f1dbf53c7e8264e65e1b7eb8c4f38f7f533498)
+
+## 2026.62
+
+`2026-11-19` | [8c4adac7ea...68aafb7caf](https://github.com/OneGov/onegov-cloud/compare/8c4adac7ea^...68aafb7caf)
+
+### Feriennet
+
+##### Add option to disable sharing contact data
+
+Option for admins to disable contact sharing altogether
+    Text changes
+    Move contact sharing option up on userprofile
+
+`Feature` | [PRO-1616](https://linear.app/projuventute/issue/PRO-1616) | [8c4adac7ea](https://github.com/onegov/onegov-cloud/commit/8c4adac7eafdd5ecb47fd69e225f0967948f9a4d)
+
+## 2026.61
+
+`2026-11-19` | [340e1f06aa...d1b3eb2dad](https://github.com/OneGov/onegov-cloud/compare/340e1f06aa^...d1b3eb2dad)
+
+### Feriennet
+
+##### Accept TOS once per period
+
+Users need to confirm once per period, that they agree to the TOS
+
+`Feature` | [PRO-1493](https://linear.app/projuventute/issue/PRO-1493) | [0e61805214](https://github.com/onegov/onegov-cloud/commit/0e61805214866a937951cd950fe60d648852e102)
+
+##### Generates QR-bills with structured creditor address.
+
+Banks reject the combined address type 'K' since the QR-bill
+Implementation Guidelines v2.3 (valid from 21 November 2025, chapter
+4.2.2). The Feriennet beneficiary setting is now parsed into street,
+postcode and city, so the QR code uses address type 'S'. The
+Translator Directory QR-bills are switched to the structured address
+as well.
+
+https://www.six-group.com/dam/download/banking-services/standardization/qr-bill/ig-qr-bill-v2.3-en.pdf
+
+`Bugfix` | [PRO-1628](https://linear.app/projuventute/issue/PRO-1628) | [8c949f1362](https://github.com/onegov/onegov-cloud/commit/8c949f136201b3dc7ad8304c35710cc4fe134e23)
+
+### Town6
+
+##### Change form of parliamentarian image
+
+`Feature` | [OGC-3469](https://linear.app/onegovcloud/issue/OGC-3469) | [340e1f06aa](https://github.com/onegov/onegov-cloud/commit/340e1f06aac5fa3ff9f82415d51441a9bb36810e)
+
+## 2026.60
+
+`2026-11-18` | [596eb662b3...06ebadc552](https://github.com/OneGov/onegov-cloud/compare/596eb662b3^...06ebadc552)
+
+### Core
+
+##### Add audit trail for user table as well.
+
+`Feature` | [OGC-3548](https://linear.app/onegovcloud/issue/OGC-3548) | [e9e960bd44](https://github.com/onegov/onegov-cloud/commit/e9e960bd44c0fed470288d955899ae327b1cb4f7)
+
+### Ris
+
+##### Prepare for horw data import.
+
+`Feature` | [OGC-3260](https://linear.app/onegovcloud/issue/OGC-3260) | [f2d7a8c42a](https://github.com/onegov/onegov-cloud/commit/f2d7a8c42ad1fd33eb5683c101663da61e94ed36)
+
+### Winterthur
+
+##### Adds redirect URL argument to directories.
+
+`Feature` | [OGC-3571](https://linear.app/onegovcloud/issue/OGC-3571) | [762e054148](https://github.com/onegov/onegov-cloud/commit/762e054148e8d66a5e58119f786d225ace1584c0)
+
+## 2026.59
+
+`2026-11-13` | [b47395ebbc...b8c190078b](https://github.com/OneGov/onegov-cloud/compare/b47395ebbc^...b8c190078b)
+
+### Feriennet
+
+##### Details Volunteer Activity
+
+Display the need descriptions in the volunteer view
+
+`Feature` | [PRO-1535](https://linear.app/projuventute/issue/PRO-1535) | [b47395ebbc](https://github.com/onegov/onegov-cloud/commit/b47395ebbcd985545aebe0c5effe787438bde263)
+
+### Town6
+
+##### Rename "export" button
+
+`Bugfix` | [OGC-3590](https://linear.app/onegovcloud/issue/OGC-3590) | [9eea50fda7](https://github.com/onegov/onegov-cloud/commit/9eea50fda7a934b90d407ff0f1b908e8cc694012)
+
+### Winterthur
+
+##### Move filter to top of directories and events
+
+`Bugfix` | [OGC-3543](https://linear.app/onegovcloud/issue/OGC-3543) | [3ca158d606](https://github.com/onegov/onegov-cloud/commit/3ca158d606396302b4fbde7b72f7dd22a6d9c29d)
+
+## 2026.58
+
+`2026-11-09` | [eb8b62d5f8...d67bd20c05](https://github.com/OneGov/onegov-cloud/compare/eb8b62d5f8^...d67bd20c05)
+
+### Agency
+
+##### Changes `Cache-Control` for people export from public to private
+
+`Bugfix` | [OGC-3617](https://linear.app/onegovcloud/issue/OGC-3617) | [df52bf8994](https://github.com/onegov/onegov-cloud/commit/df52bf89947510e5297d2ca1f31a0b6df641de0b)
+
+### Org
+
+##### Avoids race condition between user deactivation and 2FA
+
+If a user was deactivated while a two-step 2FA authentication was in
+progress, it was possible for them to complete the login. Even though
+deactivation was supposed to ensure all sessions were immediately
+terminated and no future logins were possible.
+
+`Bugfix` | [OGC-3617](https://linear.app/onegovcloud/issue/OGC-3617) | [eb8b62d5f8](https://github.com/onegov/onegov-cloud/commit/eb8b62d5f8dafcf3494b34e0e11f8ee554e2b923)
+
+##### Fixes failed API file uploads potentially not getting rolled back
+
+`Bugfix` | [OGC-3617](https://linear.app/onegovcloud/issue/OGC-3617) | [b7918b12cf](https://github.com/onegov/onegov-cloud/commit/b7918b12cf359d33e45723e55b7661f6ed87f400)
+
+##### Fixes occupancy fields for blocking resources in occupancy view
+
+Previously all reservations would be using the occupancy fields from the
+resource that's currently being viewed, not the resource tied to the
+specific reservation. In most cases this was probably fine, since most
+related resources will share the same configuration here, but it's still
+better to be just as robust here, as we are with the iCal export.
+
+`Bugfix` | [52f333f73d](https://github.com/onegov/onegov-cloud/commit/52f333f73da849a394bd66acb41b11440f907a90)
+
+### Pas
+
+##### Add bulk file studies
+
+`Feature` | [OGC-3606](https://linear.app/onegovcloud/issue/OGC-3606) | [a640025e6f](https://github.com/onegov/onegov-cloud/commit/a640025e6fe68ddb731e32da4cba7248a7d3c18f)
+
+### User
+
+##### Ensures all sessions get logged out after a password reset
+
+`Bugfix` | [OGC-3617](https://linear.app/onegovcloud/issue/OGC-3617) | [ba2c685cfb](https://github.com/onegov/onegov-cloud/commit/ba2c685cfbd075c1b5edfad3607e7fe690f3e74b)
+
 ## 2026.57
 
-`2026-11-04` | [2717e89354...6ba2b3fc56](https://github.com/OneGov/onegov-cloud/compare/2717e89354^...6ba2b3fc56)
+`2026-11-04` | [2717e89354...9405a40966](https://github.com/OneGov/onegov-cloud/compare/2717e89354^...9405a40966)
 
 ### Core
 
@@ -5271,275 +5450,4 @@ Display private address if available, otherwise show place of residence
 ##### Update political business types
 
 `Bugfix` | [OGC-2465, OGC-2466](https://linear.app/onegovcloud/issue/OGC-2465, OGC-2466) | [f88d24869c](https://github.com/onegov/onegov-cloud/commit/f88d24869ca6cbdf75684746acd72b1bd2c9e201)
-
-## 2025.34
-
-`2025-07-18` | [86456cadbf...57a3644696](https://github.com/OneGov/onegov-cloud/compare/86456cadbf^...57a3644696)
-
-### Ris
-
-##### Menu to add, edit and remove meetings
-
-`Feature` | [OGC-2453](https://linear.app/onegovcloud/issue/OGC-2453) | [7990d46167](https://github.com/onegov/onegov-cloud/commit/7990d461674eaff84f1dc5e342c4b7e54296f4e5)
-
-##### Adds filter for future/past meetings (#1913)
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [4fea222a0b](https://github.com/onegov/onegov-cloud/commit/4fea222a0b0eb79b7b5cf4123352b38df154280b)
-
-## 2025.33
-
-`2025-07-16` | [32fb87a343...83af613185](https://github.com/OneGov/onegov-cloud/compare/32fb87a343^...83af613185)
-
-### Org
-
-##### Fixes attribute error in KABA settings
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [32fb87a343](https://github.com/onegov/onegov-cloud/commit/32fb87a34341370667cbc6db9bf4f67f61efc019)
-
-##### Decodes bytes in KABA settings
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [b97a5413ca](https://github.com/onegov/onegov-cloud/commit/b97a5413ca6dbcb65eb202a9beb8b77c5ef7acd1)
-
-##### Checks whether KABA visit has already been revoked.
-
-`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [917dcf5439](https://github.com/onegov/onegov-cloud/commit/917dcf54391ff020a5b17106daa3f9c66814eb1a)
-
-##### Replace label for submit event
-
-Replace Veranstaltung vorschlagen with Veranstaltung erfassen
-
-`Other` | [3bda867ff2](https://github.com/onegov/onegov-cloud/commit/3bda867ff202787bedc0bc7ac4033645b6d3ddad)
-
-### Ris
-
-##### Refactor project structure and add political business management views
-
-RIS: Adds political business management views
-
-Refactors project structure
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [41133c87fa](https://github.com/onegov/onegov-cloud/commit/41133c87fa3bdac94e2bf1c5f93fa6b7e5fe6ac4)
-
-##### Comments out broken management link
-
-`Bugfix` | [bceaa64103](https://github.com/onegov/onegov-cloud/commit/bceaa64103d0307699b7cc79d98d0dbfe37de058)
-
-## 2025.32
-
-`2025-07-10` | [0b7c2f2ec8...a72b0244a5](https://github.com/OneGov/onegov-cloud/compare/0b7c2f2ec8^...a72b0244a5)
-
-### Feriennet
-
-##### Replace Banners
-
-`Feature` | [PRO-1404](https://linear.app/projuventute/issue/PRO-1404) | [dd50583358](https://github.com/onegov/onegov-cloud/commit/dd50583358fcb1e64bff2b23533561b62d08b163)
-
-##### Word Change
-
-`Bugfix` | [PRO-1402](https://linear.app/projuventute/issue/PRO-1402) | [c66404d82a](https://github.com/onegov/onegov-cloud/commit/c66404d82a16a2e9fd80b642eb0b679be75fff74)
-
-### Form
-
-##### Fixes CSRF-Token being reset by reset form button
-
-`Bugfix` | [OGC-2431](https://linear.app/onegovcloud/issue/OGC-2431) | [8ab09d2a9d](https://github.com/onegov/onegov-cloud/commit/8ab09d2a9d67a217f49636590de7e52d728a5d64)
-
-### Org
-
-##### Changes auto-generated Kaba-Code to be 4 digits long
-
-`Feature` | [OGC-2426](https://linear.app/onegovcloud/issue/OGC-2426) | [4a4555c9a1](https://github.com/onegov/onegov-cloud/commit/4a4555c9a1a3e9c19920d40d8d416f4f4175bbbe)
-
-##### Allows multiple Kaba configurations to coexist
-
-We will send requests to the required instances based on the associated
-components, so components from multiple systems can be mixed freely.
-
-`Feature` | [OGC-2428](https://linear.app/onegovcloud/issue/OGC-2428) | [0a89fdb173](https://github.com/onegov/onegov-cloud/commit/0a89fdb173a0d68e4f0fdbbab00d7c36f0a5a0e9)
-
-##### Includes key codes in my reservations view and optionally in ICal
-
-`Feature` | [OGC-2430](https://linear.app/onegovcloud/issue/OGC-2430) | [ff07de1c1b](https://github.com/onegov/onegov-cloud/commit/ff07de1c1b3ffa3b5b95b601304815f1f3976047)
-
-##### Improves subject and content of some reservation related emails
-
-`Feature` | [OGC-2440](https://linear.app/onegovcloud/issue/OGC-2440) | [26dea9563b](https://github.com/onegov/onegov-cloud/commit/26dea9563b9b5c671902647b7d9938c2484fb4f4)
-
-##### Includes payment details in additional reservation emails
-
-`Feature` | [OGC-2437](https://linear.app/onegovcloud/issue/OGC-2437) | [e3e27b79a3](https://github.com/onegov/onegov-cloud/commit/e3e27b79a3ef348db95b9a0b9727cd56c0f70b32)
-
-##### Order of imagesets
-
-Order imagesets by lat change
-
-`Feature` | [OGC-2275](https://linear.app/onegovcloud/issue/OGC-2275) | [bd1548d770](https://github.com/onegov/onegov-cloud/commit/bd1548d77050c864fb0f00061565b4da7eacb04d)
-
-##### Add bill run.
-
-`Feature` | [OGC-2173](https://linear.app/onegovcloud/issue/OGC-2173) | [3d545209e6](https://github.com/onegov/onegov-cloud/commit/3d545209e6e797754492d60c925015baa6a5a571)
-
-##### Adds a dashboard for the customer login
-
-`Feature` | [OGC-2421](https://linear.app/onegovcloud/issue/OGC-2421) | [a5306bc2e9](https://github.com/onegov/onegov-cloud/commit/a5306bc2e91b0ecad6f02ad600be328e218a74ac)
-
-##### Update reservation import
-
-`Bugfix` | [1c5a2e2f06](https://github.com/onegov/onegov-cloud/commit/1c5a2e2f0618c2039c2182619fa7d61d5ffffdac)
-
-### Ris
-
-##### Parliamentarian roles as more list
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [0b7c2f2ec8](https://github.com/onegov/onegov-cloud/commit/0b7c2f2ec88a4c188db2563628ac65cff2f303cc)
-
-##### Fix breadcrumbs for meetings and meeting views
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [31d24f72aa](https://github.com/onegov/onegov-cloud/commit/31d24f72aa7ed31fee277d24ebd4ec7e630b237d)
-
-### Town6
-
-##### Fix calendar view
-
-`Bugfix` | [OGC-2432](https://linear.app/onegovcloud/issue/OGC-2432) | [0f2b8a376e](https://github.com/onegov/onegov-cloud/commit/0f2b8a376e0501c5c362ac511c5e252934ef02e6)
-
-##### Fixes broken stylesheet in mail layout
-
-`Bugfix` | [a29d92e8dc](https://github.com/onegov/onegov-cloud/commit/a29d92e8dc2ef9273d0a8728722f7b61302b5d52)
-
-##### Fix calendar view (cleaner solution)
-
-`Bugfix` | [OGC-2432](https://linear.app/onegovcloud/issue/OGC-2432) | [45679a46fb](https://github.com/onegov/onegov-cloud/commit/45679a46fbe371e321dbf2f956bcdddf6e14aeb1)
-
-## 2025.31
-
-`2025-07-07` | [fe887383ec...c31c34321c](https://github.com/OneGov/onegov-cloud/compare/fe887383ec^...c31c34321c)
-
-### Org
-
-##### Vimeo unlisted videos
-
-`Feature` | [OGC-2412](https://linear.app/onegovcloud/issue/OGC-2412) | [1fec99e1b9](https://github.com/onegov/onegov-cloud/commit/1fec99e1b9505559e6e07930a55511c151367dc6)
-
-### Ris
-
-##### Show date and time of meeting
-
-`Feature` | [OGC-2254](https://linear.app/onegovcloud/issue/OGC-2254) | [7b7a5861b4](https://github.com/onegov/onegov-cloud/commit/7b7a5861b45e8ff8d8128ff0c07a565b3dbf3c67)
-
-##### Provide files to political business template
-
-`Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
-
-## 2025.30
-
-`2025-07-03` | [5fb710d69d...5725423a04](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...5725423a04)
-
-### Org
-
-##### Allows subscription to confirmed personal reservations via iCal
-
-`Feature` | [OGC-2399](https://linear.app/onegovcloud/issue/OGC-2399) | [5fb710d69d](https://github.com/onegov/onegov-cloud/commit/5fb710d69d4b6df8476c6021c5e74a8ae2f94796)
-
-### Pay
-
-##### Silences 3D-Secure Verification errors
-
-`Bugfix` | [92d3e8da7f](https://github.com/onegov/onegov-cloud/commit/92d3e8da7fd1b41ae6949bbbd26670136ed81903)
-
-## 2025.29
-
-`2025-07-03` | [93a736507d...bb698f8fd3](https://github.com/OneGov/onegov-cloud/compare/93a736507d^...bb698f8fd3)
-
-**Upgrade hints**
-- onegov-org --select /onegov_town6/wil ris-resolve-parliamentarian-doublette
-### Form
-
-##### Adds an optional reset button to forms
-
-Adds that reset button to reservation forms for admins
-
-`Feature` | [OGC-2390](https://linear.app/onegovcloud/issue/OGC-2390) | [6a5ffc42d9](https://github.com/onegov/onegov-cloud/commit/6a5ffc42d9bfdf5d66f2760f60d38712aedf4fd2)
-
-##### Ensures `data-auto-fill` works for radio- and checkboxes
-
-`Bugfix` | [OGC-2408](https://linear.app/onegovcloud/issue/OGC-2408) | [d5ab9369ca](https://github.com/onegov/onegov-cloud/commit/d5ab9369ca3317890c62d649ddda82ba7ac49286)
-
-### Org
-
-##### Adds a hint to the shared e-mail field in the user group form
-
-`Feature` | [OGC-2396](https://linear.app/onegovcloud/issue/OGC-2396) | [d5e642c2c0](https://github.com/onegov/onegov-cloud/commit/d5e642c2c00cc914bfaf726747c7d42d0312939d)
-
-##### Adds a citizen login with access to tickets and reservations
-
-Rather than requiring user registration, all citizens have to do is to
-request a login-link for their e-mail address with which they can gain
-access to all the tickets and reservations tied to that e-mail address.
-
-`Feature` | [OGC-2098](https://linear.app/onegovcloud/issue/OGC-2098) | [0048edd929](https://github.com/onegov/onegov-cloud/commit/0048edd9295228c9081bd1607a0c3d65321c6ca9)
-
-##### Fixes small regression in reservation calendar
-
-`Bugfix` | [OGC-2389](https://linear.app/onegovcloud/issue/OGC-2389) | [e96c912b1c](https://github.com/onegov/onegov-cloud/commit/e96c912b1c74476bf07c4d237ced65d5ea84e641)
-
-### Ris
-
-##### Various improvements
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [63ecf0b4d7](https://github.com/onegov/onegov-cloud/commit/63ecf0b4d70d649cc183de8a547d654bad18fe41)
-
-##### Remove party view
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [82ceca571b](https://github.com/onegov/onegov-cloud/commit/82ceca571bae15b954f8df79df3d52f9e78b094b)
-
-##### Move files for political business to sidebar
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [077dda6e0d](https://github.com/onegov/onegov-cloud/commit/077dda6e0d9fe409f4b7f66225e024899dddae26)
-
-##### Use more-list for political business and meeting views
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [f1e1d2fec8](https://github.com/onegov/onegov-cloud/commit/f1e1d2fec84bff3fab1168e38ddc48abee61c914)
-
-##### Set end date for inactive parliamentarian, copy shipping address to private address
-
-onegov-org --select /onegov_town6/wil ris-shipping-to-private-address
-onegov-org --select /onegov_town6/wil ris-set-end-date-for-inactive-parliamentarians
-
-`Feature` | [OGC-2245, OGC-2409](https://linear.app/onegovcloud/issue/OGC-2245, OGC-2409) | [8f05e17030](https://github.com/onegov/onegov-cloud/commit/8f05e17030a8592abb45b7c0d8c3604cbd28d5e1)
-
-##### Shows parliamentarians political businesses
-
-`Feature` | [OGC-2405](https://linear.app/onegovcloud/issue/OGC-2405) | [a5112d5348](https://github.com/onegov/onegov-cloud/commit/a5112d534894da3b11b5e9bad05247600b1566da)
-
-##### Resolve parliamentarian doublette
-
-`Feature` | [OGC-2394](https://linear.app/onegovcloud/issue/OGC-2394) | [d3fc3c3971](https://github.com/onegov/onegov-cloud/commit/d3fc3c3971dc3f3f67f94dbf54c2fae21201e52d)
-
-##### Sort participants of political business
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [6abcbdea95](https://github.com/onegov/onegov-cloud/commit/6abcbdea950caf9a29ed7a8c5a8bb2125ae83b13)
-
-##### Remove personnel number and contract number from form
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [eaadff40a5](https://github.com/onegov/onegov-cloud/commit/eaadff40a5915a2403f3d4af5071ae559ba4803a)
-
-### Town6
-
-##### Writes a bunch of translations that were missing.
-
-`Bugfix` | [OGC-2392](https://linear.app/onegovcloud/issue/OGC-2392) | [70c5b18543](https://github.com/onegov/onegov-cloud/commit/70c5b18543bed3d89034e9d19cee6c383331dc62)
-
-##### In `MeetingItem` list, uses a different strategy to get the `PoliticalBusiness`, for now.
-
-Currently the `political_business_id` is NULL.
-This makes it impossible to generate valid political_business_link.
-We can circumvent this problem by querying each `PoliticalBusiness` and
-checking for `self_id` in meta.
-
-`Bugfix` | [OGC-2388](https://linear.app/onegovcloud/issue/OGC-2388) | [ca68bd6202](https://github.com/onegov/onegov-cloud/commit/ca68bd620204afc1d60c62087b3a976956449ba9)
-
-##### Filter meetings to only show those with items.
-
-`Bugfix` | [OGC-2388](https://linear.app/onegovcloud/issue/OGC-2388) | [581e5260e4](https://github.com/onegov/onegov-cloud/commit/581e5260e463218b752a24a6469678ba91bac88f)
 

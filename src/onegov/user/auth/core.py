@@ -344,6 +344,7 @@ class Auth:
 
         """
         assert user is not None
+        assert user.active
 
         identity = self.as_identity(user)
 

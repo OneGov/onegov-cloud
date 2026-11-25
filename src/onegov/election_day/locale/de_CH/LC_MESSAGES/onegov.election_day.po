@@ -74,6 +74,10 @@ msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
 #, python-format
+msgid "Line ${line} contains fewer values than there are columns."
+msgstr "Zeile ${line} enthält weniger Werte als Spalten vorhanden sind."
+
+#, python-format
 msgid "Not a valid eCH xml file: ${error}"
 msgstr "Keine gültige eCH xml-Datei: ${error}"
 

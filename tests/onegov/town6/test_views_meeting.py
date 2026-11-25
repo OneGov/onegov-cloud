@@ -162,3 +162,78 @@ def test_meetings(client: Client) -> None:
         # delete meeting
         meeting.click('Löschen')
         assert 'Noch keine Sitzungen definiert' in client.get('/meetings')
+
+
+def test_imported_business_links_without_agenda(client: Client) -> None:
+    client.app.org.ris_enabled = True
+    meeting_id = uuid4()
+    meeting = Meeting(
+        id=meeting_id,
+        title='Source Meeting',
+        start_datetime=utcnow(),
+        address=Markup('<p>Aula Zentrum</p>'),
+        description=Markup('<p>Die Sitzung ist öffentlich.</p>'),
+        meta={'meeting_id': '20', 'ogi_business_ids': ['10', '11']},
+    )
+    business = PoliticalBusiness(
+        id=uuid4(),
+        title='Source Protocol',
+        political_business_type='protocol',
+        meta={'self_id': '10', 'ogi_meeting_ids': ['20']},
+    )
+    business.chronology = '<p>Bericht <strong>Inhalt</strong></p>'
+    hidden = PoliticalBusiness(
+        title='Hidden Protocol',
+        political_business_type='protocol',
+        publication_start=utcnow() + timedelta(hours=1),
+        meta={'self_id': '11', 'ogi_meeting_ids': ['20']},
+    )
+    client.app.session().add_all([meeting, business, hidden])
+    commit()
+    page = client.get(f'/meeting/{meeting_id.hex}')
+    assert 'Hidden Protocol' not in page
+    assert '<p>Aula Zentrum</p>' in page
+    assert '<p>Die Sitzung ist öffentlich.</p>' in page
+    page = page.click('Source Protocol')
+    assert '<strong>Inhalt</strong>' in page
+    page = page.click('Source Meeting')
+    assert 'Source Protocol' in page
+    assert not client.app.session().query(MeetingItem).count()
+
+
+def test_agenda_links_multiple_businesses(client: Client) -> None:
+    client.app.org.ris_enabled = True
+    meeting_id = uuid4()
+    meeting = Meeting(
+        id=meeting_id,
+        title='Multiple Business Meeting',
+        start_datetime=utcnow(),
+        address=Markup('Aula'),
+    )
+    first = PoliticalBusiness(
+        title='Public Proposal', political_business_type='motion'
+    )
+    second = PoliticalBusiness(
+        title='Public Decision', political_business_type='decision'
+    )
+    hidden = PoliticalBusiness(
+        title='Hidden Proposal',
+        political_business_type='motion',
+        publication_start=utcnow() + timedelta(hours=1),
+    )
+    meeting.meeting_items.append(
+        MeetingItem(
+            title='Agenda item',
+            number='01',
+            political_business=hidden,
+            political_businesses=[hidden, first, second],
+        )
+    )
+    client.app.session().add(meeting)
+    commit()
+    page = client.get(f'/meeting/{meeting_id.hex}')
+    assert 'Hidden Proposal' not in page
+    page = page.click('Public Decision')
+    page = page.click('Multiple Business Meeting')
+    page = page.click('Agenda item')
+    assert 'Public Proposal' in page

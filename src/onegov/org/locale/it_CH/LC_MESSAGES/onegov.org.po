@@ -677,6 +677,12 @@ msgstr "Immagini da visualizzare come anteprima su un elemento"
 msgid "Overview layout with tiles"
 msgstr "Panoramica con le piastrelle"
 
+msgid "Directory Search"
+msgstr "Ricerca nella directory"
+
+msgid "Show search field restricted to directory entries"
+msgstr "Mostra campo di ricerca limitato alle voci della directory"
+
 msgid "Address Block Title"
 msgstr "Titolo blocco indirizzi"
 
@@ -8875,3 +8881,21 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
+
+msgid "Decision"
+msgstr "Decisione"
+
+msgid "Urgent Motion"
+msgstr "Mozione urgente"
+
+msgid "Urgent Postulate"
+msgstr "Postulato urgente"
+
+msgid "Petition"
+msgstr "Petizione"
+
+msgid "Protocol"
+msgstr "Verbale"
+
+msgid "Draft"
+msgstr "Proposta"

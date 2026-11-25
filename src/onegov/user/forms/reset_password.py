@@ -75,5 +75,6 @@ class PasswordResetForm(Form):
             return False
 
         user.password = self.password.data
+        user.logout_all_sessions(request.app)
 
         return True

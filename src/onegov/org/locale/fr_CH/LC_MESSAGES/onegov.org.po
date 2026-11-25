@@ -676,6 +676,12 @@ msgstr "Images à afficher sous forme de vignettes sur une entrée"
 msgid "Overview layout with tiles"
 msgstr "Vue d'ensemble avec les tuiles"
 
+msgid "Directory Search"
+msgstr "Recherche dans le répertoire"
+
+msgid "Show search field restricted to directory entries"
+msgstr "Afficher un champ de recherche limité aux entrées du répertoire"
+
 msgid "Address Block Title"
 msgstr "Titre du bloc d'adresses"
 
@@ -8908,3 +8914,21 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ msgstr ""
 #~ "Toutes les allocations créées par la règle seront supprimées si elles "
 #~ "n'ont pas encore été réservées."
+
+msgid "Decision"
+msgstr "Décision"
+
+msgid "Urgent Motion"
+msgstr "Motion urgente"
+
+msgid "Urgent Postulate"
+msgstr "Postulat urgent"
+
+msgid "Petition"
+msgstr "Pétition"
+
+msgid "Protocol"
+msgstr "Procès-verbal"
+
+msgid "Draft"
+msgstr "Projet"

@@ -18,7 +18,8 @@ from onegov.pas.models.presidential_allowance import (
 from onegov.pas.utils import is_president_for_attendance
 from onegov.pas.utils import format_swiss_number
 from onegov.core.utils import module_path
-from weasyprint import HTML, CSS  # type: ignore[import-untyped]
+from onegov.pdf.fetcher import SafeCSS, SafeHTML
+from markupsafe import escape
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
@@ -70,13 +71,14 @@ def generate_parliamentarian_settlement_pdf(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
     with open(css_path) as f:
-        css = CSS(string=f.read())
+        css = SafeCSS(string=f.read())
     logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
-    logo_css = CSS(
+    logo_url = f'file://{logo_path}'
+    logo_css = SafeCSS(
         string=f"""
         @page {{
             @top-left {{
-                content: url('file://{logo_path}');
+                content: url('{logo_url}');
                 width: 3cm;
             }}
         }}
@@ -95,7 +97,8 @@ def generate_parliamentarian_settlement_pdf(
         .filter(PresidentialAllowance.parliamentarian_id == parliamentarian.id)
         .all()
     )
-    full_name = (
+    greeting = escape(parliamentarian.formal_greeting.split()[0])
+    full_name = escape(
         f'{parliamentarian.first_name} '
         f'{parliamentarian.last_name}'
     )
@@ -109,11 +112,11 @@ def generate_parliamentarian_settlement_pdf(
                     Staatskanzlei, Seestrasse 2, 6300 Zug
                 </div>
                 <div class="address">
-                    {parliamentarian.formal_greeting.split()[0]}<br>
+                    {greeting}<br>
                     {full_name}<br>
-                    {parliamentarian.shipping_address}<br>
-                    {parliamentarian.shipping_address_zip_code}
-                    {parliamentarian.shipping_address_city}
+                    {escape(parliamentarian.shipping_address)}<br>
+                    {escape(parliamentarian.shipping_address_zip_code)}
+                    {escape(parliamentarian.shipping_address_city)}
                 </div>
             </div>
 
@@ -152,7 +155,7 @@ def generate_parliamentarian_settlement_pdf(
         html += f"""
             <tr>
                 <td>{entry.date.strftime('%d.%m.%Y')}</td>
-                <td>{entry.type_description}</td>
+                <td>{escape(entry.type_description)}</td>
                 <td class="numeric">{format_swiss_number(
                     entry.calculated_value)}</td>
                 <td class="numeric">{format_swiss_number(
@@ -247,7 +250,7 @@ def generate_parliamentarian_settlement_pdf(
     </body>
     </html>
     """
-    return HTML(string=html).write_pdf(
+    return SafeHTML(string=html, allowed_urls=[logo_url]).write_pdf(
         stylesheets=[css, logo_css], font_config=font_config
     )
 

@@ -682,11 +682,14 @@ def transfer(
         id_ = str(uuid4())
         password_hash = hash_password('test')
         assert '"' not in schema and "'" not in schema
+        # users.data is NOT NULL in schemas created after the SQLAlchemy 2.0
+        # upgrade (older schemas still allow NULL), so it must be set here
         query = (
             f'INSERT INTO "{schema}".users '  # nosec: B608
-            f"(type, id, username, password_hash, role, active, realname) "
+            f"(type, id, username, password_hash, role, active, realname, "
+            f"data) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
-            f"'{password_hash}', 'admin', true, 'John Doe');"
+            f"'{password_hash}', 'admin', true, 'John Doe', '{{}}');"
         )
 
         # Extract connection parameters from PostgresDsn

@@ -506,9 +506,11 @@ $editbar-fg-color-active: $white;
 
         &:hover {
             background: $editbar-bg-color-active;
+
         }
 
         button {
+            cursor: pointer;
             border-radius: 0;
             padding: .7rem;
         }
