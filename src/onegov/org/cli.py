@@ -1318,6 +1318,35 @@ def get_resources_and_forms(
     return print_resources_and_forms
 
 
+def iter_export_rows(
+    sheet: Any,
+    first_header: str = 'Objekt',
+    max_header_row: int = 10,
+    fallback_first_row: int = 5
+) -> Iterator[tuple[Any, ...]]:
+    """ Yields the data rows of a reservation or option export sheet.
+
+    The number of rows before the data differs between exports, so the
+    header row is located by its first cell. If it can't be found, the data
+    is assumed to start at ``fallback_first_row``.
+    """
+    rows: Iterator[tuple[Any, ...]] = sheet.iter_rows(values_only=True)
+    skipped: list[tuple[Any, ...]] = []
+    for row in rows:
+        if row and str(row[0] or '').strip() == first_header:
+            yield from rows
+            return
+        skipped.append(row)
+        if len(skipped) >= max_header_row:
+            break
+
+    click.secho(
+        f'Header row starting with "{first_header}" not found, assuming '
+        f'the data starts at row {fallback_first_row}', fg='yellow')
+    yield from skipped[fallback_first_row - 1:]
+    yield from rows
+
+
 @cli.command(name='get-resource-options')
 @click.argument('option_file', type=click.File('rb'))
 @click.option('--field-names', is_flag=True, default=False,
@@ -1352,9 +1381,7 @@ def get_resource_options(
 
     book = load_workbook(option_file, read_only=True)
     options: dict[str, dict[str, dict[str, None]]] = {}
-    rows: Iterator[tuple[Any, ...]] = book['Reservationen'].iter_rows(
-        min_row=5, values_only=True)  # Skip the header rows
-    for row in rows:
+    for row in iter_export_rows(book['Reservationen']):
         if not row or row[0] is None:
             continue
 
@@ -1992,9 +2019,7 @@ def import_reservations(
         reservations: ImportedReservations = {}
         last_id = ''
         book = load_workbook(reservation_file, read_only=True)
-        rows: Iterator[tuple[Any, ...]] = book['Reservationsdaten'].iter_rows(
-            min_row=5, values_only=True)
-        for row in rows:
+        for row in iter_export_rows(book['Reservationsdaten']):
             if not row or row[0] is None:
                 continue
             if len(row) < 38:
@@ -2009,10 +2034,12 @@ def import_reservations(
                 if found is None:  # skipped in a test run
                     continue
                 reservation = found
+            elif id in resource_reservations:
+                # The rows of a reservation aren't always consecutive
+                last_id = id
+                reservation = resource_reservations[id]
             else:
                 last_id = id
-                if id in resource_reservations:
-                    continue
                 if (
                     test_run
                     and len(resource_reservations)
@@ -2060,9 +2087,7 @@ def import_reservations(
         options_not_found = set()
         resource_name = id = ''
         book = load_workbook(option_file, read_only=True)
-        option_rows: Iterator[tuple[Any, ...]] = book[
-            'Reservationen'].iter_rows(min_row=5, values_only=True)
-        for row in option_rows:
+        for row in iter_export_rows(book['Reservationen']):
             if len(row) <= 13:
                 continue
             if row[0] is not None:
