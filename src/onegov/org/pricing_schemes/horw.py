@@ -649,13 +649,40 @@ class HorwAulaZentrum(
     name='horw_aula_zentrum',
     label='Aula Schulhaus Zentrum',
     content_names=(
-        'horw_aula_zentrum_price_table',
         'horw_aula_zentrum_non_profit_field',
         'horw_aula_zentrum_dauerbelegung_field',
+        'horw_aula_zentrum_foyer_field',
     )
 ):
 
-    weekday_discount = Decimal(40)
+    # NOTE: We hardcode the prices here since we're only using this scheme
+    #       for a single room, if we end up needing parametrization in the
+    #       future, we can create a new version and deprecate this scheme.
+    # foyer -> category/belegung -> weekday/weekend -> 2 h, ½ Tag, 1 Tag
+    prices = (
+        # Aula
+        (
+            # Horwer Non-Profit Einzelbelegung
+            ((60, 100, 160), (100, 140, 200)),
+            # Horwer Non-Profit Dauerbelegung
+            ((60, 100, 160), (60, 100, 160)),
+            # Übrige Einzelbelegung
+            ((100, 200, 400), (100, 200, 400)),
+            # Übrige Dauerbelegung
+            ((100, 200, 400), (100, 200, 400)),
+        ),
+        # Aula inkl. Foyer (WC)
+        (
+            # Horwer Non-Profit Einzelbelegung
+            ((220, 260, 320), (260, 300, 360)),
+            # Horwer Non-Profit Dauerbelegung
+            ((220, 260, 320), (220, 260, 320)),
+            # Übrige Einzelbelegung
+            ((260, 360, 560), (260, 360, 560)),
+            # Übrige Dauerbelegung
+            ((260, 360, 560), (260, 360, 560)),
+        ),
+    )
 
     @classmethod
     def reservation_unit_price(
@@ -676,33 +703,24 @@ class HorwAulaZentrum(
             'horw_aula_zentrum_dauerbelegung_field',
             'dauerbelegung'
         )) == 'Ja'
-        table = data.get('horw_aula_zentrum_price_table')
-        if table is None:
-            table = resource.content.get('horw_aula_zentrum_price_table')
-        if table is None:
-            log.error(
-                f'Pricing table missing for pricing scheme '
-                f'horw_aula_zentrum on reservation {reservation.id}'
-            )
-            return None
+        foyer = submission_data.get(data.get(
+            'horw_aula_zentrum_foyer_field',
+            'inkl_foyer'
+        )) == 'Ja'
 
         start, end = reservation.start, reservation.end
         assert start is not None and end is not None
         weekend = start.weekday() >= 5
-        two_hours, half_day, full_day = table[
+        two_hours, half_day, full_day = cls.prices[1 if foyer else 0][
             (0 if non_profit else 2) + (1 if dauerbelegung else 0)
-        ]
+        ][1 if weekend else 0]
         duration = end + timedelta(microseconds=1) - start
         if duration < timedelta(hours=2):
-            price = two_hours
+            return Decimal(two_hours)
         elif duration < timedelta(hours=5):
-            price = half_day
+            return Decimal(half_day)
         else:
-            price = full_day
-
-        if not weekend and non_profit and not dauerbelegung:
-            price -= cls.weekday_discount
-        return price
+            return Decimal(full_day)
 
     @classmethod
     def extend_form[T: Form](
@@ -735,33 +753,19 @@ class HorwAulaZentrum(
                     return field
             return None
 
-        class AulaZentrumForm(form_class):  # type:ignore
-            horw_aula_zentrum_price_table = FieldTable(
-                DecimalField(validators=[InputRequired(), NumberRange(min=0)]),
-                ['2 h', '½ Tag', '1 Tag'],
-                [
-                    'Horwer Non-Profit Einzelbelegung',
-                    'Horwer Non-Profit Dauerbelegung',
-                    'Übrige Einzelbelegung',
-                    'Übrige Dauerbelegung'
-                ],
-                label='Preistabelle (Wochenende)',
-                description=(
-                    'Horwer Non-Profit Einzelbelegungen erhalten unter der '
-                    'Woche einen Rabatt von 40 CHF.'
-                ),
-                fieldset=_('Payments'),
-                depends_on=(
-                    'pricing_method', 'pricing_scheme',
-                    'pricing_scheme', cls.name
-                )
-            )
+        def get_foyer_field(form: Form) -> RadioField | None:
+            parsed: ParsedForm | None = form['parsed'].data
+            if parsed is None:
+                return None
 
-            def process_obj(self, obj: object) -> None:
-                super().process_obj(obj)
-                if not request.POST and isinstance(obj, Resource):
-                    self.horw_aula_zentrum_price_table.data = (
-                        obj.content.get('horw_aula_zentrum_price_table'))
+            for field in parsed.fields:
+                if field.type != 'radio':
+                    continue
+                if 'Foyer' in field.label:
+                    return field
+            return None
+
+        class AulaZentrumForm(form_class):  # type:ignore
 
             def populate_obj(
                 self,
@@ -769,10 +773,7 @@ class HorwAulaZentrum(
                 exclude: Collection[str] | None = None,
                 include: Collection[str] | None = None
             ) -> None:
-                exclude = {'horw_aula_zentrum_price_table', *(exclude or ())}
                 super().populate_obj(obj, exclude, include)
-                obj.content['horw_aula_zentrum_price_table'] = (
-                    self.horw_aula_zentrum_price_table.data)
                 if field := get_non_profit_field(self):
                     obj.content[
                         'horw_aula_zentrum_non_profit_field'
@@ -785,6 +786,10 @@ class HorwAulaZentrum(
                     ] = field.id
                 elif 'horw_aula_zentrum_dauerbelegung_field' in obj.content:
                     del obj.content['horw_aula_zentrum_dauerbelegung_field']
+                if field := get_foyer_field(self):
+                    obj.content['horw_aula_zentrum_foyer_field'] = field.id
+                elif 'horw_aula_zentrum_foyer_field' in obj.content:
+                    del obj.content['horw_aula_zentrum_foyer_field']
 
             def ensure_valid_horw_aula_zentrum_form_definition(
                 self
@@ -846,13 +851,31 @@ class HorwAulaZentrum(
                         f'sein.'
                     )
                     return False
+
+                foyer_field = get_foyer_field(self)
+                if (
+                    foyer_field is None
+                    or not any(
+                        choice.label == 'Ja'
+                        for choice in foyer_field.choices
+                    )
+                ):
+                    self['parsed'].errors.append(
+                        'Mit Preisschema "Aula Schulhaus Zentrum" braucht es '
+                        'ein Feld mit "Foyer" im Namen, mit einer "Ja" '
+                        'Antwort, welche bedeutet, dass die Aula inklusive '
+                        'Foyer reserviert wird.'
+                    )
+                    return False
+                elif not foyer_field.required:
+                    self['parsed'].errors.append(
+                        f'Mit Preisschema "Aula Schulhaus Zentrum" darf das '
+                        f'Feld "{foyer_field.label}" nicht optional sein.'
+                    )
+                    return False
                 return None
 
-        return move_fields(
-            AulaZentrumForm,
-            ('horw_aula_zentrum_price_table',),
-            after='pricing_scheme'
-        )
+        return AulaZentrumForm
 
 
 class HorwSaalEgli(

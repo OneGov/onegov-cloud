@@ -917,37 +917,26 @@ def test_horw_aula_zentrum(client: Client) -> None:
     page.select_radio('extras_pricing_method', 'Pro Eintrag')
     page.select_radio('discount_method', 'Nur den Preis pro Eintrag/Stunde')
     page.form['currency'] = 'CHF'
-    # missing definition and empty table are errors
+    # missing definition is an error
     page = page.form.submit()
-    assert 'Mit Preisschema "Aula Schulhaus Zentrum" braucht' in page
-    assert 'Dieses Feld wird benötigt' in page
+    assert 'mit "Non-Profit" im Namen' in page
 
-    # a partially complete table is still missing, correct field
-    # but missing required option is an error as well
+    # a non-profit field without a "Ja" option is invalid
     page.form['definition'] = '\n'.join((
-        'Horwer Non-Profit Organisation =',
+        'Horwer Non-Profit Organisation * =',
         '    ( ) Ya',
         '    (x) Nein',
         'Dauerbelegung * =',
         '    ( ) Ja',
         '    (x) Nein',
+        'Inkl. Foyer * =',
+        '    ( ) Ja',
+        '    (x) Nein',
     ))
-    page.form['horw_aula_zentrum_price_table-0-0'] = 260
-    page.form['horw_aula_zentrum_price_table-0-1'] = 300
-    page.form['horw_aula_zentrum_price_table-0-2'] = 360
-    page.form['horw_aula_zentrum_price_table-1-0'] = 220
-    page.form['horw_aula_zentrum_price_table-1-1'] = 250
-    page.form['horw_aula_zentrum_price_table-1-2'] = 320
-    page.form['horw_aula_zentrum_price_table-2-0'] = 270
-    page.form['horw_aula_zentrum_price_table-2-1'] = 370
-    page.form['horw_aula_zentrum_price_table-2-2'] = 570
-    page.form['horw_aula_zentrum_price_table-3-0'] = 280
-    page.form['horw_aula_zentrum_price_table-3-1'] = 380
     page = page.form.submit()
     assert 'mit "Non-Profit" im Namen' in page
-    assert 'Dieses Feld wird benötigt' in page
 
-    # a correct definition that is non-required is also invalid
+    # a non-required non-profit field is invalid
     page.form['definition'] = '\n'.join((
         'Horwer Non-Profit Organisation =',
         '    ( ) Ja',
@@ -955,28 +944,20 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'Dauerbelegung * =',
         '    ( ) Ja',
         '    (x) Nein',
+        'Inkl. Foyer * =',
+        '    ( ) Ja',
+        '    (x) Nein',
     ))
-    page.form['horw_aula_zentrum_price_table-3-2'] = 580
     page = page.form.submit()
     assert '"Horwer Non-Profit Organisation" nicht optional sein' in page
-    assert 'Dieses Feld wird benötigt' not in page
 
     # a missing dauerbelegung field is invalid
     page.form['definition'] = '\n'.join((
         'Horwer Non-Profit Organisation * =',
         '    ( ) Ja',
         '    (x) Nein',
-    ))
-    page = page.form.submit()
-    assert 'mit "Dauerbelegung" im Namen' in page
-
-    # a dauerbelegung field without a "Ja" option is invalid
-    page.form['definition'] = '\n'.join((
-        'Horwer Non-Profit Organisation * =',
+        'Inkl. Foyer * =',
         '    ( ) Ja',
-        '    (x) Nein',
-        'Dauerbelegung * =',
-        '    ( ) Ya',
         '    (x) Nein',
     ))
     page = page.form.submit()
@@ -990,15 +971,48 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'Dauerbelegung =',
         '    ( ) Ja',
         '    (x) Nein',
+        'Inkl. Foyer * =',
+        '    ( ) Ja',
+        '    (x) Nein',
     ))
     page = page.form.submit()
     assert '"Dauerbelegung" nicht optional sein' in page
+
+    # a missing foyer field is invalid
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Dauerbelegung * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+    ))
+    page = page.form.submit()
+    assert 'mit "Foyer" im Namen' in page
+
+    # a non-required foyer field is invalid
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Dauerbelegung * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Inkl. Foyer =',
+        '    ( ) Ja',
+        '    (x) Nein',
+    ))
+    page = page.form.submit()
+    assert '"Inkl. Foyer" nicht optional sein' in page
 
     page.form['definition'] = '\n'.join((
         'Horwer Non-Profit Organisation * =',
         '    ( ) Ja',
         '    (x) Nein',
         'Dauerbelegung * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Inkl. Foyer * =',
         '    ( ) Ja',
         '    (x) Nein',
     ))
@@ -1046,49 +1060,64 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'dauerbelegung',
         'Nein'
     )
-    # on weekdays there's a discount
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '100.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Nein'
+    )
+    page.select_radio(
+        'dauerbelegung',
+        'Nein'
+    )
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '200.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'dauerbelegung',
+        'Nein'
+    )
+    page.select_radio(
+        'inkl_foyer',
+        'Ja'
+    )
     assert '260.00 CHF' in page.form.submit().follow()
     page.select_radio(
         'horwer_non_profit_organisation',
-        'Ja'
-    )
-    page.select_radio(
-        'dauerbelegung',
-        'Ja'
-    )
-    assert '250.00 CHF' in page.form.submit().follow()
-    page.select_radio(
-        'horwer_non_profit_organisation',
-        'Nein'
-    )
-    page.select_radio(
-        'dauerbelegung',
-        'Nein'
-    )
-    assert '370.00 CHF' in page.form.submit().follow()
-    page.select_radio(
-        'horwer_non_profit_organisation',
         'Nein'
     )
     page.select_radio(
         'dauerbelegung',
         'Ja'
     )
-    assert '380.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'inkl_foyer',
+        'Ja'
+    )
+    assert '360.00 CHF' in page.form.submit().follow()
     page.form.submit().follow().form.submit()
 
     # open ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
-    assert '380.00' in ticket
+    assert '360.00' in ticket
 
     # changing the submission details updates the price as expected
     edit_page = ticket.click('Details bearbeiten')
     edit_page.select_radio(
-        'dauerbelegung',
+        'inkl_foyer',
         'Nein'
     )
     ticket = edit_page.form.submit().follow()
-    assert '370.00' in ticket
+    assert '200.00' in ticket
 
     # create a two hour reservation on a saturday
     assert reserve2('8:00', '9:30').json == {'success': True}
@@ -1106,13 +1135,34 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'dauerbelegung',
         'Nein'
     )
-    assert '260.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '100.00 CHF' in page.form.submit().follow()
     page.select_radio(
         'horwer_non_profit_organisation',
         'Ja'
     )
     page.select_radio(
         'dauerbelegung',
+        'Ja'
+    )
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '60.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'dauerbelegung',
+        'Ja'
+    )
+    page.select_radio(
+        'inkl_foyer',
         'Ja'
     )
     assert '220.00 CHF' in page.form.submit().follow()
@@ -1124,30 +1174,25 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'dauerbelegung',
         'Nein'
     )
-    assert '270.00 CHF' in page.form.submit().follow()
     page.select_radio(
-        'horwer_non_profit_organisation',
-        'Nein'
-    )
-    page.select_radio(
-        'dauerbelegung',
+        'inkl_foyer',
         'Ja'
     )
-    assert '280.00 CHF' in page.form.submit().follow()
+    assert '260.00 CHF' in page.form.submit().follow()
     page.form.submit().follow().form.submit()
 
     # open ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
-    assert '280.00' in ticket
+    assert '260.00' in ticket
 
     # changing the submission details updates the price as expected
     edit_page = ticket.click('Details bearbeiten')
     edit_page.select_radio(
-        'horwer_non_profit_organisation',
-        'Ja'
+        'inkl_foyer',
+        'Nein'
     )
     ticket = edit_page.form.submit().follow()
-    assert '220.00' in ticket
+    assert '100.00' in ticket
 
     # create a full day reservation on a sunday
     assert reserve3('8:00', '20:00').json == {'success': True}
@@ -1162,34 +1207,50 @@ def test_horw_aula_zentrum(client: Client) -> None:
         'dauerbelegung',
         'Nein'
     )
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '200.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'dauerbelegung',
+        'Ja'
+    )
+    page.select_radio(
+        'inkl_foyer',
+        'Nein'
+    )
+    assert '160.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'dauerbelegung',
+        'Nein'
+    )
+    page.select_radio(
+        'inkl_foyer',
+        'Ja'
+    )
     assert '360.00 CHF' in page.form.submit().follow()
     page.select_radio(
         'horwer_non_profit_organisation',
-        'Ja'
-    )
-    page.select_radio(
-        'dauerbelegung',
-        'Ja'
-    )
-    assert '320.00 CHF' in page.form.submit().follow()
-    page.select_radio(
-        'horwer_non_profit_organisation',
         'Nein'
     )
     page.select_radio(
         'dauerbelegung',
         'Nein'
     )
-    assert '570.00 CHF' in page.form.submit().follow()
     page.select_radio(
-        'horwer_non_profit_organisation',
-        'Nein'
-    )
-    page.select_radio(
-        'dauerbelegung',
+        'inkl_foyer',
         'Ja'
     )
-    assert '580.00 CHF' in page.form.submit().follow()
+    assert '560.00 CHF' in page.form.submit().follow()
 
 
 @freeze_time('2026-09-04', tick=True)
