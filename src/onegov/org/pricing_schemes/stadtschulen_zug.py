@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.form import Form
     from onegov.form.parser.core import ParsedField
+    from onegov.form.parser.form import ParsedForm
     from onegov.org.request import OrgRequest
     from onegov.reservation import Reservation
 
@@ -83,6 +84,16 @@ class StadtschulenZug(
         request: OrgRequest
     ) -> type[T]:
 
+        def get_kategorie_field(form: Form) -> ParsedField | None:
+            parsed: ParsedForm | None = form['parsed'].data
+            if parsed is None:
+                return None
+
+            for field in parsed.fields:
+                if field.label.lower() == 'kategorie':
+                    return field
+            return None
+
         class StadtSchulenZugForm(form_class):  # type:ignore
             stadtschulen_zug_price_table = FieldTable(
                 DecimalField(validators=[InputRequired(), NumberRange(min=0)]),
@@ -116,22 +127,14 @@ class StadtschulenZug(
                 super().populate_obj(obj, exclude, include)
                 obj.content['stadtschulen_zug_price_table'] = (
                     self.stadtschulen_zug_price_table.data)
-                if field := self.get_kategorie_field():
+                if field := get_kategorie_field(self):
                     obj.content['stadtschulen_zug_kategorie_field'] = field.id
                 elif 'stadtschulen_zug_kategorie_field' in obj.content:
                     del obj.content['stadtschulen_zug_kategorie_field']
 
-            def get_kategorie_field(self) -> ParsedField | None:
-                parsed = self['parsed'].data
-                if parsed is None:
-                    return None
-
-                for field in parsed.fields:
-                    if field.label.lower() == 'kategorie':
-                        return field
-                return None
-
-            def ensure_valid_form_definition(self) -> bool | None:
+            def ensure_valid_stadtschulen_zug_form_definition(
+                self
+            ) -> bool | None:
                 if 'pricing_scheme' not in self:
                     return None
 
@@ -145,7 +148,7 @@ class StadtschulenZug(
                     # if we failed to parse, don't pile on more errors
                     return None
 
-                field = self.get_kategorie_field()
+                field = get_kategorie_field(self)
                 if (
                     field is None
                     or field.type != 'radio'

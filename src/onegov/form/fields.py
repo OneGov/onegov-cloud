@@ -115,7 +115,7 @@ FIELDS_NO_RENDERED_PLACEHOLDER = (
     'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
     'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
     'PreviewField', 'PanelField', 'UploadFileWithORMSupport',
-    'TreeSelectField', 'TreeSelectMultipleField'
+    'TreeSelectField', 'TreeSelectMultipleField', 'FieldTable',
 )
 
 
