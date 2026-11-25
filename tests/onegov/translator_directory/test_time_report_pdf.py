@@ -87,7 +87,7 @@ def test_time_report_pdf_escapes_translator_data(
     }
     transaction.commit()
 
-    client.login_translator()
+    client.login_member()
     page = client.get(f'/translator/{translator_id}/add-time-report')
     page.form['assignment_type'] = 'on-site'
     page.form['assignment_location'] = 'obergericht'
