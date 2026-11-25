@@ -5,6 +5,9 @@ from decimal import Decimal
 from freezegun import freeze_time
 from sqlalchemy.orm.attributes import flag_modified
 from onegov.core.utils import Bunch
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
+from onegov.org.models import ExtendedDirectory
+from onegov.org.upgrade import enable_directory_search
 from onegov.org.upgrade import refresh_zeroed_reservation_invoices
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -195,3 +198,35 @@ def test_refresh_zeroed_reservation_invoices_allocation_priced(
     assert ticket.invoice.total_amount == Decimal('200')
     assert ticket.handler.payment is not None
     assert ticket.handler.payment.amount == Decimal('200')
+
+
+def test_enable_directory_search(client: Client) -> None:
+    transaction.begin()
+    session = client.app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    for title, enable_search in (
+        ('Unset', None), ('Disabled', False), ('Enabled', True)
+    ):
+        directory = directories.add(
+            title=title,
+            structure='Name *= ___',
+            configuration=DirectoryConfiguration(title='[Name]')
+        )
+        assert isinstance(directory, ExtendedDirectory)
+        if enable_search is not None:
+            directory.enable_search = enable_search
+    transaction.commit()
+
+    session = client.app.session()
+    enable_directory_search(
+        cast('UpgradeContext', Bunch(session=session)))
+    transaction.commit()
+
+    # only unset directories are enabled, explicit choices are kept
+    session = client.app.session()
+    result = {
+        d.title: d.enable_search
+        for d in session.query(ExtendedDirectory)
+    }
+    assert result == {'Unset': True, 'Disabled': False, 'Enabled': True}

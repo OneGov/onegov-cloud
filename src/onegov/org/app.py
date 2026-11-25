@@ -789,6 +789,11 @@ def get_sortable_asset() -> Iterator[str]:
     yield 'sortable_custom.js'
 
 
+@OrgApp.webasset('inline-search')
+def get_inline_search_asset() -> Iterator[str]:
+    yield 'inline-search.js'
+
+
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.js'

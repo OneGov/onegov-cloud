@@ -1124,3 +1124,15 @@ def add_horw_political_business_enums(context: UpgradeContext) -> bool:
             )
             changed = True
     return changed
+
+
+@upgrade_task('Enable directory search on existing directories')
+def enable_directory_search(context: UpgradeContext) -> None:
+    directories = (
+        context.session.query(ExtendedDirectory)
+        .options(undefer(ExtendedDirectory.content))
+    )
+
+    for directory in directories:
+        if directory.enable_search is None:
+            directory.enable_search = True

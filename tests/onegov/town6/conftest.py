@@ -117,6 +117,30 @@ def fts_town_app(request: pytest.FixtureRequest) -> Iterator[TestTownApp]:
 
 
 @pytest.fixture(scope='function')
+def fts_town_app_url(
+    request: pytest.FixtureRequest,
+    fts_town_app: TestTownApp
+) -> Iterator[str]:
+    fts_town_app.print_exceptions = True
+    server = WSGIServer(application=fts_town_app)
+    server.start()
+    yield server.url
+    server.stop()
+
+
+@pytest.fixture(scope='function')
+def browser_with_fts(
+    playwright_browser: object,
+    fts_town_app_url: str
+) -> Iterator[ExtendedBrowser]:
+    from tests.shared.browser import ExtendedBrowser
+    wrapped = ExtendedBrowser(playwright_browser)  # type: ignore[arg-type]
+    wrapped.baseurl = fts_town_app_url
+    yield wrapped
+    wrapped.close_contexts()
+
+
+@pytest.fixture(scope='function')
 def client_with_fts(fts_town_app: TestTownApp) -> Client[TestTownApp]:
     client = Client(fts_town_app)
     client.skip_n_forms = 1

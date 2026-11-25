@@ -3527,3 +3527,28 @@
         </div>
     </form>
 </metal:inline_search>
+
+<metal:directory_search define-macro="directory_search">
+    <?python request.include('inline-search') ?>
+    <form id="inline-search" class="searchbox" action="${action}" method="GET">
+        <div class="input-group">
+            <div class="input">
+                <input id="search-term" type="text" required autocomplete="off" autocorrect="off" value="${term or ''}" />
+                <button type="reset" class="reset-button" tabindex="-1"></button>
+
+                <input type="hidden" name="search" value="inline" />
+                <input type="hidden" name="search_query" />
+
+                <tal:b tal:repeat="param request.GET.items()">
+                    <input type="hidden" name="${param[0]}" value="${param[1]}"
+                           tal:condition="param[0] not in ('search', 'search_query', 'page')" />
+                </tal:b>
+            </div>
+            <div class="input-group-button">
+                <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
+                    <i class="fa fa-fw fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</metal:directory_search>

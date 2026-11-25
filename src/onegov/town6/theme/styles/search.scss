@@ -30,6 +30,35 @@
                 padding: .2rem 1.2rem !important;
             }
         }
+
+        .input {
+            flex: 1 1 0;
+            position: relative;
+
+            input {
+                margin-bottom: 0;
+                width: 100%;
+            }
+        }
+    }
+
+    .reset-button {
+        $size: 1rem;
+
+        background: transparent;
+        border: 0;
+        color: inherit;
+        padding: 0;
+        position: absolute;
+        right: $size / 2;
+        top: calc(50% - #{$size / 2});
+
+        &::after {
+            @include icon('\f057');
+            display: block;
+            height: $size;
+            width: $size;
+        }
     }
 
     .typeahead ul {
