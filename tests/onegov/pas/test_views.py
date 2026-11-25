@@ -1668,3 +1668,126 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     assert remaining.parliamentarian_id.hex == alice_id
     assert remaining.bulk_edit_id == group_id
     assert remaining.type == attendence_type
+
+
+def test_commission_president_books_former_member_retroactively(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='H2 2024',
+            start=datetime.date(2024, 7, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice.president@example.org',
+        zg_username='zgalice',
+    )
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Left',
+        email_primary='bob.left@example.org',
+        zg_username='zgleft',
+    )
+    carol = parliamentarians.add(
+        first_name='Carol',
+        last_name='Joined',
+        email_primary='carol.joined@example.org',
+        zg_username='zgjoined',
+    )
+    for p in (alice, bob, carol):
+        session.add(
+            PASParliamentarianRole(
+                parliamentarian_id=p.id,
+                role='member',
+                meta={'org_type': 'Kantonsrat'},
+            )
+        )
+
+    commission = PASCommissionCollection(session).add(name='Finanzkommission')
+    session.add_all(
+        [
+            PASCommissionMembership(
+                parliamentarian_id=alice.id,
+                commission_id=commission.id,
+                role='president',
+            ),
+            PASCommissionMembership(
+                parliamentarian_id=bob.id,
+                commission_id=commission.id,
+                role='member',
+                end=datetime.date(2024, 8, 26),
+            ),
+            PASCommissionMembership(
+                parliamentarian_id=carol.id,
+                commission_id=commission.id,
+                role='member',
+                start=datetime.date(2024, 9, 1),
+            ),
+        ]
+    )
+
+    commission_id = commission.id.hex
+    bob_id = bob.id.hex
+    carol_id = carol.id.hex
+
+    user = UserCollection(session).by_username('zgalice')
+    assert user is not None
+    user.role = 'commission_president'
+    user.password = 'test'
+    user.active = True
+    transaction.commit()
+
+    def count(parliamentarian_id: str) -> int:
+        return (
+            client.app.session()
+            .query(Attendence)
+            .filter_by(parliamentarian_id=UUID(parliamentarian_id))
+            .count()
+        )
+
+    client.login('zgalice', 'test')
+
+    page = client.get('/attendences/new-commission-bulk')
+    page.form['date'] = '2024-08-20'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '2'
+    page.form['commission_id'] = commission_id
+    page.form['parliamentarian_id'] = [bob_id]
+    page.form.submit().maybe_follow()
+    assert count(bob_id) == 1
+
+    page = client.get('/attendences/new-commission-bulk')
+    page.form['date'] = '2024-08-20'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '2'
+    page.form['commission_id'] = commission_id
+    page.form['parliamentarian_id'] = [carol_id]
+    page.form.submit().maybe_follow()
+    assert count(carol_id) == 0
+
+    page = client.get('/attendences/new')
+    page.form['date'] = '2024-08-26'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '1'
+    page.form['commission_id'] = commission_id
+    page.form['parliamentarian_id'] = bob_id
+    page.form.submit().maybe_follow()
+    assert count(bob_id) == 2
+
+    page = client.get('/attendences/new')
+    page.form['date'] = '2024-08-27'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '1'
+    page.form['commission_id'] = commission_id
+    page.form['parliamentarian_id'] = bob_id
+    page = page.form.submit()
+    assert count(bob_id) == 2

@@ -481,7 +481,7 @@ def handle_commission_bulk_add(
                         for membership in request.session.query(
                             PASCommissionMembership
                         ).filter_by(commission_id=commission_id)
-                        if membership.is_active_on(today)
+                        if membership.is_active_on(form.date.data or today)
                     }
 
                 for parl_id in raw_parl_ids:

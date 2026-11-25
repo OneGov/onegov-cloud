@@ -17,3 +17,8 @@ class PASCommissionMembership(CommissionMembership):
         return (self.start is None or self.start <= on_date) and (
             self.end is None or self.end >= on_date
         )
+
+    def is_active_during(self, start: date, end: date) -> bool:
+        return (self.start is None or self.start <= end) and (
+            self.end is None or self.end >= start
+        )

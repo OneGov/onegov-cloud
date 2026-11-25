@@ -68,6 +68,18 @@ class SettlementRunBoundMixin:
             self.date.data = settlement_run.start
 
 
+def booking_window(request: CoreRequest) -> tuple[date, date]:
+    """Members of this period can be booked, the membership on the meeting
+    date itself is checked on submit.
+
+    """
+    run = get_attendance_settlement_run(request)
+    if run is None:
+        today = date.today()
+        return today, today
+    return run.start, run.end
+
+
 def hours_to_minutes(hours: Decimal | None) -> Decimal:
     """A duration is entered in hours and stored in minutes. Both are
     exact, 2.01 h is stored as 120.60 and not as 120.
@@ -171,7 +183,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             role='president',
         )
         target_memberships = target_parl.commission_memberships_on(
-            on_date=today,
+            on_date=self.date.data or today,
         )
         for presidency in presidencies:
             if any(
@@ -287,6 +299,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                     on_date=today,
                     role='president',
                 )
+                start, end = booking_window(self.request)
                 seen = {parliamentarian.id}
                 for presidency in presidencies:
                     memberships = self.request.session.query(
@@ -294,7 +307,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                     ).filter_by(commission_id=presidency.commission_id)
                     for membership in memberships:
                         if (
-                            membership.is_active_on(today)
+                            membership.is_active_during(start, end)
                             and membership.parliamentarian_id
                             != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
@@ -390,6 +403,7 @@ class AttendenceAddForm(AttendenceForm):
                     on_date=today,
                     role='president',
                 )
+                start, end = booking_window(self.request)
                 seen = {parliamentarian.id}
                 for presidency in presidencies:
                     memberships = self.request.session.query(
@@ -397,7 +411,7 @@ class AttendenceAddForm(AttendenceForm):
                     ).filter_by(commission_id=presidency.commission_id)
                     for membership in memberships:
                         if (
-                            membership.is_active_on(today)
+                            membership.is_active_during(start, end)
                             and membership.parliamentarian_id
                             != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
@@ -527,6 +541,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             )
             if user and user.parliamentarian:  # type: ignore[attr-defined]
                 today = date.today()
+                start, end = booking_window(self.request)
                 led_commission_ids = {
                     membership.commission_id
                     for membership in (
@@ -545,7 +560,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
                         PASCommissionMembership
                     )
                     if membership.commission_id in led_commission_ids
-                    and membership.is_active_on(today)
+                    and membership.is_active_during(start, end)
                 }
                 parliamentarians = [
                     parliamentarian

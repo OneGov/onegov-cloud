@@ -117,7 +117,7 @@ def restrict_attendence_access(
                     )
                     owner = attendance_owner.parliamentarian  # type: ignore[attr-defined]
                     owner_memberships = owner.commission_memberships_on(
-                        on_date=today,
+                        on_date=model.date,
                     )
                     if any(
                         presidency.commission_id == membership.commission_id
