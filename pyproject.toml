@@ -11,9 +11,6 @@ python_files = ["test_*.py"]
 timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
-    '''ignore:Call to deprecated setex:DeprecationWarning:dogpile.*''',
-    # FIXME: OGC-2659
-    '''ignore:'crypt':DeprecationWarning:passlib.*:''',
     # Until pysaml2 is compatible with newer versions of xmlschema
     # we are stuck with this DeprecationWarning
     # See: https://github.com/IdentityPython/pysaml2/issues/947
