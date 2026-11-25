@@ -707,6 +707,17 @@ def test_horw_aussensportanlagen(client: Client) -> None:
         '    ( ) Ja',
         '    (x) Nein',
     ))
+    page = page.form.submit()
+    assert 'nicht optional sein' in page
+
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Mit Wirtschaft * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+    ))
     page.form.submit().follow()
 
     transaction.begin()
