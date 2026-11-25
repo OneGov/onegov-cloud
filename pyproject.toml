@@ -309,6 +309,8 @@ extend-immutable-calls = ["attr.attrib"]
 "aiohttp".msg = "We have switched to niquests, please use that instead"
 "httpx".msg = "We have switched to niquests, please use that instead"
 "requests".msg = "We have switched to niquests, please use that instead"
+"weasyprint.HTML".msg = "Use onegov.pdf.fetcher.SafeHTML (blocks file:// and SSRF)"
+"weasyprint.CSS".msg = "Use onegov.pdf.fetcher.SafeCSS (blocks file:// and SSRF)"
 
 [tool.ruff.format]
 quote-style = "single"

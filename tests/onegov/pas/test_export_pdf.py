@@ -87,8 +87,8 @@ def test_parliamentarian_pdf_formats_hours_as_decimal(
     html = Mock()
     html.write_pdf.return_value = b'%PDF'
     html_factory = Mock(return_value=html)
-    monkeypatch.setattr(pdf_export, 'HTML', html_factory)
-    monkeypatch.setattr(pdf_export, 'CSS', Mock())
+    monkeypatch.setattr(pdf_export, 'SafeHTML', html_factory)
+    monkeypatch.setattr(pdf_export, 'SafeCSS', Mock())
     monkeypatch.setattr(pdf_export, 'FontConfiguration', Mock())
 
     request = Mock(spec=TownRequest)
@@ -559,8 +559,8 @@ def _settlement_pdf_html(
     html = Mock()
     html.write_pdf.return_value = b'%PDF'
     html_factory = Mock(return_value=html)
-    monkeypatch.setattr(settlement_run_views, 'HTML', html_factory)
-    monkeypatch.setattr(settlement_run_views, 'CSS', Mock())
+    monkeypatch.setattr(settlement_run_views, 'SafeHTML', html_factory)
+    monkeypatch.setattr(settlement_run_views, 'SafeCSS', Mock())
     monkeypatch.setattr(settlement_run_views, 'FontConfiguration', Mock())
 
     generate_settlement_pdf(settlement_run, request, entity_type, entity)
@@ -894,8 +894,8 @@ def test_exports_zero_bookings(
         assert '100.00' in rendered
 
     html_factory = Mock()
-    monkeypatch.setattr(pdf_export, 'HTML', html_factory)
-    monkeypatch.setattr(pdf_export, 'CSS', Mock())
+    monkeypatch.setattr(pdf_export, 'SafeHTML', html_factory)
+    monkeypatch.setattr(pdf_export, 'SafeCSS', Mock())
     monkeypatch.setattr(pdf_export, 'FontConfiguration', Mock())
     generate_parliamentarian_settlement_pdf(run, request, person)
     rendered = html_factory.call_args.kwargs['string']
