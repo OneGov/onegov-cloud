@@ -3,11 +3,13 @@ from decimal import Decimal
 
 from onegov.translator_directory.request import TranslatorAppRequest
 from unittest.mock import Mock
+from qrbill.bill import QRBill
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.qrbill import (
     generate_translator_qr_bill,
     is_valid_iban,
+    translator_to_creditor,
 )
 
 
@@ -27,6 +29,31 @@ def test_is_valid_iban() -> None:
     assert not is_valid_iban('')
     assert not is_valid_iban('invalid')
     assert not is_valid_iban('CH00 0000 0000 0000 0000 0')
+
+
+def test_translator_creditor_is_structured_address() -> None:
+    translator = Translator(
+        first_name='Hans',
+        last_name='Muster',
+        address='Musterstrasse 123',
+        zip_code='8000',
+        city='Zürich',
+    )
+    bill = QRBill(
+        account='CH93 0076 2011 6238 5295 7',
+        creditor=translator_to_creditor(translator),
+    )
+    lines = bill.qr_data().splitlines()
+    # combined address type 'K' was removed in QR-bill IG v2.3 (4.2.2)
+    assert lines[4:11] == [
+        'S',
+        'Hans Muster',
+        'Musterstrasse 123',
+        '',
+        '8000',
+        'Zürich',
+        'CH',
+    ]
 
 
 def test_generate_qr_bill_for_self_employed(translator_app: 'TestApp') -> None:

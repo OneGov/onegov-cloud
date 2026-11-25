@@ -26,6 +26,15 @@ def is_valid_iban(value: str | None) -> bool:
         return False
 
 
+def translator_to_creditor(translator: Translator) -> dict[str, str | None]:
+    return {
+        'name': f'{translator.first_name} {translator.last_name}',
+        'street': translator.address,
+        'pcode': translator.zip_code,
+        'city': translator.city,
+    }
+
+
 def generate_translator_qr_bill(
     translator: Translator,
     time_report: TranslatorTimeReport,
@@ -53,12 +62,7 @@ def generate_translator_qr_bill(
         log.error(f'Incomplete address for translator {translator.id}')
         return None
 
-    # Creditor (translator)
-    creditor = {
-        'name': f'{translator.first_name} {translator.last_name}',
-        'line1': translator.address,
-        'line2': f'{translator.zip_code} {translator.city}',
-    }
+    creditor = translator_to_creditor(translator)
 
     debtor_name = 'Polizei Schaffhausen'
     debtor_street = 'Beckenstube 1'

@@ -3040,6 +3040,12 @@ $booking-left-margin: 1.6rem;
     }
 
     .needs {
+        h4 {
+            font-size: .875rem;
+            text-decoration: underline;
+            font-weight: normal;
+        }
+
         li:last-child .button {
             margin-bottom: 0;
 

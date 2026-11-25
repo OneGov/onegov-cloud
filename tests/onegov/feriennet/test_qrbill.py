@@ -7,6 +7,7 @@ from onegov.feriennet.qrbill import generate_qr_bill
 from onegov.feriennet.qrbill import qr_iban
 from onegov.feriennet.qrbill import swiss_iban
 from onegov.pay.models import InvoiceReference
+from qrbill.bill import QRBill
 
 
 from typing import Any
@@ -20,9 +21,36 @@ def test_beneficiary_to_creditor() -> None:
     assert beneficiary_to_creditor(None) is None
     assert beneficiary_to_creditor('') is None
     assert beneficiary_to_creditor('Street') is None
+    assert beneficiary_to_creditor('FP, Bac 1, 1234') is None
     assert beneficiary_to_creditor('FP Govikon, Rue du Bac, 1234 Govikon') == {
-        'name': 'FP Govikon', 'line1': 'Rue du Bac', 'line2': '1234 Govikon'
+        'name': 'FP Govikon',
+        'street': 'Rue du Bac',
+        'pcode': '1234',
+        'city': 'Govikon',
     }
+    assert beneficiary_to_creditor('FP, Platz 1, 1234 Govikon Dorf') == {
+        'name': 'FP',
+        'street': 'Platz 1',
+        'pcode': '1234',
+        'city': 'Govikon Dorf',
+    }
+
+
+def test_beneficiary_creditor_is_structured_address() -> None:
+    creditor = beneficiary_to_creditor('FerPa, Platz 1, 1234 Govikon')
+    assert creditor is not None
+    bill = QRBill(account=SWISS_IBAN, creditor=creditor)
+    lines = bill.qr_data().splitlines()
+    # combined address type 'K' was removed in QR-bill IG v2.3 (4.2.2)
+    assert lines[4:11] == [
+        'S',
+        'FerPa',
+        'Platz 1',
+        '',
+        '1234',
+        'Govikon',
+        'CH',
+    ]
 
 
 def test_iban() -> None:

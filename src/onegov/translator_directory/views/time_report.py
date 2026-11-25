@@ -269,6 +269,18 @@ def accept_time_report(
         )
 
     time_report = handler.time_report
+    if not request.is_admin:
+        if not request.is_editor or request.current_user is None:
+            raise HTTPForbidden()
+        try:
+            accountant_emails = get_accountant_emails_for_finanzstelle(
+                request, time_report.finanzstelle
+            )
+        except ValueError:
+            raise HTTPForbidden() from None
+        if request.current_user.username not in accountant_emails:
+            raise HTTPForbidden()
+
     translator = time_report.translator
 
     if translator and translator.self_employed:

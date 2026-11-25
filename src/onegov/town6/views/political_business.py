@@ -1,8 +1,8 @@
-from sqlalchemy import func, exc
-from sqlalchemy.orm import joinedload
+from sqlalchemy import func, exc, or_
 from webob.exc import HTTPNotFound
 
 from onegov.core.elements import Link
+from onegov.core.html import sanitize_html
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
 from onegov.org.models import Meeting
@@ -245,20 +245,36 @@ def view_political_business(
     participations.sort(key=lambda x: x.parliamentarian.title)
     participations.sort(key=lambda x: x.participant_type or '', reverse=True)
 
-    # sort meeting items of this business
-    items = (
-        request.session.query(MeetingItem)
-        .join(Meeting, Meeting.id == MeetingItem.meeting_id)
-        .filter(MeetingItem.political_business_id == self.id)
-        .options(joinedload(MeetingItem.meeting))
-        .order_by(Meeting.start_datetime.desc())
+    conditions = [
+        MeetingItem.political_business_id == self.id,
+        MeetingItem.political_businesses.any(PoliticalBusiness.id == self.id),
+    ]
+    source = self.meta.get('self_id')
+    if source:
+        conditions.append(Meeting.meta['ogi_business_ids'].contains([source]))
+    meeting_ids = self.meta.get('ogi_meeting_ids', [])
+    if meeting_ids:
+        conditions.append(Meeting.meta['meeting_id'].astext.in_(meeting_ids))
+    meetings = (
+        request.session.query(Meeting)
+        .outerjoin(MeetingItem, MeetingItem.meeting_id == Meeting.id)
+        .filter(or_(*conditions))
+        .distinct()
+        .order_by(Meeting.start_datetime.desc().nullslast())
         .all()
     )
-    self.meeting_items = items
 
     return {
         'layout': layout,
         'business': self,
+        'meetings': meetings,
+        'chronology': sanitize_html(self.chronology or ''),
+        'images': [
+            {'url': request.link(file), 'alt': image['alt']}
+            for image in self.meta.get('ogi_images', [])
+            for file in self.files
+            if file.id == image['file_id']
+        ],
         'title': self.title,
         'participations': participations,
         'type_map': POLITICAL_BUSINESS_TYPE,

@@ -2,7 +2,7 @@ from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.org.i18n import _
 from onegov.search import ORMSearchable
-from sqlalchemy import ForeignKey
+from sqlalchemy import Column, ForeignKey, Table, Uuid
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
@@ -13,6 +13,24 @@ if TYPE_CHECKING:
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import Meeting
     from sqlalchemy.orm import Query
+
+
+meeting_item_political_businesses: Table = Table(
+    'par_meeting_item_political_businesses',
+    Base.metadata,
+    Column(
+        'meeting_item_id',
+        Uuid,
+        ForeignKey('par_meeting_items.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+    Column(
+        'political_business_id',
+        Uuid,
+        ForeignKey('par_political_businesses.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+)
 
 
 class MeetingItem(Base, ORMSearchable):
@@ -68,6 +86,12 @@ class MeetingItem(Base, ORMSearchable):
     )
     political_business: Mapped[PoliticalBusiness | None] = relationship(
         foreign_keys=[political_business_id],
+        back_populates='meeting_items',
+    )
+
+    political_businesses: Mapped[list[PoliticalBusiness]] = relationship(
+        secondary=meeting_item_political_businesses,
+        back_populates='agenda_items',
     )
 
     #: link ID only used for mapping after import

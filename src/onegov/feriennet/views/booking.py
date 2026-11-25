@@ -372,7 +372,7 @@ def view_my_bookings(
     grouped_bookings = period and group_bookings_merge_denied_and_blocked(
         period, bookings) or {}
 
-    if period and period.confirmed:
+    if period and period.confirmed and request.app.carpooling_enabled:
         related = related_attendees(self.session, occasion_ids={
             b.occasion_id for b in bookings
         })
