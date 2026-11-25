@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
@@ -132,7 +130,7 @@ def test_models(session: Session) -> None:
     assert change.commission == commission
 
     # properties
-    assert parliamentarian.title == 'First Last'
+    assert parliamentarian.title == 'Last First'
     assert change.user == 'User (user@example.org)'
     assert change.date == date(2022, 1, 1)
 

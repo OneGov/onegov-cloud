@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.fsi import _
 from onegov.fsi.app import FsiApp

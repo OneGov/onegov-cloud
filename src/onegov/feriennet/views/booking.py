@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import urllib.parse
 
@@ -41,7 +39,6 @@ if TYPE_CHECKING:
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Session
     from typing import NamedTuple
     from webob import Response
@@ -85,7 +82,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
     return query.all()
 
 
-def group_bookings(
+def group_bookings_merge_denied_and_blocked(
     period: BookingPeriod | BookingPeriodMeta,
     bookings: Iterable[Booking]
 ) -> dict[Attendee, dict[BookingState, SortedList[Booking]]]:
@@ -107,7 +104,10 @@ def group_bookings(
             return 'open'
     else:
         def state(booking: Booking) -> BookingState:
-            return booking.state
+            if booking.state in ('blocked', 'denied'):
+                return 'denied'
+            else:
+                return booking.state
 
     grouped: dict[Attendee, dict[BookingState, SortedList[Booking]]] = {}
 
@@ -155,7 +155,7 @@ def related_attendees(
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related: Result[RelatedAttendeeRow] = session.execute(
+    related: Iterable[RelatedAttendeeRow] = session.execute(  # type: ignore[assignment]
         select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
@@ -167,7 +167,7 @@ def related_attendees(
 
     result = defaultdict(list)
 
-    for r in related.tuples():
+    for r in related:
         result[r.occasion_id].append(r)
 
     return result
@@ -369,9 +369,10 @@ def view_my_bookings(
     period = next((p for p in periods if p.id == self.period_id), None)
 
     bookings = all_bookings(self)
-    grouped_bookings = period and group_bookings(period, bookings) or {}
+    grouped_bookings = period and group_bookings_merge_denied_and_blocked(
+        period, bookings) or {}
 
-    if period and period.confirmed:
+    if period and period.confirmed and request.app.carpooling_enabled:
         related = related_attendees(self.session, occasion_ids={
             b.occasion_id for b in bookings
         })

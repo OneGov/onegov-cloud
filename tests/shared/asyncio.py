@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from asyncio import run
 from functools import wraps
 from threading import Thread

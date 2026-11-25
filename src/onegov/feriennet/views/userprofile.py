@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.forms import UserProfileForm

@@ -3,8 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
-from __future__ import annotations
-
 from inspect import isabstract
 from itertools import chain
 from libres.db.models import ORMBase

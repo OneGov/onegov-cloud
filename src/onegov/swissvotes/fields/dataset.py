@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField
@@ -23,6 +21,7 @@ if TYPE_CHECKING:
     from onegov.form.types import Validators
     from onegov.form.types import Widget
     from typing import Self
+    from wtforms.datalist import DataList
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext
     from wtforms.meta import DefaultMeta
@@ -39,9 +38,11 @@ class SwissvoteDatasetField(UploadField):
         description: str = '',
         id: str | None = None,
         default: StrictFileDict | None = None,
+        invalid_value_message: str | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
+        datalist: DataList | str | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -72,9 +73,11 @@ class SwissvoteDatasetField(UploadField):
             description=description,
             id=id,
             default=default,
+            invalid_value_message=invalid_value_message,
             widget=widget,
             render_kw={**(render_kw or {}), 'force_simple': True},
             name=name,
+            datalist=datalist,
             allowed_mimetypes=mimetypes,
             _form=_form,
             _prefix=_prefix,

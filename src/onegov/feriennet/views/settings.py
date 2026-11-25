@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.feriennet import _
@@ -19,6 +17,7 @@ from onegov.org.views.settings import handle_generic_settings
 from stdnum import iban
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -61,9 +60,9 @@ class FeriennetSettingsForm(Form):
         label=_('Payment Order'),
         fieldset=_('Payment'),
         choices=[
-            ('feriennet-v1', _('Basic')),
-            ('esr-v1', _('ESR (General) / QR-Reference')),
-            ('raiffeisen-v1', _('ESR (Raiffeisen)'))
+            SelectChoice('feriennet-v1', _('Basic')),
+            SelectChoice('esr-v1', _('ESR (General) / QR-Reference')),
+            SelectChoice('raiffeisen-v1', _('ESR (Raiffeisen)'))
         ],
         default='feriennet-v1'
     )
@@ -104,14 +103,25 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 10}
     )
 
+    carpooling_enabled = BooleanField(
+        label=_('Enable parents to connect with one another'),
+        description=_(
+            'Parents can share their contact information (email, phone '
+            'number and municipality) with other parents in the same '
+            'occurrence.'
+        ),
+        fieldset=_('Privacy'),
+        default=False
+    )
+
     public_organiser_data = MultiCheckboxField(
         label=_('Public organiser data'),
         choices=(
-            ('name', _('Name')),
-            ('address', _('Address')),
-            ('email', _('E-Mail')),
-            ('phone', _('Phone')),
-            ('website', _('Website'))
+            SelectChoice('name', _('Name')),
+            SelectChoice('address', _('Address')),
+            SelectChoice('email', _('E-Mail')),
+            SelectChoice('phone', _('Phone')),
+            SelectChoice('website', _('Website'))
         ),
         fieldset=_('Organiser')
     )
@@ -146,9 +156,9 @@ class FeriennetSettingsForm(Form):
         label=_('Volunteer registration'),
         fieldset=_('Volunteers'),
         choices=[
-            ('disabled', _('Disabled')),
-            ('admins', _('Only for Admins')),
-            ('enabled', _('Enabled')),
+            SelectChoice('disabled', _('Disabled')),
+            SelectChoice('admins', _('Only for Admins')),
+            SelectChoice('enabled', _('Enabled')),
         ],
         default='disabled'
     )
@@ -288,6 +298,7 @@ class FeriennetSettingsForm(Form):
             ('require_swisspass', False),
             ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
+            ('carpooling_enabled', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
             ('bank_beneficiary', ''),
@@ -329,6 +340,7 @@ class FeriennetSettingsForm(Form):
             'require_swisspass',
             'cancellation_conditions',
             'require_full_age_for_registration',
+            'carpooling_enabled',
             'public_organiser_data',
             'bank_account',
             'bank_beneficiary',

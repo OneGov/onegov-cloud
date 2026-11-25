@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.pas import PasApp
 from onegov.pas.collections import PASParliamentaryGroupCollection

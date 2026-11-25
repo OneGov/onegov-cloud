@@ -1,8 +1,5 @@
-from __future__ import annotations
-
 from onegov.chat.models import Message
 from onegov.core.collection import GenericCollection
-from sqlalchemy import desc
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -125,7 +122,7 @@ class MessageCollection[MessageT: Message](GenericCollection[MessageT, str]):
         if self.load == 'older-first':
             q = q.order_by(self.model_class.id)
         else:
-            q = q.order_by(desc(self.model_class.id))
+            q = q.order_by(self.model_class.id.desc())
 
         if self.limit is not None:
             q = q.limit(self.limit)
@@ -142,7 +139,7 @@ class MessageCollection[MessageT: Message](GenericCollection[MessageT, str]):
     def latest_message(self, offset: int = 0) -> MessageT | None:
         """ Returns the latest message in descending order (newest first)."""
         q = self.session.query(self.model_class)
-        q = q.order_by(desc(self.model_class.id))
+        q = q.order_by(self.model_class.id.desc())
 
         if offset:
             q = q.offset(offset)

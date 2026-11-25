@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Mapping
 from decimal import Decimal
 from onegov.core.orm import Base

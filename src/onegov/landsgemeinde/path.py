@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.converters import extended_date_converter
 from onegov.landsgemeinde.app import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection

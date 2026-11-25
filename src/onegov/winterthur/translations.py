@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.winterthur import _
 
 # lingua ignores the first translation string in this file for some reason

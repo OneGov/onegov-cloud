@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.ticket
 import pytest
 import transaction
@@ -98,6 +96,7 @@ def browser(
 ) -> Iterator[ExtendedBrowser]:
     browser.baseurl = town_app_url
     yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope='function')

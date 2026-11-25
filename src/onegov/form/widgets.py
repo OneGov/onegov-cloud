@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import humanize
 
 from contextlib import suppress
@@ -335,6 +333,21 @@ class UploadMultipleWidget(FileInput):
                 input_html=input_html
             )
             return existing_html + simple_template.format(additional_html)
+
+
+class CropperUploadWidget(UploadWidget):
+
+    def __call__(
+        self,
+        field: UploadField,  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+        field.meta.request.include('cropper')
+        if 'wrapper_css_class' in kwargs:
+            kwargs['wrapper_css_class'] += ' cropper-upload-widget'
+        else:
+            kwargs['wrapper_css_class'] = 'cropper-upload-widget'
+        return super().__call__(field, **kwargs)
 
 
 class TextAreaWithTextModules(TextArea):

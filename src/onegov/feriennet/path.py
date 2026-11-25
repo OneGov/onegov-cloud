@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection

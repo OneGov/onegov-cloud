@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models import (
     CourseSubscription, CourseAttendee, CourseEvent, Course)

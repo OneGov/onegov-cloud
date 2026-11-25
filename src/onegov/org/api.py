@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 
 from datetime import date
@@ -265,13 +263,18 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
         collection = self._base_collection
+
+        possible_sources = sorted(collection.used_sources)
+        possible_sources.append('null')
+
         filters: dict[str, Collection[str] | str | None] = {
             'search': 'Performs a full-text search for the given term',
             'start': 'Earliest event date '
             '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
-            'locations': 'Can be specified multiple times',
-            'sources': sorted(collection.used_sources),
+            'locations': 'Can be specified multiple times, use "null" for '
+                         'events with no location',
+            'sources': possible_sources,
             'syndicate': ('true', 'false'),
             'highlight': ('true', 'false'),
         }
@@ -281,7 +284,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
             used_tags = collection.used_tags
-            if not self.app.custom_event_tags:
+            custom_tags = self.app.custom_event_tags
+            if custom_tags:
+                # list all configured tags, even if currently unused
+                used_tags = used_tags | set(custom_tags)
+            else:
                 # built-in tags need to be translated
                 used_tags = {
                     self.request.translate(_(tag))
@@ -321,6 +328,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             page=self.page or 0,
             available_accesses=available_accesses
         )
+        result.batch_size = self.batch_size
 
         filter_type = self.app.org.event_filter_type
         filter_config = self.app.org.event_filter_configuration
@@ -407,6 +415,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         event = contains_eager(Occurrence.event)
         return result.set_query_options(
             event.joinedload(Event.image),
+            event.joinedload(Event.pdf),
             event.undefer(Event.content),
             undefer(Occurrence.content),
         )
@@ -427,7 +436,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             'price': item.event.price,
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
-            'location': item.location,
+            'location': item.location or None,
             'source': source,
             'coordinates': get_geo_location(item),
         }
@@ -462,6 +471,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
     request: OrgRequest
     endpoint = 'news'
     pk_type = int
+    default_batch_size = 25
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -483,7 +493,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: News) -> dict[str, Any]:
@@ -523,6 +533,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
     app: OrgApp
     endpoint = 'topics'
     pk_type = int
+    default_batch_size = 25
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -544,7 +555,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: Topic) -> dict[str, Any]:
@@ -617,12 +628,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
     app: OrgApp
     endpoint: str
     pk_type = UUID
-
-    @cached_property
-    def filters(self) -> Mapping[str, Collection[str] | str | None]:
-        if self.app.fts_search_enabled:
-            return {'search': 'Performs a full-text search for the given term'}
-        return {}
+    default_batch_size = 25
 
     def __init__(
         self,
@@ -630,9 +636,16 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         name: str,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
+        batch_size: int | None = None,
     ):
-        super().__init__(request, extra_parameters, page)
+        super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -664,7 +677,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
                     self.request,
                     term
                 )
-        result.batch_size = 25
+        result.batch_size = self.batch_size
 
         # eager-load the serialized entry data, batch only
         return result.set_query_options(
@@ -672,14 +685,15 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
             selectinload(ExtendedDirectoryEntry.files),
         )
 
-    def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
+    def for_page(self, page: int | None,
+                 batch_size: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
         return self.__class__(self.request, self.endpoint,
-                              self.extra_parameters, page)
+                              self.extra_parameters, page, batch_size)
 
     def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while

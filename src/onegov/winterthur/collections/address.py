@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from onegov.core.collection import GenericCollection

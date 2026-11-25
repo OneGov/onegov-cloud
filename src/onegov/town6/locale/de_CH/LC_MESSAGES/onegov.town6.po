@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-09-18 10:37+0200\n"
+"POT-Creation-Date: 2026-10-20 16:23+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -186,6 +186,19 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
+msgid "Designation for parliamentarians"
+msgstr "Bezeichnung der Parlamentsmitglieder"
+
+msgid ""
+"This designation is used for parliamentarians throughout the RIS pages and "
+"menus."
+msgstr ""
+"Diese Bezeichnung wird auf RIS-Seiten und in Menüs für Parlamentsmitglieder "
+"verwendet."
+
+msgid "Town council members"
+msgstr "Einwohnerratsmitglieder"
+
 msgid "URL path for the RIS main page"
 msgstr "URL-Pfad für die RIS-Hauptseite"
 
@@ -350,6 +363,9 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 msgid "Delete meeting"
 msgstr "Sitzung löschen"
 
+msgid "Town council member"
+msgstr "Einwohnerratsmitglied"
+
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
@@ -493,8 +509,14 @@ msgstr "Keine aktiven Chats."
 msgid "Commission members"
 msgstr "Kommissionsmitglieder"
 
-msgid "Contact"
-msgstr "Kontakt"
+msgid "To add a member, open the parliamentarian and select “New commission function”."
+msgstr "Zum Hinzufügen eines Mitglieds das Personenprofil öffnen und «Neue Kommissionsfunktion» wählen."
+
+msgid "Edit membership"
+msgstr "Mitgliedschaft bearbeiten"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Filters"
 msgstr "Filter"
@@ -829,6 +851,9 @@ msgstr "Kunden-Login"
 msgid "About"
 msgstr "Impressum"
 
+msgid "Contact"
+msgstr "Kontakt"
+
 msgid "more"
 msgstr "mehr"
 
@@ -1032,9 +1057,6 @@ msgstr "Zurückgezogen"
 
 msgid "Title"
 msgstr "Titel"
-
-msgid "Description"
-msgstr "Beschreibung"
 
 msgid "List Preview"
 msgstr "Listen-Vorschau"
@@ -1552,8 +1574,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -1862,6 +1884,9 @@ msgstr "Stornierung beantragen"
 
 msgid "See all your reservations"
 msgstr "Alle Ihre Reservationen einsehen"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "Reservationskalender abonnieren"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -2224,8 +2249,8 @@ msgstr "Personalnummer"
 msgid "Contract number"
 msgstr "Vertragsnummer"
 
-msgid "Private address"
-msgstr "Privatadresse"
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Place of residence"
 msgstr "Wohnort"
@@ -2341,6 +2366,9 @@ msgstr "Geschäftsart"
 
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
+
+msgid "Chronology"
+msgstr "Chronologie"
 
 msgid "Participants"
 msgstr "Verfasser/Beteiligte"
@@ -2500,6 +2528,12 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
+
+msgid "Log in for full details"
+msgstr "Für alle Details anmelden"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
@@ -2799,7 +2833,7 @@ msgid "Internal Comments"
 msgstr "Internes Kommentarfeld"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Schlagworte"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -3017,11 +3051,10 @@ msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
 
 msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
-"unwiderruflich gelöscht werden."
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
+msgstr "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten sowie "
+"Audit-Trail-Einträge können unwiderruflich gelöscht werden."
 
 msgid "Prices"
 msgstr "Preise"
@@ -3073,6 +3106,16 @@ msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Private address"
+#~ msgstr "Privatadresse"
+
+#~ msgid ""
+#~ "Proceed with caution. Tickets and the data they contain may be "
+#~ "irrevocable deleted."
+#~ msgstr ""
+#~ "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten "
+#~ "können unwiderruflich gelöscht werden."
 
 #~ msgid "Reminder: your upcoming reservations"
 #~ msgstr "Erinnerung: Ihre bevorstehenden Reservationen"

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.people.models import Agency
 from onegov.core.orm.abstract import AdjacencyListCollection
 

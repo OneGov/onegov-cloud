@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from onegov.foundation import BaseTheme
@@ -58,6 +56,7 @@ class OrgTheme(BaseTheme):
             'pagination',
             'panels',
             'progress-bars',
+            'offcanvas',
             'reveal',
             'side-nav',
             'switches',
@@ -68,7 +67,7 @@ class OrgTheme(BaseTheme):
             'tooltips',
             'top-bar',
             'type',
-            'visibility'
+            'visibility',
         )
 
     @property

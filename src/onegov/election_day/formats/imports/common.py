@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
@@ -7,6 +5,7 @@ from onegov.core.errors import AmbiguousColumnsError
 from onegov.core.errors import DuplicateColumnNamesError
 from onegov.core.errors import EmptyFileError
 from onegov.core.errors import EmptyLineInFileError
+from onegov.core.errors import MissingValuesInLineError
 from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
@@ -26,6 +25,7 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Sequence
     from csv import Dialect
     from onegov.core.csv import DefaultCSVFile
@@ -224,11 +224,12 @@ def load_csv(
             _('The file contains an empty line.'),
             filename=filename
         )
-    except IndexError as e:
-        # Will happen if something goes wrong in src/onegov/core/csv.py:188
-        # use list(csv.lines_to_debug) and see which index ix fails
+    except MissingValuesInLineError as e:
         error = FileImportError(
-            e.args[0],
+            _(
+                'Line ${line} contains fewer values than there are columns.',
+                mapping={'line': e.line}
+            ),
             filename=filename
         )
     except Exception:
@@ -313,6 +314,31 @@ def line_is_relevant(
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
     return line.sortgeschaeft == number
+
+
+def get_gelfnrs(
+    lines: Iterable[DefaultRow],
+    number: str,
+    district: str | None
+) -> set[str]:
+    """ Returns the WabstiC GeLfNr (which uniquely identifies an election) of
+    the lines matching the given SortGeschaeft and SortWahlkreis.
+
+    """
+    return {
+        line.gelfnr
+        for line in lines
+        if line_is_relevant(line, number, district=district)
+        and getattr(line, 'gelfnr', None)
+    }
+
+
+def line_matches_gelfnr(line: DefaultRow, gelfnrs: set[str]) -> bool:
+    """ Returns False if the line has a GeLfNr not contained in the given
+    GeLfNrs. """
+    if gelfnrs and getattr(line, 'gelfnr', None):
+        return line.gelfnr in gelfnrs
+    return True
 
 
 @overload

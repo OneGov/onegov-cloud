@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import MessageCollection
 from onegov.ticket import Handler, Ticket
 

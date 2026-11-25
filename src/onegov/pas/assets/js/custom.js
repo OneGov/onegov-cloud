@@ -1,8 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
+    preventNumberInputScroll();
     handleBulkAddCommission();
     handleAttendanceFormSync();
     handleParliamentarianCounter();
 });
+
+
+function preventNumberInputScroll() {
+  document.addEventListener("wheel", function (event) {
+    if (event.target instanceof HTMLInputElement &&
+        event.target.type === "number") {
+      event.preventDefault();
+    }
+  }, { passive: false });
+}
 
 
 function handleBulkAddCommission() {
@@ -10,9 +21,13 @@ function handleBulkAddCommission() {
     // commission. Hides checkboxes for parliamentarians not in the
     // commission.
 
-   if (!window.location.href.includes('new-commission-bulk')) {
-        return;
-    }
+  const url = window.location.href;
+  if (
+    !url.includes('new-commission-bulk')
+    && !url.includes('new-file-study-bulk')
+  ) {
+    return;
+  }
 
   const commissionSelect = document.getElementById("commission_id");
   const parliamentarianList = document.getElementById("parliamentarian_id");
@@ -21,7 +36,7 @@ function handleBulkAddCommission() {
   let commissionParliamentarians = {};
   let isInitialLoad = true;
   const baseUrl = window.location.href.split("/").slice(0, -2).join("/");
-  fetch(`${baseUrl}/commissions/commissions-parliamentarians-json`)
+  fetch(commissionMembersUrl(baseUrl))
     .then((response) => response.json())
     .then((data) => {
       commissionParliamentarians = data;
@@ -105,7 +120,10 @@ function handleBulkAddCommission() {
         const li = existingCheckbox.closest('li');
         if (li) {
           li.style.display = 'block';
-          existingCheckbox.checked = true;
+          // Only check for commission bulk forms, not file study bulk forms
+          if (url.includes('new-commission-bulk')) {
+            existingCheckbox.checked = true;
+          }
           if (!isInitialLoad) {
             li.classList.add("animate-in");
           }
@@ -142,6 +160,19 @@ function handleParliamentarianCounter() {
 
 
 
+function commissionMembersUrl(baseUrl) {
+  const url = new URL(
+    `${baseUrl}/commissions/commissions-parliamentarians-json`
+  );
+  const runId = new URLSearchParams(window.location.search)
+    .get('settlement_run_id');
+  if (runId) {
+    url.searchParams.set('settlement_run_id', runId);
+  }
+  return url;
+}
+
+
 function handleAttendanceFormSync() {
     // Prevent invalid combinations in dependent dropdowns
 
@@ -154,17 +185,19 @@ function handleAttendanceFormSync() {
   const parliamentarianSelect = document.getElementById("parliamentarian_id");
 
   // Only proceed if both elements exist (not all forms have both)
-  if (!commissionSelect || !parliamentarianSelect) {
+  if (!commissionSelect || !parliamentarianSelect
+      || parliamentarianSelect.tagName !== 'SELECT') {
     return;
   }
 
   // Store commission->parliamentarians and parliamentarian->commissions
   let commissionParliamentarians = {};
   let parliamentarianCommissions = {};
+  let loaded = false;
   const baseUrl = window.location.href.split("/").slice(0, -2).join("/");
 
 
-  fetch(`${baseUrl}/commissions/commissions-parliamentarians-json`)
+  fetch(commissionMembersUrl(baseUrl))
     .then((response) => {
       return response.json();
     })
@@ -180,6 +213,10 @@ function handleAttendanceFormSync() {
           parliamentarianCommissions[parliamentarian.id].push(commissionId);
         });
       });
+      loaded = true;
+      if (commissionSelect.value) {
+        filterParliamentariansByCommission(commissionSelect.value);
+      }
     })
     .catch(error => {
       console.error("DEBUG: Fetch error:", error);
@@ -196,6 +233,9 @@ function handleAttendanceFormSync() {
   });
 
   function filterParliamentariansByCommission(commissionId) {
+    if (!loaded) {
+      return;
+    }
     const parliamentarianOptions = parliamentarianSelect.querySelectorAll('option');
 
     // Reset all options to visible
@@ -229,6 +269,9 @@ function handleAttendanceFormSync() {
   }
 
   function filterCommissionsByParliamentarian(parliamentarianId) {
+    if (!loaded) {
+      return;
+    }
     const commissionOptions = commissionSelect.querySelectorAll('option');
 
     // Reset all options to visible

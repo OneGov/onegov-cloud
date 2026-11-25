@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models.document_form import FormDocument
 from onegov.page import Page
 from onegov.form import FormDefinition
@@ -44,6 +42,29 @@ class PersonMove[OwnerT: PersonLinkExtension]:
             target=self.target,
             direction=self.direction
         )
+
+    def is_valid(self) -> bool:
+        if self.subject == self.target:
+            return False
+
+        people = self.obj.content.get('people')
+        if not people:
+            return False
+
+        # we're valid as long as both the subject and target exist
+        subject_present = False
+        target_present = False
+        for person, _function_tuple in people:
+            if person == self.subject:
+                if target_present:
+                    return True
+                subject_present = True
+            elif person == self.target:
+                if subject_present:
+                    return True
+                target_present = True
+
+        return False
 
     @staticmethod
     def get_implementation(

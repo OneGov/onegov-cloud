@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import normalize_for_url, is_uuid
 from onegov.newsletter import Newsletter, Recipient
 from onegov.newsletter.errors import AlreadyExistsError

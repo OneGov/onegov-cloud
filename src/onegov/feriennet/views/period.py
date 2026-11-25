@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.core.security import Secret

@@ -22,8 +22,6 @@ Examples:
 :copyright: (c) 2011 by Armin Ronacher
 :license: BSD
 """
-from __future__ import annotations
-
 import re
 from contextlib import contextmanager
 from difflib import SequenceMatcher
@@ -36,7 +34,7 @@ from turbohtml import parse_fragment, Element, Text as TextNode
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator, Iterator
     from genshi.core import StreamEventKind
 
     type Position = tuple[str | None, int, int]
@@ -132,7 +130,7 @@ class StreamDiffer:
         self._context = None
 
     @contextmanager
-    def context(self, kind: str | None) -> Iterator[None]:
+    def context(self, kind: str | None) -> Generator[None]:
         old_context = self._context
         self._context = kind
         try:

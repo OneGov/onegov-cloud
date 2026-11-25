@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
@@ -14,7 +12,7 @@ from onegov.ticket.collection import ArchivedTicketCollection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
 
 

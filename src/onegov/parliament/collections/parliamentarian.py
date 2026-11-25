@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.collection import GenericCollection
 from onegov.core.utils import toggle
 from onegov.parliament.models import Parliamentarian
@@ -64,9 +62,8 @@ class ParliamentarianCollection[ParliamentarianT: Parliamentarian = Any](
 
     def party_values(self) -> list[str]:
         """ Returns a list of all parties given in the database. """
-
-        return sorted([
-            party[0]
-            for party in self.session.query(Parliamentarian.party).distinct()
-            if party[0]
-        ])
+        return sorted(
+            party
+            for party, in self.session.query(Parliamentarian.party).distinct()
+            if party
+        )

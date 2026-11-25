@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
@@ -108,7 +106,7 @@ def view_messages_feed(
                 general if hide_personal_email else username,
                 realname
             )
-            for username, realname in query.tuples()
+            for username, realname in query
         }
         owners.update({
             username: Owner(

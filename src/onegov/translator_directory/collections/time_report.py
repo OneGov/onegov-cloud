@@ -1,11 +1,8 @@
-from __future__ import annotations
-
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
 from onegov.translator_directory.models.translator import Translator
-from sqlalchemy import asc
 
 
 from typing import TYPE_CHECKING
@@ -52,8 +49,8 @@ class TimeReportCollection(
         else:
             q = q.filter(TranslatorTimeReport.exported == False)
         return q.order_by(
-            asc(Translator.pers_id),
-            asc(TranslatorTimeReport.created),
+            Translator.pers_id.asc(),
+            TranslatorTimeReport.created.asc(),
         )
 
     @property
@@ -79,7 +76,7 @@ class TimeReportCollection(
             .filter(TranslatorTimeReport.status == 'confirmed')
             .filter(TranslatorTimeReport.exported == False)
             .order_by(
-                asc(Translator.pers_id),
-                asc(TranslatorTimeReport.created),
+                Translator.pers_id.asc(),
+                TranslatorTimeReport.created.asc(),
             )
         )

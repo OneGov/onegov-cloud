@@ -1,6 +1,4 @@
 """ The onegov org collection of images uploaded to the site. """
-from __future__ import annotations
-
 from datetime import date
 from markupsafe import Markup
 from morepath import redirect
@@ -67,6 +65,7 @@ def get_filters(
                     ),
                     name=view_name
                 ),
+                attrs={'rel': 'nofollow'},
                 rounded=keyword in radio_fields
             ) for value in values if get_count(keyword, value)
         )
@@ -115,6 +114,7 @@ def view_occurrences(
             Link(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
+                attributes={'rel': 'nofollow'},
                 active=tag in self.tags
             ) for tag, translation in used_tags if self.tag_counts[tag]
         ]
@@ -123,6 +123,7 @@ def view_occurrences(
         Link(
             text=location,
             url=request.link(self.for_filter(location=location)),
+            attributes={'rel': 'nofollow'},
             active=location in self.locations
         ) for location in sorted(
             request.app.org.event_locations,
@@ -142,6 +143,7 @@ def view_occurrences(
         Link(
             text=_('All'),
             url=request.link(self.for_filter(start=None, end=None)),
+            attributes={'rel': 'nofollow'},
             active=not (self.range or self.start or self.end)
         )
     ] + [
@@ -150,6 +152,7 @@ def view_occurrences(
             url=request.link(
                 self.for_filter(range=range, start=None, end=None)
             ),
+            attributes={'rel': 'nofollow'},
             active=range == self.range
         ) for range, label in range_labels
     ]

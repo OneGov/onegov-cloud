@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import copy
 from uuid import UUID
 
@@ -40,7 +38,6 @@ from onegov.ticket import TicketCollection
 from purl import URL
 from re import search
 from sedate import dtrange, overlaps
-from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
@@ -113,7 +110,7 @@ def occasions_by_period(
         query = query.filter(BookingPeriod.active == False)
 
     query = query.order_by(
-        desc(BookingPeriod.active),
+        BookingPeriod.active.desc(),
         BookingPeriod.execution_start,
         Occasion.order)
 
@@ -242,9 +239,9 @@ def filter_price_range(
             url=request.link(activity.for_filter(price_range=price_range))
         ) for text, price_range in (
             (_('Free of Charge'), (0, 0)),
-            (_('Up to 25 CHF'), (1, 25)),
-            (_('Up to 50 CHF'), (26, 50)),
-            (_('Up to 100 CHF'), (51, 100)),
+            (_('Up to 25 CHF'), (0, 25)),
+            (_('Up to 50 CHF'), (1, 50)),
+            (_('Up to 100 CHF'), (1, 100)),
             (_('More than 100 CHF'), (101, 100000)),
         )
     )
@@ -740,7 +737,7 @@ def view_activities_for_volunteers(
             query = query.filter(BookingPeriod.archived == False)
 
             query = query.order_by(
-                desc(BookingPeriod.active),
+                BookingPeriod.active.desc(),
                 BookingPeriod.execution_start,
                 Occasion.order)
 

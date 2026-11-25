@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 import re
 import wtforms.widgets.core
@@ -7,6 +5,7 @@ import wtforms.widgets.core
 from bs4 import BeautifulSoup
 from decimal import Decimal
 from unidecode import unidecode
+from uuid import UUID
 
 
 from typing import cast, overload, Any, TYPE_CHECKING
@@ -188,3 +187,15 @@ def remove_empty_links(
                 link.decompose()
 
     return str(soup)
+
+
+def coerce_uuid(value: object) -> UUID | None:
+    if isinstance(value, UUID):
+        return value
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise TypeError('Value needs to be a UUID, str or None')
+    if value in ('', 'None'):
+        return None
+    return UUID(value)

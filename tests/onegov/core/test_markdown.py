@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.markdown import render_untrusted_markdown as render
 from mistletoe import HtmlRenderer
 

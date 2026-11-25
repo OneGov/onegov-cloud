@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.winterthur.forms.mission_report import MissionReportForm
 from onegov.winterthur.forms.mission_report import MissionReportVehicleForm
 

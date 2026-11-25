@@ -1,4 +1,3 @@
-from __future__ import annotations
 import transaction
 
 from onegov.election_day import _

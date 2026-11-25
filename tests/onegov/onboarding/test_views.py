@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import onegov.onboarding
 import os
@@ -74,6 +72,13 @@ def test_town_valid_values(onboarding_app: OnboardingApp) -> None:
     assert "Ungültige Email-Adresse" in a
     assert "Ungültige Farbe" in a
     assert "Diese Telefonnummer hat eine ungültige Länge" in a
+
+
+def test_town_missing_values(onboarding_app: OnboardingApp) -> None:
+    c = Client(onboarding_app)
+    a = c.get('/for-towns/1')
+    a = a.form.submit()
+    assert "Dieses Feld wird benötigt" in a
 
 
 def test_town_create(

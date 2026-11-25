@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from morepath.authentication import Identity, NO_IDENTITY
 from onegov.core.security import Personal

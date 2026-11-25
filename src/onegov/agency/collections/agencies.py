@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.utils import filter_modified_or_created
 from onegov.core.collection import GenericCollection, Pagination

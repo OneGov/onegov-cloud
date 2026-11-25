@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 
 import pytz
@@ -303,6 +301,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'definedlinks.js'
     yield 'filemanager.js'
     yield 'imagemanager.js'
+    yield 'imagecropper.js'
     yield 'table.js'
     yield 'alphalist.js'
     yield 'redactor.de.js'

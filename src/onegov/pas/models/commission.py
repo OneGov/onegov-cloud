@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.parliament.models import Commission
 from onegov.pas.i18n import _
 from onegov.search import ORMSearchable

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 import sys
 import threading
@@ -25,7 +23,7 @@ from zope.sqlalchemy import datamanager
 
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator, Iterator
     from sqlalchemy.engine import Connection, Engine, Result
     from sqlalchemy.engine.interfaces import (
         DBAPICursor,
@@ -316,6 +314,7 @@ class SessionManager:
         self.on_insert = Signal()
         self.on_update = Signal()
         self.on_delete = Signal()
+        self.on_before_delete = Signal()
 
         # onegov.core creates extensions that it requires in a separate schema
         # in the future, this might become something we can configure through
@@ -325,7 +324,8 @@ class SessionManager:
             'btree_gist',
             'hstore',
             'intarray',
-            'unaccent'
+            'unaccent',
+            'uuid-ossp',
         }
         self.created_extensions: set[str] = set()
 
@@ -378,7 +378,7 @@ class SessionManager:
         self.register_session(self.session_factory)
 
     @contextmanager
-    def ignore_bulk_updates(self) -> Iterator[Self]:
+    def ignore_bulk_updates(self) -> Generator[Self]:
         """ Ensures bulk updates don't get blocked when we can't emit
         update events for each changed object.
 
@@ -395,7 +395,7 @@ class SessionManager:
             self._ignore_bulk_updates = previous_state
 
     @contextmanager
-    def ignore_bulk_deletes(self) -> Iterator[Self]:
+    def ignore_bulk_deletes(self) -> Generator[Self]:
         """ Ensures bulk delete don't get blocked when we can't emit
         delete events for each changed object.
 
@@ -412,7 +412,7 @@ class SessionManager:
             self._ignore_bulk_deletes = previous_state
 
     @contextmanager
-    def disable_change_signals(self) -> Iterator[Self]:
+    def disable_change_signals(self) -> Generator[Self]:
         """ Disables the insert/update/delete signals temporarily. """
         previous_state = self._change_signals_disabled
         self._change_signals_disabled = True
@@ -604,6 +604,20 @@ class SessionManager:
             result.rowcount = rowcount  # type: ignore[attr-defined]
             return result
 
+        @event.listens_for(session, 'before_flush')
+        def on_before_flush(
+            session: Session,
+            flush_context: Any,
+            instances: Any,
+        ) -> None:
+            if self._change_signals_disabled:
+                return
+            # Capture delete snapshots before ORM and database cascades run.
+            for obj in session.deleted:
+                self.on_before_delete.send(
+                    self.current_schema, session=session, obj=obj
+                )
+
         @event.listens_for(session, 'after_flush')
         def on_after_flush(
             session: Session,
@@ -719,7 +733,7 @@ class SessionManager:
         self,
         user_id: str | None,
         username: str | None,
-    ) -> Iterator[Self]:
+    ) -> Generator[Self]:
         """Sets the user responsible for changes within the context."""
         previous_user_id = self.current_user_id
         previous_username = self.current_username

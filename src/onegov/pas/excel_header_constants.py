@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 We define all expected headers to avoid nasty surprises.
 

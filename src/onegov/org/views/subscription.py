@@ -1,6 +1,4 @@
 """ Newsletter subscription management. """
-from __future__ import annotations
-
 import morepath
 
 from morepath.request import Response

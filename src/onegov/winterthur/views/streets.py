@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import groupby
 from functools import lru_cache
 from onegov.core.security import Public, Private

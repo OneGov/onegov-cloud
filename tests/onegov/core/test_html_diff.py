@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.core.html_diff import render_html_diff

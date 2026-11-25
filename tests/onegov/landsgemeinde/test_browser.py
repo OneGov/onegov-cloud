@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.landsgemeinde.models import Assembly
 from transaction import commit
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.onboarding.models.assistant import (
     Assistant,
     DefaultAssistant,

@@ -7,6 +7,11 @@
         <div class="grid-x grid-padding-x">
             <div class="large-8 medium-8 cell main-content">
                 <h2 i18n:translate class="h3">Commission members</h2>
+                <p tal:condition="request.is_manager">
+                    <a href="${request.link(layout.parliamentarian_collection)}"
+                       i18n:translate>To add a member, open the parliamentarian
+                       and select “New commission function”.</a>
+                </p>
                 <div tal:condition="commission.memberships">
                     <dd>
                         <ul class="more-list">
@@ -20,6 +25,9 @@
                                         (${layout.format_date_range(membership.start, membership.end)})
                                     </tal:b>
                                 </span>
+                                <a tal:condition="request.is_manager"
+                                   href="${request.link(membership, 'edit')}"
+                                   i18n:translate>Edit membership</a>
                             </li>
                         </ul>
                     </dd>

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from babel.dates import format_date
 from babel.dates import format_time
 from copy import deepcopy

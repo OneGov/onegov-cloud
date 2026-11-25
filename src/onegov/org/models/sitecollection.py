@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.models import FormDefinition
 from onegov.reservation import Resource
 from onegov.directory import Directory

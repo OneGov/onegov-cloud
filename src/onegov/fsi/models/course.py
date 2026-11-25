@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base

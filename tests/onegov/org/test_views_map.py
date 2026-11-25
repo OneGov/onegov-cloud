@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.gis import Coordinates
 from tests.shared.utils import decode_map_value, encode_map_value
 

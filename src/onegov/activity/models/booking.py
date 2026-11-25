@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base

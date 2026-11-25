@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 
 from dogpile.cache.api import NO_VALUE

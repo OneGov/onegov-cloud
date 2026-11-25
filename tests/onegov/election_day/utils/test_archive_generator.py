@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import Counter
 from datetime import date
 from onegov.election_day.models import ArchivedResult

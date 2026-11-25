@@ -1,6 +1,4 @@
 """ Renders a onegov.page. """
-from __future__ import annotations
-
 import morepath
 from markupsafe import Markup
 

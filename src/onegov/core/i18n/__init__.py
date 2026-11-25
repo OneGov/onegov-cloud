@@ -31,8 +31,6 @@ For example::
         return 'en'
 
 """
-from __future__ import annotations
-
 import gettext
 import glob
 import os

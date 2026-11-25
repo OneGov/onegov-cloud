@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import kerberos  # type: ignore[import-not-found]
 import morepath
 import pytest

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Activity, ActivityCollection
 from onegov.activity import Attendee, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
@@ -18,7 +16,8 @@ from onegov.ticket import Ticket
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
 
 

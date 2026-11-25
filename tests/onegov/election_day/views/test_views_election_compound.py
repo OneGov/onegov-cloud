@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionCompoundLayout
 from tests.onegov.election_day.common import create_election_compound

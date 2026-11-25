@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from io import BytesIO
 from onegov.election_day.models import BallotResult

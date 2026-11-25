@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import pyotp
 
@@ -92,6 +90,7 @@ class SecondFactor(metaclass=ABCMeta):
     def start_activation(
         self,
         request: CoreRequest,
+        user: User,
         auth: Auth
     ) -> Response | None:
         """ Initiates the activation of the second factor. """
@@ -238,11 +237,13 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
     def start_activation(
         self,
         request: CoreRequest,
+        user: User,
         auth: Auth
     ) -> Response | None:
         if not self.self_activation:
             return None
 
+        request.browser_session['mtan_setup_username'] = user.username
         activation_url = request.link(auth, name='mtan-setup')
         return morepath.redirect(activation_url)
 

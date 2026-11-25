@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 
 from decimal import Decimal, ROUND_HALF_UP
@@ -10,14 +8,12 @@ from wtforms import HiddenField
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.utils import coerce_uuid
 from onegov.pas import _
-from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
-from onegov.pas.utils import (
-    get_active_kantonsrat_parliamentarians,
-    is_active_kantonsrat_member,
-)
+from onegov.pas.utils import get_attendance_parliamentarians
+from onegov.pas.utils import get_attendance_settlement_run
 from onegov.pas.custom import AttendenceCollection
 from onegov.pas.models import PASCommission, PASCommissionMembership
 from onegov.pas.models import SettlementRun
@@ -26,16 +22,18 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.fields import SelectChoice
+from wtforms.validators import InputRequired, NumberRange, ValidationError
 from onegov.user import User
-from uuid import UUID
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.core.request import CoreRequest
     from onegov.pas.models import Attendence
+    from onegov.pas.request import PasRequest
     from typing import Any
+    from uuid import UUID
 
 
 class SettlementRunBoundMixin:
@@ -65,7 +63,7 @@ class SettlementRunBoundMixin:
         if self.request.method == 'POST':
             return
 
-        settlement_run = get_current_settlement_run(self.request.session)
+        settlement_run = get_attendance_settlement_run(self.request)
         if settlement_run is not None:
             self.date.data = settlement_run.start
 
@@ -89,6 +87,8 @@ def minutes_to_hours(minutes: Decimal) -> Decimal:
 
 class AttendenceForm(Form, SettlementRunBoundMixin):
 
+    request: PasRequest
+
     date = DateField(
         label=_('Date'),
         validators=[InputRequired()],
@@ -98,12 +98,12 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(
         label=_('Type'),
-        choices=list(TYPES.items()),
+        choices=[SelectChoice(value, label) for value, label in TYPES.items()],
         validators=[InputRequired()],
         default='plenary'
     )
@@ -111,11 +111,13 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = ChosenSelectField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
+        coerce=coerce_uuid,
     )
 
     commission_id = ChosenSelectField(
         label=_('Commission'),
         validators=[InputRequired()],
+        coerce=coerce_uuid,
         depends_on=('type', '!plenary'),
     )
 
@@ -125,7 +127,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     )
 
     def _can_edit_parliamentarian(
-        self, parliamentarian_id: str
+        self, parliamentarian_id: UUID
     ) -> tuple[bool, str | None]:
         """Check if current user can edit attendance for given parl ID.
 
@@ -149,7 +151,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         if not user or not user.parliamentarian:  # type: ignore[attr-defined]
             return (False, _('User has no parliamentarian record.'))
 
-        user_parl_id = str(user.parliamentarian.id)  # type: ignore[attr-defined]
+        user_parl_id = user.parliamentarian.id  # type: ignore[attr-defined]
 
         if parliamentarian_id == user_parl_id:
             return (True, None)
@@ -158,7 +160,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             return (False, _('You can only edit your own attendance.'))
 
         target_parl = PASParliamentarianCollection(self.request.app).by_id(
-            UUID(parliamentarian_id)
+            parliamentarian_id
         )
         if not target_parl:
             return (False, _('Target parliamentarian not found.'))
@@ -202,11 +204,10 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             collection = PASParliamentarianCollection(self.request.app)
             parliamentarian = collection.by_id(self.parliamentarian_id.data)
             if parliamentarian:
-                commission_ids = [
-                    str(membership.commission_id)
+                if self.commission_id.data not in (
+                    membership.commission_id
                     for membership in parliamentarian.commission_memberships
-                ]
-                if self.commission_id.data not in commission_ids:
+                ):
                     assert isinstance(self.commission_id.errors, list)
                     self.commission_id.errors.append(
                         _('Parliamentarian is not in this commission.')
@@ -242,14 +243,12 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
 
-        if not self.request.is_admin:  # type: ignore[attr-defined]
+        if not self.request.is_admin:
             self.type.choices = [
-                (key, value)
-                for key, value in TYPES.items()
-                if key != 'plenary'
+                choice
+                for choice in self.type.choices
+                if choice.value != 'plenary'
             ]
-        else:
-            self.type.choices = list(TYPES.items())
 
         if (
             hasattr(self.request.identity, 'role')
@@ -260,13 +259,14 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 .filter_by(username=self.request.identity.userid)
                 .first()
             )
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
-                self.parliamentarian_id.choices = [
-                    (str(user.parliamentarian.id), user.parliamentarian.title)  # type: ignore[attr-defined]
-                ]
+            if user and (parliamentarian := user.parliamentarian):  # type: ignore[attr-defined]
+                self.parliamentarian_id.choices = [SelectChoice(
+                    parliamentarian.id.hex,
+                    parliamentarian.title
+                )]
             else:
                 self.parliamentarian_id.choices = []
-                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
+                self.request.warn_no_parliamentarian()
         elif (
             hasattr(self.request.identity, 'role')
             and self.request.identity.role == 'commission_president'
@@ -276,19 +276,18 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 .filter_by(username=self.request.identity.userid)
                 .first()
             )
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
-                choices = [
-                    (
-                        str(user.parliamentarian.id),  # type: ignore[attr-defined]
-                        user.parliamentarian.title,  # type: ignore[attr-defined]
-                    )
-                ]
+            if user and (parliamentarian := user.parliamentarian):  # type: ignore[attr-defined]
+                choices = [SelectChoice(
+                    parliamentarian.id.hex,
+                    parliamentarian.title,
+                )]
 
                 today = date.today()
                 presidencies = user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
                     on_date=today,
                     role='president',
                 )
+                seen = {parliamentarian.id}
                 for presidency in presidencies:
                     memberships = self.request.session.query(
                         PASCommissionMembership
@@ -300,18 +299,21 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                             != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
                             member = membership.parliamentarian
-                            choices.append((str(member.id), member.title))
+                            if member.id in seen:
+                                continue
+                            seen.add(member.id)
+                            choices.append(
+                                SelectChoice(member.id.hex, member.title)
+                            )
 
-                self.parliamentarian_id.choices = list(dict.fromkeys(choices))
+                self.parliamentarian_id.choices = choices
             else:
                 self.parliamentarian_id.choices = []
-                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
+                self.request.warn_no_parliamentarian()
         else:
             self.parliamentarian_id.choices = [
-                (str(p.id), p.title)
-                for p in get_active_kantonsrat_parliamentarians(
-                    self.request.app
-                )
+                SelectChoice(p.id.hex, p.title)
+                for p in get_attendance_parliamentarians(self.request)
             ]
 
         # Filter commission choices based on user role
@@ -336,7 +338,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                     for membership in memberships
                 ]
                 self.commission_id.choices = [
-                    (commission.id, commission.title)
+                    SelectChoice(commission.id.hex, commission.title)
                     for commission in PASCommissionCollection(
                         self.request.session
                     ).query()
@@ -346,12 +348,12 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 self.commission_id.choices = []
         else:
             self.commission_id.choices = [
-                (commission.id, commission.title)
+                SelectChoice(commission.id.hex, commission.title)
                 for commission in PASCommissionCollection(
                     self.request.session
                 ).query()
             ]
-        self.commission_id.choices.insert(0, ('', '-'))
+        self.commission_id.choices.insert(0, SelectChoice('', '-'))
 
 
 class AttendenceAddForm(AttendenceForm):
@@ -365,9 +367,9 @@ class AttendenceAddForm(AttendenceForm):
             # Regular parliamentarians can only select themselves
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
+            if user and (parliamentarian := user.parliamentarian):  # type: ignore[attr-defined]
                 self.parliamentarian_id.choices = [
-                    (str(user.parliamentarian.id), user.parliamentarian.title)  # type: ignore[attr-defined]
+                    SelectChoice(parliamentarian.id.hex, parliamentarian.title)
                 ]
             else:
                 self.parliamentarian_id.choices = []
@@ -376,9 +378,11 @@ class AttendenceAddForm(AttendenceForm):
             # Commission presidents can select themselves + commission members
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
-                choices = [(str(user.parliamentarian.id),  # type: ignore[attr-defined]
-                           user.parliamentarian.title)]  # type: ignore[attr-defined]
+            if user and (parliamentarian := user.parliamentarian):  # type: ignore[attr-defined]
+                choices = [SelectChoice(
+                    parliamentarian.id.hex,
+                    parliamentarian.title
+                )]
 
                 # Add commission members
                 today = date.today()
@@ -386,6 +390,7 @@ class AttendenceAddForm(AttendenceForm):
                     on_date=today,
                     role='president',
                 )
+                seen = {parliamentarian.id}
                 for presidency in presidencies:
                     memberships = self.request.session.query(
                         PASCommissionMembership
@@ -397,17 +402,20 @@ class AttendenceAddForm(AttendenceForm):
                             != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
                             member = membership.parliamentarian
-                            choices.append((str(member.id), member.title))
+                            if member.id in seen:
+                                continue
+                            seen.add(member.id)
+                            choices.append(
+                                SelectChoice(member.id.hex, member.title)
+                            )
 
-                self.parliamentarian_id.choices = list(dict.fromkeys(choices))
+                self.parliamentarian_id.choices = choices
             else:
                 self.parliamentarian_id.choices = []
         else:
             self.parliamentarian_id.choices = [
-                (str(p.id), p.title)
-                for p in get_active_kantonsrat_parliamentarians(
-                    self.request.app
-                )
+                SelectChoice(p.id.hex, p.title)
+                for p in get_attendance_parliamentarians(self.request)
             ]
 
 
@@ -422,12 +430,13 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
+        coerce=coerce_uuid,
     )
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
@@ -438,11 +447,14 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
-            (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            SelectChoice(p.id.hex, p.title)
+            for p in get_attendance_parliamentarians(self.request)
         ]
+        # FIXME: Setting this unconditionally seems wrong
         self.parliamentarian_id.data = [
-            choice[0] for choice in self.parliamentarian_id.choices
+            value
+            for choice in self.parliamentarian_id.choices
+            if (value := coerce_uuid(choice.value)) is not None
         ]
 
 
@@ -463,7 +475,10 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
 
     type = RadioField(
         label=_('Type'),
-        choices=list(BULK_MEETING_TYPES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in BULK_MEETING_TYPES.items()
+        ],
         validators=[InputRequired()],
         default='commission',
     )
@@ -471,12 +486,13 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
         label=_('Commission'),
         validators=[InputRequired()],
+        coerce=coerce_uuid
     )
 
     abschluss = BooleanField(
@@ -487,7 +503,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
-        choices=[]  # are set with in src/pas/assets/custom.js
+        coerce=coerce_uuid
     )
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
@@ -498,9 +514,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         commissions = PASCommissionCollection(self.request.session).query()
-        parliamentarians = get_active_kantonsrat_parliamentarians(
-            self.request.app
-        )
+        parliamentarians = get_attendance_parliamentarians(self.request)
 
         if (
             hasattr(self.request.identity, 'role')
@@ -543,14 +557,30 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
                 parliamentarians = []
 
         self.commission_id.choices = [
-            (commission.id, commission.title) for commission in commissions
+            SelectChoice(commission.id.hex, commission.title)
+            for commission in commissions
         ]
         self.parliamentarian_id.choices = [
-            (str(p.id), p.title) for p in parliamentarians
+            SelectChoice(p.id.hex, p.title)
+            for p in parliamentarians
         ]
+        # FIXME: Setting this unconditionally seems wrong
         self.parliamentarian_id.data = []
 
         self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
+
+
+class AttendenceAddFileStudyBulkForm(AttendenceAddCommissionBulkForm):
+    """ Bulk form for file studies. """
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['type'] = 'study'
+        return result
+
+    def on_request(self) -> None:
+        super().on_request()
+        self.delete_field('type')
 
 
 class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
@@ -565,19 +595,23 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
         label=_('Commission'),
         validators=[InputRequired()],
-        render_kw={'readonly': True},
+        coerce=coerce_uuid,
+        # FIXME: This only applies client-side in order to protect this
+        #        from being changed, you need to exclude the field in
+        #        populate_obj
+        render_kw={'readonly': True}
     )
 
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
-        choices=[]
+        coerce=coerce_uuid
     )
 
     bulk_edit_id = HiddenField(
@@ -598,23 +632,18 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         self.commission_id.choices = [
-            (commission.id, commission.title)
+            SelectChoice(commission.id.hex, commission.title)
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
         self.parliamentarian_id.choices = [
-            (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            SelectChoice(p.id.hex, p.title)
+            for p in get_attendance_parliamentarians(self.request)
         ]
 
 
 class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
     """ Edit form for commission bulk attendance changes. """
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        result['type'] = 'commission'
-        return result
 
     def process_obj(self, obj: Attendence) -> None:   # type: ignore[override]
         super().process_obj(obj)
@@ -624,10 +653,16 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
                 PASCommissionMembership.commission_id == obj.commission_id
             ).all()
 
+        eligible = {
+            p.id for p in get_attendance_parliamentarians(self.request)
+        }
         self.parliamentarian_id.choices = [
-            (str(m.parliamentarian.id), m.parliamentarian.title)
-            for m in memberships
-            if is_active_kantonsrat_member(m.parliamentarian)
+            SelectChoice(value, label)
+            for value, label in {
+                m.parliamentarian_id.hex: m.parliamentarian.title
+                for m in memberships
+                if m.parliamentarian_id in eligible
+            }.items()
         ]
 
         self.duration.data = minutes_to_hours(obj.duration)
@@ -637,21 +672,16 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
                 self.request.session).query().filter_by(
                     bulk_edit_id=obj.bulk_edit_id
                 )
-        selected_parliamentarians = [
-            (
-                str(attendence.parliamentarian.id),
-                attendence.parliamentarian.title
-            ) for attendence in attendences
-        ]
 
+        assert obj.commission is not None
         self.commission_id.choices = [
-            (obj.commission.id, obj.commission.title)  # type:ignore
+            SelectChoice(obj.commission.id.hex, obj.commission.title)
         ]
 
-        self.commission_id.data = str(obj.commission_id)
+        self.commission_id.data = obj.commission_id
 
         self.parliamentarian_id.data = [
-            choice[0] for choice in selected_parliamentarians
+            attendence.parliamentarian_id for attendence in attendences
         ]
 
     def populate_obj(self, obj: Attendence) -> None:  # type: ignore[override]
@@ -677,20 +707,15 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
                 self.request.session).query().filter_by(
                     bulk_edit_id=obj.bulk_edit_id
                 )
-        selected_parliamentarians = [
-            (
-                str(attendence.parliamentarian.id),
-                attendence.parliamentarian.title
-            ) for attendence in attendences
-        ]
 
         self.parliamentarian_id.choices = [
-            (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            SelectChoice(p.id.hex, p.title)
+            for p in get_attendance_parliamentarians(self.request)
         ]
 
         self.parliamentarian_id.data = [
-            choice[0] for choice in selected_parliamentarians
+            attendence.parliamentarian.id
+            for attendence in attendences
         ]
 
     def on_request(self) -> None:
@@ -713,13 +738,15 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(
         label=_('Type'),
         choices=[
-            (key, value) for key, value in TYPES.items() if key != 'plenary'
+            SelectChoice(key, value)
+            for key, value in TYPES.items()
+            if key != 'plenary'
         ],
         validators=[InputRequired()],
         default='commission'
@@ -728,6 +755,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
+        coerce=coerce_uuid
     )
 
     abschluss = BooleanField(
@@ -744,12 +772,15 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
-            (
-                str(membership.parliamentarian.id),
+            SelectChoice(
+                membership.parliamentarian.id.hex,
                 membership.parliamentarian.title
             )
             for membership in self.model.memberships
         ]
+        # FIXME: Setting this uncondtionally seems wrong
         self.parliamentarian_id.data = [
-            choice[0] for choice in self.parliamentarian_id.choices
+            value
+            for choice in self.parliamentarian_id.choices
+            if (value := coerce_uuid(choice.value)) is not None
         ]

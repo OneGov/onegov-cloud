@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-09-07 14:57+0200\n"
+"POT-Creation-Date: 2026-10-29 16:05+0100\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -430,6 +430,12 @@ msgstr "Prolunga di un mese alla fine del mese"
 
 msgid "Extend by one year at the end of the year"
 msgstr "Prolunga di un anno alla fine dell'anno"
+
+msgid "Extend by one year at a given date"
+msgstr "Prolunga di un anno a partire da una determinata data"
+
+msgid "Extend on"
+msgstr "Prolunga alla"
 
 msgid "Start"
 msgstr "Inizio"
@@ -1347,22 +1353,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato "
-"(${claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso "
-"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso ($"
+"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -1791,6 +1797,9 @@ msgstr "Stato"
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 
+msgid "Chronology"
+msgstr "Cronologia"
+
 msgid "Parliamentary Group(s)"
 msgstr "Gruppo/i parlamentare/i"
 
@@ -1809,6 +1818,12 @@ msgstr "A partire da"
 
 msgid "Ending at"
 msgstr "Fine a"
+
+msgid "Internal"
+msgstr "Interno"
+
+msgid "Internal reservations ignore availability periods"
+msgstr "Le prenotazioni interne non tengono conto dei periodi di disponibilità"
 
 msgid "Quota"
 msgstr "Quota"
@@ -1864,6 +1879,18 @@ msgstr "Data di inizio nel passato"
 msgid "Duration is longer than the range between start and end time"
 msgstr ""
 "La durata è superiore all'intervallo tra l'ora di inizio e l'ora di fine"
+
+msgid "The end can be at most two years from the start"
+msgstr ""
+"La data di scadenza non può essere superiore a due anni dalla data di inizio"
+
+msgid ""
+"The number of possible reservation dates is too large. Either lower the end "
+"date, or select fewer rooms / weekdays."
+msgstr ""
+"Il numero di date disponibili per la prenotazione è troppo elevato. Riduci "
+"la data di fine del periodo oppure seleziona un numero inferiore di camere o "
+"di giorni feriali."
 
 msgid "Describes what this reservation resource is about"
 msgstr "Descrive il contenuto di questa risorsa di prenotazione"
@@ -3104,6 +3131,11 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 
+msgid "Duration from audit trail entry creation until deleted automatically"
+msgstr ""
+"Durata dalla creazione di una voce del registro di audit alla sua "
+"cancellazione automatica"
+
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Credenziali Firebase Adminsdk (JSON)"
 
@@ -3788,12 +3820,6 @@ msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
-msgid "This event can't be edited."
-msgstr "Questo evento non può essere modificato."
-
-msgid "Imported events can not be edited."
-msgstr "Gli eventi importati non possono essere modificati."
-
 msgid "Do you really want to delete this event?"
 msgstr "Desideri davvero eliminare questo evento?"
 
@@ -4041,6 +4067,9 @@ msgstr "Selezionare una persona aggiuntiva"
 
 msgid "List this function in the page of this person"
 msgstr "Mostra questa funzione nella pagina di questa persona"
+
+msgid "Show pictures of people"
+msgstr "Mostra le foto delle persone"
 
 msgid "Use Western ordered names"
 msgstr "Utilizzare nomi ordinati all'occidentale"
@@ -4308,6 +4337,9 @@ msgstr "Nega registrazione"
 msgid "Cancel registration"
 msgstr "Annulla registrazione"
 
+msgid "Do you really want to cancel this registration?"
+msgstr "Vuoi davvero annullare questa registrazione?"
+
 msgid "Edit submission"
 msgstr "Modifica iscrizione"
 
@@ -4385,8 +4417,8 @@ msgstr "Rifiuta tutto con messaggio"
 msgid "Add reservation"
 msgstr "Aggiungi prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4576,8 +4608,8 @@ msgstr ""
 "eliminare le pagine con sottopagine. Per eliminare questa pagina, elimina "
 "prima tutte le sottopagine o chiedi a un amministratore di farlo per te."
 
-#.
 #. Modification for the footer left on all pages
+#.
 msgid "Source"
 msgstr "Fonte"
 
@@ -4635,8 +4667,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -4699,35 +4731,23 @@ msgstr "Proprietario:"
 msgid "Kind:"
 msgstr "Tipo:"
 
-msgid "When"
-msgstr "Quando"
-
-msgid "Action"
-msgstr "Azione"
-
-msgid "Who"
-msgstr "Utente"
-
-msgid "Target table"
-msgstr "Tabella di destinazione"
-
-msgid "Target ID"
-msgstr "ID destinazione"
-
-msgid "Current page"
-msgstr "Pagina attuale"
-
-msgid "JSON Snapshot"
-msgstr "Snapshot JSON"
+msgid "Changes"
+msgstr "Modifiche"
 
 msgid "Before update"
 msgstr "Prima della modifica"
 
+msgid "Copy JSON"
+msgstr "Copia JSON"
+
+msgid "Copied to Clipboard!"
+msgstr "Copiato negli appunti!"
+
+msgid "JSON Snapshot"
+msgstr "Snapshot JSON"
+
 msgid "After update"
 msgstr "Dopo la modifica"
-
-msgid "No audit entries yet."
-msgstr "Nessuna voce nel registro delle modifiche."
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "
@@ -4736,23 +4756,26 @@ msgstr ""
 "Il registro delle modifiche mostra quando e da chi sono stati creati, "
 "modificati o eliminati i record."
 
-msgid "Page"
-msgstr "Pagina"
+msgid "Action"
+msgstr "Azione"
+
+msgid "No audit entries yet."
+msgstr "Nessuna voce nel registro delle modifiche."
+
+msgid "When"
+msgstr "Quando"
 
 msgid "Target"
 msgstr "Destinazione"
 
-msgid "Contained subpages"
-msgstr "Sottopagine contenute"
+msgid "Who"
+msgstr "Utente"
 
 msgid "Changed"
 msgstr "Modificato"
 
 msgid "Deleted"
 msgstr "Eliminato"
-
-msgid "Copy JSON"
-msgstr "Copia JSON"
 
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
@@ -5051,6 +5074,9 @@ msgstr "Caricamento degli argomenti..."
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
 
+msgid "Close menu"
+msgstr "Chiudi il menu"
+
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
 
@@ -5066,8 +5092,8 @@ msgstr "Cerca"
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-msgid "Copied to Clipboard!"
-msgstr "Copiato negli appunti!"
+msgid "Sidebar"
+msgstr "Barra laterale"
 
 msgid "Healthy"
 msgstr "In stato corretto"
@@ -5439,8 +5465,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -5484,14 +5510,13 @@ msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
 
 msgid ""
-"This is a notification for accepted cancellation requests for "
-"${organisation}. If you no longer wish to receive these notifications, "
-"please contact an administrator so they can remove you from the recipients "
-"list."
+"This is a notification for accepted cancellation requests for $"
+"{organisation}. If you no longer wish to receive these notifications, please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è una notifica per le richieste di cancellazione accettate per "
-"${organisation}. Se non si desidera più ricevere queste notifiche, "
-"contattare un amministratore."
+"Questa è una notifica per le richieste di cancellazione accettate per $"
+"{organisation}. Se non si desidera più ricevere queste notifiche, contattare "
+"un amministratore."
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
@@ -5565,9 +5590,9 @@ msgid "visit the request page"
 msgstr "visita la pagina di richiesta"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
@@ -5696,8 +5721,8 @@ msgid ""
 "The publication period of the entry \"${entry}\" in the \"${directory}\" "
 "directory has ended."
 msgstr ""
-"Il periodo di pubblicazione della voce \"${entry}\" nel registro "
-"\"${directory}\" è terminato."
+"Il periodo di pubblicazione della voce \"${entry}\" nel registro \"$"
+"{directory}\" è terminato."
 
 msgid "Your directory submission has been adopted:"
 msgstr "L'invio della cartella è stato adottato:"
@@ -5722,13 +5747,13 @@ msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5865,6 +5890,9 @@ msgstr "Richiedere la cancellazione"
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "Abbonarsi al calendario delle prenotazioni"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -5883,8 +5911,8 @@ msgstr "Hai un nuovo biglietto"
 msgid ""
 "A cancellation request has been submitted for the following ticket: ${link}"
 msgstr ""
-"È stata inoltrata una richiesta di annullamento per il seguente ticket: "
-"${link}"
+"È stata inoltrata una richiesta di annullamento per il seguente ticket: $"
+"{link}"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
@@ -6346,8 +6374,8 @@ msgstr "ore"
 #, python-format
 msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni possono essere effettuate solo con un anticipo massimo di "
-"${n} ${unit}."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
+"{n} ${unit}."
 
 msgid ""
 "Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
@@ -6372,6 +6400,13 @@ msgstr ""
 "fine. Ciò include le allocazioni create utilizzando un periodo di "
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr ""
+"State visualizzando un riepilogo limitato delle prenotazioni confermate."
+
+msgid "Log in for full details"
+msgstr "Accedere per tutti i dettagli"
 
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
@@ -6848,8 +6883,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${updated} "
 "allocations adjusted and ${created} new allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
-"${updated} allocazioni modificate e ${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
+"{updated} allocazioni modificate e ${created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -6876,8 +6911,8 @@ msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
 
 #, python-format
 msgid ""
-"${periods} availability periods copied to ${resources} resources, creating "
-"${allocations} allocations"
+"${periods} availability periods copied to ${resources} resources, creating $"
+"{allocations} allocations"
 msgstr ""
 "${periods} periodi di disponibilità copiati in ${resources} risorse, creando "
 "${allocations} disponibilità"
@@ -6891,6 +6926,9 @@ msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
 
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
+
+msgid "Contained subpages"
+msgstr "Sottopagine contenute"
 
 msgid "Audit Trail Entry"
 msgstr "Voce del registro delle modifiche"
@@ -6955,8 +6993,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account attivo esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -7052,11 +7090,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to "
-"\"${new_type}\"."
+"Cannot convert field \"${field}\" from type \"${old_type}\" to \"${new_type}"
+"\"."
 msgstr ""
-"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
-"\"${new_type}\"."
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a \"$"
+"{new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
@@ -7164,11 +7202,11 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella "
-"\"${directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
+"{directory}\""
 
 #, python-format
 msgid ""
@@ -7292,6 +7330,13 @@ msgstr "La tua richiesta non può essere accettata automaticamente!"
 
 msgid "Thank you for your submission!"
 msgstr "Ti ringraziamo per l'iscrizione!"
+
+msgid ""
+"This event has been imported. Once saved, it will no longer be updated by "
+"the import."
+msgstr ""
+"Questo evento è stato importato. Una volta salvato, non verrà più aggiornato "
+"dall'importazione."
 
 msgid "Your event was rejected"
 msgstr "Il tuo evento è stato rifiutato"
@@ -7891,8 +7936,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
-"${site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
+"{site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Accepted"
 msgstr "Accettato"
@@ -8149,11 +8194,11 @@ msgid "Data Retention Policy"
 msgstr "Politica di Conservazione dei Dati"
 
 msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
 msgstr ""
-"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
-"irrevocabilmente cancellati."
+"Procedere con cautela. I ticket e i dati in essi contenuti, così come le "
+"voci del registro di audit, possono essere cancellati irreversibilmente."
 
 msgid "Access (mTAN)"
 msgstr "Accesso (mTAN)"
@@ -8206,8 +8251,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente "
-"\"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
+"\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -8497,8 +8542,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."
@@ -8569,6 +8614,25 @@ msgstr "Utente creato correttamente"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
+#~ msgid ""
+#~ "Proceed with caution. Tickets and the data they contain may be "
+#~ "irrevocable deleted."
+#~ msgstr ""
+#~ "Procedere con cautela. I biglietti e i dati in essi contenuti possono "
+#~ "essere irrevocabilmente cancellati."
+
+#~ msgid "Target table"
+#~ msgstr "Tabella di destinazione"
+
+#~ msgid "Target ID"
+#~ msgstr "ID destinazione"
+
+#~ msgid "Current page"
+#~ msgstr "Pagina attuale"
+
+#~ msgid "Page"
+#~ msgstr "Pagina"
+
 #~ msgid "Confirmation"
 #~ msgstr "Conferma"
 
@@ -8587,6 +8651,52 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Ad essa sono associate iscrizioni confermate o aperte. Annulla prima la "
 #~ "finestra di registrazione."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published or de-published. Useful "
+#~ "e.g. for permit directories."
+#~ msgstr ""
+#~ "Riceve un'e-mail quando le voci vengono pubblicate o depubblicate. Utile "
+#~ "ad esempio per i registri dei permessi."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published, de-published or deleted. "
+#~ "Useful e.g. for permit directories."
+#~ msgstr ""
+#~ "Riceve un'e-mail quando le voci vengono pubblicate, depubblicate o "
+#~ "eliminate. Utile ad es. per i registri delle autorizzazioni."
+
+#~ msgid "A new entry has been published in the \"${directory}\" directory:"
+#~ msgstr "Una nuova voce è stata pubblicata nel registro \"${directory}\":"
+
+#~ msgid "An entry in the \"${directory}\" directory has been updated:"
+#~ msgstr "Una voce nel registro \"${directory}\" è stata aggiornata:"
+
+#, python-format
+#~ msgid "${org}: Updated Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Voce aggiornata \"${entry}\" in \"${directory}\""
+
+#, python-format
+#~ msgid "${org}: New Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Nuova voce \"${entry}\" in \"${directory}\""
+
+#~ msgid ""
+#~ "The entry \"${entry}\" in the \"${directory}\" directory has been deleted."
+#~ msgstr ""
+#~ "La voce \"${entry}\" nel registro \"${directory}\" è stata eliminata."
+
+#~ msgid "Automatically deleted as configured."
+#~ msgstr "Eliminato automaticamente come configurato."
+
+#, python-format
+#~ msgid "${org}: Deleted Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Voce eliminata \"${entry}\" in \"${directory}\""
+
+#~ msgid "General information above the event list"
+#~ msgstr "Informazioni generali sopra l'elenco degli eventi"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informazioni generali sotto l'elenco degli eventi"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "es. 07:00 o 07:00, 14:30"
@@ -8765,3 +8875,21 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
+
+msgid "Decision"
+msgstr "Decisione"
+
+msgid "Urgent Motion"
+msgstr "Mozione urgente"
+
+msgid "Urgent Postulate"
+msgstr "Postulato urgente"
+
+msgid "Petition"
+msgstr "Petizione"
+
+msgid "Protocol"
+msgstr "Verbale"
+
+msgid "Draft"
+msgstr "Proposta"

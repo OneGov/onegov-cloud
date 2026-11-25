@@ -30,8 +30,6 @@ If you need to serve something on another path you can::
         return StaticFile.from_application(app, 'favicon.ico')
 
 """
-from __future__ import annotations
-
 import os.path
 
 from onegov.core.framework import Framework

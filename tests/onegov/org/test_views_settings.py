@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring

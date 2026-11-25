@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.collection import Pagination
 from onegov.core.orm.utils import QueryChain
 from onegov.pay import Payment

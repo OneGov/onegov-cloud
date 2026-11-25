@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import humanize
 
 from abc import abstractmethod, ABC
@@ -14,7 +12,7 @@ from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidDateRange
 from onegov.form.validators import WhitelistedMimeType
 from pydantic import create_model, model_validator
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 from pydantic import AwareDatetime, Base64Bytes, EmailStr, HttpUrl
 from wtforms import HiddenField
 from wtforms.validators import DataRequired, InputRequired, Optional
@@ -22,7 +20,7 @@ from wtforms.validators import Email, Length, NumberRange, Regexp, URL
 from wtforms.validators import HostnameValidation
 
 
-from typing import Annotated, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import Annotated, Any, cast, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
     from onegov.core.types import FileDict
@@ -105,7 +103,12 @@ def adapt_regexp(validator: Regexp) -> Any:
 
 @registry.validator(NumberRange)
 def adapt_number_range(validator: NumberRange) -> Any:
-    return Field(ge=validator.min, le=validator.max)
+    min, max = validator.min, validator.max
+    if callable(min):
+        min = min()
+    if callable(max):
+        max = max()
+    return Field(ge=min, le=max)
 
 
 @registry.validator(ValidDateRange)
@@ -358,9 +361,9 @@ class IntegerFieldAdapter(BaseAdapter):
 class RadioFieldAdapter(BaseAdapter):
     def __call__(self, field: WTField) -> Generator[Any]:
         yield from self.handle_scalar_field_type(Literal[*(  # type: ignore[arg-type]
-            value
-            for value, _ in field.choices  # type: ignore[attr-defined]
-            if value
+            choice.value
+            for choice in field.choices  # type: ignore[attr-defined]
+            if choice.value
         )], field)
         yield from self.adapt_validators(field.validators)
 
@@ -369,9 +372,9 @@ class RadioFieldAdapter(BaseAdapter):
 class MultiCheckboxFieldAdapter(BaseAdapter):
     def __call__(self, field: WTField) -> Generator[Any]:
         yield from self.handle_sequence_field_type(Literal[*(  # type: ignore[arg-type]
-            value
-            for value, _ in field.choices  # type: ignore[attr-defined]
-            if value
+            choice.value
+            for choice in field.choices  # type: ignore[attr-defined]
+            if choice.value
         )], field)
         yield from self.adapt_validators(field.validators)
 
@@ -486,14 +489,17 @@ def model_from_form(form: Form) -> type[BaseModel] | None:
         ] = validate_required_dependent_fields
 
     try:
-        fields = {
-            field.name: Annotated[
-                *registry.adapt(field),
-                Field(
-                    title=field.label.text,
-                    description=field.description or None,
-                )
-            ]
+        fields: dict[str, TypeForm[Any]] = {
+            field.name: cast(
+                'TypeForm[Any]',
+                Annotated[
+                    *registry.adapt(field),
+                    Field(
+                        title=field.label.text,
+                        description=field.description or None,
+                    ),
+                ],
+            )
             for field in form
             if not isinstance(field, (HiddenField, HoneyPotField))
         }
@@ -506,8 +512,8 @@ def model_from_form(form: Form) -> type[BaseModel] | None:
         __module__=form.__class__.__module__,
         __qualname__=None,
         __doc__=None,
-        __config__={'frozen': True},
+        __config__=ConfigDict(frozen=True),
         __validators__=validators,
         __cls_kwargs__=None,
-        **fields
+        **cast('dict[str, Any]', fields),
     )

@@ -18,6 +18,7 @@
             "version": "15.3.2"
         }
     },
+    "root": true,
     "rules": {
         "accessor-pairs": ["error", {"getWithoutSet": false, "setWithoutGet": true}],
         "array-bracket-spacing": ["warn", "never"],

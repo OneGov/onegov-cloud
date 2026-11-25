@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote

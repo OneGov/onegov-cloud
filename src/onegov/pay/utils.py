@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 from functools import cached_property, total_ordering

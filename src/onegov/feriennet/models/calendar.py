@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import icalendar
 
 from onegov.activity import Attendee
@@ -142,7 +140,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
 
         datestamp = utcnow()
 
-        for record in records.tuples():
+        for record in records:
             event = icalendar.Event()
 
             event.add('uid', record.uid)

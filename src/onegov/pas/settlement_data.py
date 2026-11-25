@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -173,7 +171,7 @@ def get_settlement_data(
             date=settlement_run.end,
             parliamentarian=allowance.parliamentarian,
             type_description=LOHNART_ALLOWANCE_TEXT,
-            value=Decimal('0'),
+            value=Decimal('1'),
             compensation=calculate_compensation(
                 allowance.amount,
                 rate_set.cost_of_living_adjustment,

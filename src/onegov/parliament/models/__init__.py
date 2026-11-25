@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.parliament.models.commission import Commission
 from onegov.parliament.models.commission_membership import CommissionMembership
 from onegov.parliament.models.parliamentarian import Parliamentarian

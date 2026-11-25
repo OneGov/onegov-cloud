@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.models import BookingPeriod
 from onegov.core.collection import GenericCollection
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import module_path
 from onegov.org.theme import OrgTheme
 
@@ -17,7 +15,7 @@ class WinterthurTheme(OrgTheme):
 
     @property
     def post_imports(self) -> list[str]:
-        return [*super().post_imports, 'winterthur']
+        return [*super().post_imports, 'winterthur', 'offcanvas_styling']
 
     @property
     def extra_search_paths(self) -> list[str]:

@@ -338,6 +338,15 @@
         height: 2.25rem;
         text-shadow: none;
 
+        &.add-reservation {
+            height: 1.25rem;
+            font-size: .675rem;
+            border-radius: .4rem;
+            padding: .2em .4em;
+            margin: 2px 4px;
+            float: right;
+        }
+
         &.fc-button-active,
         &:disabled {
             background: $charcoal !important;
@@ -836,7 +845,7 @@
                 font-size: .875rem;
                 position: absolute;
                 right: -4px;
-                top: 1.5rem;
+                bottom: .25rem;
             }
         }
 
@@ -947,7 +956,7 @@ a#results {
         }
 
         .event-unavailable {
-            cursor: not-allowed;
+            cursor: not-allowed !important;
             background-color: $red;
         }
 

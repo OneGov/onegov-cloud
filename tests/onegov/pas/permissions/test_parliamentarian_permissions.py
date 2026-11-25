@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 import pytest
 import transaction
 
 from datetime import date
-from morepath import Identity
+from onegov.core import Identity
 from onegov.core.security import Private
 from onegov.pas.collections import (
     PASCommissionCollection,
@@ -486,7 +484,7 @@ def test_parliamentarian_self_bookings_show_in_list(
         page.form['date'] = date.today().isoformat()
         page.form['duration'] = '2.0'
         page.form['type'] = a_type
-        page.form['parliamentarian_id'].select(text='Parla Mentarian')
+        page.form['parliamentarian_id'].select(text='Mentarian Parla')
         page.form['commission_id'].select(text='Test Commission')
         assert page.form.submit().maybe_follow().status_code == 200
 

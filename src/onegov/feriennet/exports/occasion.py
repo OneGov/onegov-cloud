@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Activity, Occasion, OccasionNeed
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -59,7 +57,8 @@ class OccasionExport(FeriennetExport):
     def fields(self, occasion: Occasion) -> Iterator[tuple[str, Any]]:
         yield from self.activity_fields(occasion.activity)
         yield from self.occasion_fields(occasion)
-        yield from self.user_fields(occasion.activity.user)
+        yield from self.user_fields(
+            occasion.activity.user, occasion.period_id)
 
 
 @FeriennetApp.export(

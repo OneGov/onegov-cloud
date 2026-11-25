@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
@@ -12,6 +10,7 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidPhoneNumber
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
@@ -29,8 +28,8 @@ class SubscriptionForm(Form):
     domain = RadioField(
         label=_('Type'),
         choices=(
-            ('canton', _('Cantonal')),
-            ('municipality', _('Communal')),
+            SelectChoice('canton', _('Cantonal')),
+            SelectChoice('municipality', _('Communal')),
         ),
         default='canton',
         validators=[
@@ -56,7 +55,7 @@ class SubscriptionForm(Form):
         principal = self.request.app.principal
         if principal.segmented_notifications:
             self.domain_segment.choices = [
-                (entity, entity)
+                SelectChoice(entity)
                 for entity in sorted(
                     principal.get_entities(date.today().year)
                 )
@@ -111,8 +110,8 @@ class SubscribersCleanupForm(Form):
             InputRequired()
         ],
         choices=[
-            ('delete', _('Delete')),
-            ('deactivate', _('Deactivate')),
+            SelectChoice('delete', _('Delete')),
+            SelectChoice('deactivate', _('Deactivate')),
         ]
     )
 

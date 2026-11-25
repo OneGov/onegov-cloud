@@ -1,6 +1,4 @@
 """ The settings view, defining things like the logo or color of the org. """
-from __future__ import annotations
-
 from wtforms.fields import BooleanField, IntegerField
 
 from onegov.core.security import Secret
@@ -211,8 +209,13 @@ def town_handle_ticket_data_deletion_settings(
     request: TownRequest,
     form: DataRetentionPolicyForm
 ) -> RenderData | Response:
-    request.message(_('Proceed with caution. Tickets and the data they '
-                      'contain may be irrevocable deleted.'), 'alert')
+    request.message(
+        _(
+            'Proceed with caution. Tickets and the data they contain, as well '
+            'as audit trail entries, may be irreversibly deleted.'
+        ),
+        'alert',
+    )
     return handle_generic_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),

@@ -1,6 +1,4 @@
 """ Contains the base application used by other applications. """
-from __future__ import annotations
-
 import re
 
 import niquests
@@ -37,33 +35,34 @@ from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
+from onegov.user.audit import register_user_auditing
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
     from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
-    from reg.dispatch import _KeyLookup
+    from reg.types import KeyLookup
 
 
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
              PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     serve_static_files = True
-    request_class = OrgRequest
+    request_class: type[OrgRequest[Self]] = OrgRequest
 
     #: org directives
     homepage_widget = directive(directives.HomepageWidgetAction)
@@ -109,6 +108,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     def configure_application(self, **cfg: Any) -> None:
         super().configure_application(**cfg)
         register_page_auditing()
+        register_user_auditing()
         self.known_schemas = set()
 
         if self.has_database_connection:
@@ -179,9 +179,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
         # it on the instance, this should be a unique instance of the method
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
-        assert isinstance(get_view_meth, MethodType)
         get_view = get_view_meth.__func__
-        assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
             get_view.key_lookup = KeyLookupWithMTANHook(key_lookup)
@@ -197,7 +195,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
             # this should be safe, since each class gets its own dispatch
             # but it is ugly that we have to access the dispatch using the
             # __self__ on one of the methods
-            assert hasattr(get_view, 'clean')
+            assert hasattr(get_view.clean, '__self__')
             dispatch = get_view.clean.__self__
             if not getattr(dispatch, '_mtan_hook_configured', False):
                 orig_get_key_lookup = dispatch.get_key_lookup
@@ -831,6 +829,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
+    yield 'imagecropper.js'
     yield 'imagemanager.js'
     yield 'table.js'
     yield 'alphalist.js'
@@ -911,6 +910,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'foundation.orbit.js'
     yield 'foundation.reveal.js'
     yield 'foundation.topbar.js'
+    yield 'foundation.offcanvas.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
@@ -944,6 +944,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'foundation.accordion.js'
     yield 'chosen_select_hierarchy.js'
     yield 'ai_formcoder.js'
+    yield 'sidebar_mobile.js'
 
 
 @OrgApp.webasset('fontpreview')
@@ -1048,7 +1049,7 @@ def wrap_with_mtan_hook(
 
 
 class KeyLookupWithMTANHook:
-    def __init__(self, key_lookup: _KeyLookup):
+    def __init__(self, key_lookup: KeyLookup):
         self.key_lookup = key_lookup
 
     def component(
@@ -1074,5 +1075,5 @@ class KeyLookupWithMTANHook:
     def all(
         self,
         key: Sequence[Any]
-    ) -> Iterator[Callable[..., Any]]:
+    ) -> Iterable[Callable[..., Any]]:
         return self.key_lookup.all(key)

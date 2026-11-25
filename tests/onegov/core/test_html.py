@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.core.html import sanitize_html, sanitize_svg

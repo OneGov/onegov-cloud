@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from webob.exc import HTTPForbidden
 
 from onegov.core.security import Public, Secret

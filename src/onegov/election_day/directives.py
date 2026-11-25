@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dectate import Action
 from morepath.directive import HtmlAction
 from morepath.directive import ViewAction
@@ -18,7 +16,6 @@ from typing import cast
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterable
     from onegov.core.request import CoreRequest
@@ -47,11 +44,11 @@ class ManageHtmlAction(HtmlAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
-        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
-        template: StrOrBytesPath | None = None,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str | None = None,
+        model: type,
+        render: Callable[[Any, RequestT], BaseResponse] | None = None,
+        template: str | None = None,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object | None = None,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -76,12 +73,12 @@ class ManageFormAction(HtmlHandleFormAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
+        model: type,
         form: type[Form] | Callable[[Any, RequestT], type[Form]] = EmptyForm,
-        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
-        template: StrOrBytesPath = 'form.pt',
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str | None = None,
+        render: Callable[[Any, RequestT], BaseResponse] | None = None,
+        template: str = 'form.pt',
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object | None = None,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -171,9 +168,9 @@ class SvgFileViewAction(ViewAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str = Public,
+        model: type,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object = Public,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -196,9 +193,9 @@ class PdfFileViewAction(ViewAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str = Public,
+        model: type,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object = Public,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -220,9 +217,9 @@ class JsonFileAction(ViewAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str = Public,
+        model: type,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object = Public,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -244,9 +241,9 @@ class CsvFileAction(ViewAction):
 
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str = Public,
+        model: type,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object = Public,
         internal: bool = False,
         **predicates: Any,
     ) -> None:
@@ -286,13 +283,13 @@ class ScreenWidgetAction(Action):
         self.tag = tag
         self.category = category
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         screen_widget_registry: ScreenWidgetRegistry
     ) -> str:
         return self.tag
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[[], InputScreenWidget],
         screen_widget_registry: ScreenWidgetRegistry

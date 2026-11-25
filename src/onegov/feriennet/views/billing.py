@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
@@ -30,7 +28,6 @@ from onegov.pay import PaymentProviderCollection
 from onegov.pay import payments_association_table_for
 from onegov.user import UserCollection, User
 from purl import URL
-from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 from urllib.parse import quote_plus
 
@@ -299,15 +296,18 @@ def reset_billing(
     request: FeriennetRequest
 ) -> Response | None:
 
-    if not self.period.active:
+    if not (
+        self.period.active
+        and self.period.confirmed
+        and self.period.finalizable
+        and not self.period.finalized
+    ):
         request.warning(
             _('The period must be active in order to reset billing'))
         return request.redirect(request.link(self))
 
-    session = request.session
-
     for invoice in self.invoices.query():
-        session.delete(invoice)
+        self.invoices.delete(invoice, raise_on_payment_links=True)
 
     request.success(_('The billing was successfully reset.'))
     return None
@@ -336,7 +336,7 @@ def view_online_payments(
     payments = session.query(Payment).filter(
         Payment.id.in_(payment_ids.scalar_subquery()))
 
-    payments = payments.order_by(desc(Payment.created))
+    payments = payments.order_by(Payment.created.desc())
 
     providers = {
         provider.id: provider
@@ -446,7 +446,6 @@ def view_execute_import(
     users = dict(
         request.session.query(User)
         .with_entities(User.username, User.id)
-        .tuples()
     )
 
     payments = {

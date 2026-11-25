@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import AIS
 import hashlib
 import isodate
@@ -76,7 +74,7 @@ def app(
 
     backend = request.param
 
-    class BypassCSRFRequest(CoreRequest):
+    class BypassCSRFRequest(CoreRequest['App']):
         def assert_valid_csrf_token(
             self,
             signed_value: str | bytes | None = None,

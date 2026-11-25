@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.feriennet import FeriennetApp
 from onegov.core.redirect import Redirect
 

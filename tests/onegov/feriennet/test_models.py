@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from sedate import utcnow
 from datetime import date, timedelta

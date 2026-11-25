@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem

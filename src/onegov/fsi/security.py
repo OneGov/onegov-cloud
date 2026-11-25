@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Personal
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
@@ -10,7 +8,7 @@ from onegov.fsi.models import CourseAttendee
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
 
 """

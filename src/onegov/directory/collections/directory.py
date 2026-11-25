@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.collection import GenericCollection
 from onegov.core.utils import normalize_for_url, increment_name, is_uuid
 from onegov.directory.models import Directory

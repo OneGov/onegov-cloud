@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pay import InvoiceItem
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column

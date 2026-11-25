@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import textwrap
 
 from onegov.core.utils import module_path

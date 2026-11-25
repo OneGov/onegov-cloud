@@ -1,4 +1,3 @@
-from __future__ import annotations
 import json
 
 from functools import cached_property
@@ -202,6 +201,7 @@ class AgencyLayout(
 
     def include_editor(self) -> None:
         self.request.include('redactor')
+        self.request.include('cropper')
         self.request.include('editor')
 
     @cached_property

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.ticket.handler import Handler, HandlerRegistry
 handlers = HandlerRegistry()
 

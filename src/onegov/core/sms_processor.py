@@ -7,8 +7,6 @@ Usage::
     qp = SmsQueueProcessor(sms_directory)
     qp.send_messages()
 """
-from __future__ import annotations
-
 import errno
 import logging
 import json

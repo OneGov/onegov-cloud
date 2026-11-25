@@ -1,6 +1,4 @@
 """ The settings view, defining things like the logo or color of the org. """
-from __future__ import annotations
-
 from onegov.core.security import Secret
 from onegov.landsgemeinde.forms.settings import AssemblySettingsForm
 from onegov.org import _

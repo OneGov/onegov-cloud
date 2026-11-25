@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.activity import Activity, BookingPeriodCollection, Occasion
 from onegov.activity import BookingCollection
@@ -602,7 +600,7 @@ class BillingCollectionLayout(DefaultLayout):
               AND invoices.period_id = :period_id
             GROUP BY family, text
             ORDER BY text
-        """), {'period_id': self.model.period.id}).tuples()
+        """), {'period_id': self.model.period.id})  # type: ignore[misc]
 
     @property
     def family_removal_links(self) -> Iterator[Link]:

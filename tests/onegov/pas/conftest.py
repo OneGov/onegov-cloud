@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.core.orm.observer import ScopedPropertyObserver
@@ -544,10 +542,11 @@ def browser(
     request: pytest.FixtureRequest,
     browser: ExtendedBrowser,
     wsgi_server: WSGIServer
-) -> ExtendedBrowser:
+) -> Iterator[ExtendedBrowser]:
     browser.baseurl = wsgi_server.url
     browser.wsgi_server = wsgi_server  # type: ignore[attr-defined]
-    return browser
+    yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope='session', autouse=True)

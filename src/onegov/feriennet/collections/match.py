@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Booking, Attendee, Occasion
 from onegov.core.utils import toggle
 from onegov.core.orm import as_selectable_from_path
@@ -131,4 +129,4 @@ class MatchCollection:
 
         query = query.order_by(columns.title, columns.start)
 
-        return self.session.execute(query).tuples()
+        return self.session.execute(query)  # type: ignore[return-value]

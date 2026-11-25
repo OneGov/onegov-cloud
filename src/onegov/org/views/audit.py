@@ -1,4 +1,5 @@
-from __future__ import annotations
+import difflib
+import re
 
 from onegov.core.custom import json
 from onegov.core.elements import Link
@@ -7,9 +8,10 @@ from onegov.core.security import Secret
 from onegov.org import _, OrgApp
 from onegov.org.layout import AuditTrailLayout
 from onegov.page import Page
+from markupsafe import Markup
 
 
-from typing import NamedTuple, TYPE_CHECKING
+from typing import Any, NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -19,8 +21,26 @@ if TYPE_CHECKING:
 
 
 class AuditEntryFact(NamedTuple):
+    """A labelled detail shown beneath an audit entry's target title."""
+
     label: str
     value: object
+
+
+def audit_entry_title(entry: AuditEntry) -> str:
+    snapshot = entry.snapshot
+    if entry.target_table == 'role_mappings':
+        subject = snapshot.get('username') or snapshot.get('group_id')
+        return (
+            f'{subject}: {snapshot.get("role")} '
+            f'({snapshot.get("content_type")} #{snapshot.get("content_id")})'
+        )
+    return str(
+        snapshot.get('title')
+        or snapshot.get('username')
+        or snapshot.get('name')
+        or entry.target_table
+    )
 
 
 def page_snapshot_subpage_count(
@@ -58,6 +78,8 @@ def page_audit_entry_facts(
     )
 
 
+# Optional display details by table; this does not control audit recording.
+# Only pages currently add a detail: the number of contained subpages.
 AUDIT_ENTRY_FACTORIES: dict[
     str,
     Callable[[AuditEntry, OrgRequest], tuple[AuditEntryFact, ...]],
@@ -72,6 +94,107 @@ def audit_entry_facts(
 ) -> tuple[AuditEntryFact, ...]:
     factory = AUDIT_ENTRY_FACTORIES.get(entry.target_table)
     return factory(entry, request) if factory else ()
+
+
+def audit_snapshot_diff(
+    previous_snapshot: dict[str, Any],
+    snapshot: dict[str, Any],
+    previous_label: str,
+    snapshot_label: str,
+) -> Markup:
+    missing = object()
+
+    def display(value: object) -> str:
+        if value is missing:
+            return '—'
+        if value is None:
+            return 'null'
+        if isinstance(value, str):
+            return value or '""'
+        return json.dumps(value, indent=2, sort_keys=True)
+
+    def word_diff(previous: str, current: str) -> tuple[Markup, Markup]:
+        token_pattern = re.compile(
+            r'\d{4}-\d{2}-\d{2}|[a-zA-Z0-9_]+|[^a-zA-Z0-9_]+'
+        )
+        previous_words = token_pattern.findall(previous)
+        current_words = token_pattern.findall(current)
+        previous_parts: list[Markup] = []
+        current_parts: list[Markup] = []
+        matcher = difflib.SequenceMatcher(
+            a=previous_words,
+            b=current_words,
+            autojunk=False,
+        )
+
+        for operation, start_a, end_a, start_b, end_b in matcher.get_opcodes():
+            old = previous_words[start_a:end_a]
+            new = current_words[start_b:end_b]
+            if operation == 'equal':
+                previous_parts.extend(Markup.escape(word) for word in old)
+                current_parts.extend(Markup.escape(word) for word in new)
+                continue
+            if old:
+                previous_parts.append(
+                    Markup('<del class="diff-word-removed">{}</del>').format(
+                        ''.join(old)
+                    )
+                )
+            if new:
+                current_parts.append(
+                    Markup('<ins class="diff-word-added">{}</ins>').format(
+                        ''.join(new)
+                    )
+                )
+
+        return Markup('').join(previous_parts), Markup('').join(current_parts)
+
+    def changes(
+        previous: Any,
+        current: Any,
+        path: tuple[str, ...] = (),
+    ) -> list[Markup]:
+        if type(previous) is type(current) and previous == current:
+            return []
+        rows: list[Markup] = []
+        if isinstance(previous, dict) and isinstance(current, dict):
+            for key in sorted(previous.keys() | current.keys()):
+                rows.extend(
+                    changes(
+                        previous.get(key, missing),
+                        current.get(key, missing),
+                        (*path, key),
+                    )
+                )
+        else:
+            previous_text = display(previous)
+            current_text = display(current)
+            previous_diff, current_diff = word_diff(
+                previous_text,
+                current_text,
+            )
+            rows.append(
+                Markup(
+                    '<tr><th scope="row">{}</th>'
+                    '<td class="diff_sub"><pre>{}</pre></td>'
+                    '<td class="diff_add"><pre>{}</pre></td></tr>'
+                ).format(
+                    ' / '.join(path),
+                    previous_diff,
+                    current_diff,
+                )
+            )
+        return rows
+
+    return Markup(
+        '<table class="diff"><thead><tr><td></td>'
+        '<th scope="col">{}</th><th scope="col">{}</th>'
+        '</tr></thead><tbody>{}</tbody></table>'
+    ).format(
+        previous_label,
+        snapshot_label,
+        Markup('').join(changes(previous_snapshot, snapshot)),
+    )
 
 
 @OrgApp.html(
@@ -111,6 +234,9 @@ def view_audit_trail(
         'layout': layout or AuditTrailLayout(self, request),
         'title': _('Audit Trail'),
         'entries': entries,
+        'entry_titles': {
+            entry.id: audit_entry_title(entry) for entry in entries
+        },
         'filters': filters,
         'entry_facts': {
             entry.id: audit_entry_facts(entry, request) for entry in entries
@@ -144,8 +270,19 @@ def view_audit_entry(
         'layout': layout,
         'title': _('Audit Trail Entry'),
         'entry': self,
+        'entry_title': audit_entry_title(self),
         'operation': operation,
         'current_page': current_page,
+        'diff': (
+            audit_snapshot_diff(
+                self.previous_snapshot,
+                self.snapshot,
+                request.translate(_('Before update')),
+                request.translate(_('After update')),
+            )
+            if self.previous_snapshot
+            else None
+        ),
         'snapshot': json.dumps(self.snapshot, indent=2),
         'previous_snapshot': (
             json.dumps(self.previous_snapshot, indent=2)

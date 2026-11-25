@@ -1,10 +1,9 @@
-from __future__ import annotations
-
 from onegov.form import merge_forms
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
 from onegov.org.forms.generic import ExportForm
 from operator import attrgetter
+from wtforms import SelectChoice
 
 
 from typing import TYPE_CHECKING
@@ -47,9 +46,11 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
             return
 
         self.submission_window.choices = [
-            (window.id.hex,
-             (f'{layout.format_date_range(window.start, window.end)}, '
-             f'{window.title}'))
+            SelectChoice(
+                window.id.hex,
+                f'{layout.format_date_range(window.start, window.end)}, '
+                f'{window.title}'
+            )
             for window in windows
         ]
 

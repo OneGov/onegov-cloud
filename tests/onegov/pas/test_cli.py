@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 import traceback
 
@@ -116,9 +114,7 @@ def test_import_commission_data(
         )
         assert vivianne_membership.commission.name == 'commission test'
         assert vivianne_membership.role == 'member'
-        assert (
-            vivianne_membership.parliamentarian.title == 'Vivianne Gonzalez'
-        )
+        assert vivianne_membership.parliamentarian.title == 'Gonzalez Vivianne'
 
         # Check president role
         president = (

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 
 from freezegun import freeze_time

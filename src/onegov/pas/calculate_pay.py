@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import math
 
 from dataclasses import dataclass
@@ -92,6 +90,12 @@ def calculate_rate(
 ) -> Decimal:
     """Calculate the rate for an attendance based on type, duration and role.
     """
+
+    # Zero-duration entries are administrative markers used to close a
+    # commission when a member did not attend. They must not trigger the
+    # fixed base rate for a commission meeting.
+    if duration_minutes == 0:
+        return Decimal('0')
 
     if attendence_type == 'plenary':
         # Entry of plenary session is always half a day. Duration (minutes)

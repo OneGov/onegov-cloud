@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
 from onegov.org.custom import logout_path
@@ -78,7 +76,6 @@ def get_accountant_ticket_count(
             )
         )
         .group_by(Ticket.state)
-        .tuples()
     )
 
     return TicketCount(**dict(query))

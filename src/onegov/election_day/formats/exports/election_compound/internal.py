@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from itertools import chain
 from onegov.election_day.formats.exports.election import (

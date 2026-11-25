@@ -1,6 +1,4 @@
 """ The settings of the logged in user. """
-from __future__ import annotations
-
 from morepath.request import Response
 from onegov.core.security import Personal, Public
 from onegov.org import _

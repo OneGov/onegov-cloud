@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.views.external_link import (
     handle_new_external_link, edit_external_link, get_external_link_form)
 from onegov.town6 import TownApp

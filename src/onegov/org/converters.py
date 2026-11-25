@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 
 from collections import defaultdict
@@ -75,5 +73,5 @@ def keywords_decode(text: str) -> dict[str, list[str]] | None:
 
 keywords_converter = morepath.Converter(
     decode=keywords_decode,
-    encode=keywords_encode  # type: ignore[arg-type]
+    encode=keywords_encode
 )

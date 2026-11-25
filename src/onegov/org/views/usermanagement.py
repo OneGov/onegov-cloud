@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import defaultdict
 from copy import copy
 from onegov.core.crypto import random_password
@@ -191,7 +189,7 @@ def ticket_links(request: OrgRequest, user: User) -> LinkGroup:
                 Ticket.id,
                 Ticket.number,
                 Ticket.handler_code
-            ).tuples()
+            )
         ]
     )
 

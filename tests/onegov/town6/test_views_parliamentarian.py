@@ -1,12 +1,52 @@
-from __future__ import annotations
-
 import json
 from typing import TYPE_CHECKING
 
 from freezegun import freeze_time
+from onegov.newsletter import RecipientCollection
+from onegov.org.models import RISParliamentarianCollection
 
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+def test_parliamentarian_creation_requires_private_permission(
+    client: Client,
+) -> None:
+    client.login_admin()
+    settings = client.get('/module-activation-settings')
+    settings.form['ris_enabled'] = True
+    settings.form.submit()
+    client.logout()
+
+    for logged_in in (False, True):
+        if logged_in:
+            client.login_member()
+
+        client.get('/parliamentarians', status=200)
+        client.get('/parliamentarians/new', status=403)
+        client.post(
+            '/parliamentarians/new',
+            {
+                'first_name': 'Synthetic',
+                'last_name': 'Parliamentarian',
+                'email_primary': 'synthetic@example.org',
+            },
+            status=403,
+        )
+        client.get('/commissions/new', status=403)
+        client.post(
+            '/commissions/new',
+            {
+                'name': 'Synthetic Commission',
+            },
+            status=403,
+        )
+
+        session = client.app.session()
+        assert RISParliamentarianCollection(session).query().count() == 0
+        assert not RecipientCollection(session).by_address(
+            'synthetic@example.org'
+        )
 
 
 def test_parliamentary_group_members_sorted_by_name(client: Client) -> None:
@@ -105,6 +145,9 @@ def test_parliamentarians(client: Client) -> None:
         new.form['first_name'] = 'Funny'
         new.form['last_name'] = 'Comedian'
         new.form['email_primary'] = 'funny.comedian@fun.org'
+        new.form['email_secondary'] = 'secondary@fun.org'
+        new.form['website'] = 'https://fun.org'
+        new.form['private_address'] = 'Fun Street 1'
         new.form['party'] = 'Die Moderne'
         new.form['interest_ties'] = json.dumps({  # many field
             'values': [{
@@ -117,6 +160,13 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Funny' in parliamentarian
         assert 'Comedian' in parliamentarian
         assert 'funny.comedian@fun.org' in parliamentarian
+        assert parliamentarian.pyquery(
+            'a[href="mailto:funny.comedian@fun.org"]'
+        )
+        assert parliamentarian.pyquery('a[href="mailto:secondary@fun.org"]')
+        assert parliamentarian.pyquery('a[href="https://fun.org"]')
+        assert 'Adresse' in parliamentarian.pyquery('dt').text()
+        assert 'Privatadresse' not in parliamentarian.pyquery('dt').text()
         assert 'Die Moderne' in parliamentarian
         assert 'Manager' in parliamentarian
         assert 'Work' in parliamentarian
@@ -160,11 +210,19 @@ def test_parliamentarians(client: Client) -> None:
         id = next(
             (opt[0] for opt in options if opt[2] == 'Verkehrskommission'))
         commission.form['commission_id'] = id
-        commission.form['role'] = 'member'
+        commission.form['role'] = 'substitute_member'
         parliamentarian = commission.form.submit().follow()
         assert 'Neue Rolle hinzugefügt' in parliamentarian
-        assert 'Mitglied' in parliamentarian
+        assert 'Ersatzmitglied' in parliamentarian
         assert 'Verkehrskommission' in parliamentarian
+
+        commission_page = client.get('/commissions').click(
+            'Verkehrskommission'
+        )
+        assert 'Zum Hinzufügen eines Mitglieds' in commission_page
+        edit_membership = commission_page.click('Mitgliedschaft bearbeiten')
+        assert edit_membership.form is not None
+        assert 'Ersatzmitglied' in edit_membership
 
         # add another parliamentarian
         new = client.get('/parliamentarians/new')

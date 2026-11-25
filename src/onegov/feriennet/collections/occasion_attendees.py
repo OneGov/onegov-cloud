@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict, Counter
 from onegov.activity import Activity, Attendee, Occasion, OccasionCollection
 from onegov.user import User

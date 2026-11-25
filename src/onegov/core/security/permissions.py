@@ -6,7 +6,6 @@ This is the default however, any application building on top of onegov.core
 may of course introduce its own byzantine permission system.
 
 """
-from __future__ import annotations
 
 
 class Intent:

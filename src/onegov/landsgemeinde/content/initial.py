@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import module_path
 from onegov.org.initial_content import load_content
 from onegov.org.models import Organisation

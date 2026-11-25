@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.quill.widgets import QuillInput
 from onegov.quill.fields import QuillField

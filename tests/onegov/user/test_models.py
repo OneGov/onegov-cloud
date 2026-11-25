@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from onegov.user import RoleMapping
 from onegov.user import User

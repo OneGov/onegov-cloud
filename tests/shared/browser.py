@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import re
 import shutil
@@ -314,6 +312,10 @@ class ExtendedBrowser:
         instance._spawned_contexts = self._spawned_contexts
         self._spawned_contexts.append(instance.context)
         return instance
+
+    def close_contexts(self) -> None:
+        while self._spawned_contexts:
+            self._spawned_contexts.pop().close()
 
     @property
     def links(self) -> FindLinks:

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException, ApiInvalidParamException
@@ -77,27 +75,27 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
     request.app = app
     # ... for_page
     new: ApiEndpoint[Any, Any] | None
-    new = ApiEndpoint(request).for_page(None)
+    new = ApiEndpoint(request).for_page(None, None)
     assert new is not None
     assert new.page is None
     assert new.extra_parameters == {}
 
-    new = ApiEndpoint(request).for_page(1)
+    new = ApiEndpoint(request).for_page(1, None)
     assert new is not None
     assert new.page == 1
     assert new.extra_parameters == {}
 
-    new = ApiEndpoint(request).for_page('1')  # type: ignore[arg-type]
+    new = ApiEndpoint(request).for_page('1', None)  # type: ignore[arg-type]
     assert new is not None
     assert new.page == 1
     assert new.extra_parameters == {}
 
-    new = ApiEndpoint(request, {'a': ['1']}, 4).for_page(5)
+    new = ApiEndpoint(request, {'a': ['1']}, 4).for_page(5, None)
     assert new is not None
     assert new.page == 5
     assert new.extra_parameters == {'a': ['1']}
 
-    new = ApiEndpoint(request).for_page(1)
+    new = ApiEndpoint(request).for_page(1, None)
     assert new is not None
     new = new.for_filter(a=['1'])
     assert new.page is None
@@ -120,7 +118,7 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
     assert new.page is None
     assert new.extra_parameters == {'b': ['2']}
 
-    new = ApiEndpoint(request).for_filter(a=['1']).for_page(1)
+    new = ApiEndpoint(request).for_filter(a=['1']).for_page(1, None)
     assert new is not None
     assert new.page == 1
     assert new.extra_parameters == {'a': ['1']}

@@ -1347,6 +1347,50 @@ dl.field-display > dt {
 }
 
 /*
+    Cropper widget
+*/
+
+.cropper-widget {
+    .cropper-widget-canvas-container {
+        min-height: 320px;
+        max-height: 400px;
+        max-width: 640px;
+    }
+
+    .cropper-widget-toolbar {
+        display: flex;
+        flex-flow: row wrap;
+
+        label {
+            flex-basis: 100%;
+        }
+
+        .button {
+            flex-basis: 50%;
+            padding: 0;
+
+            &.postfix {
+                border-left: 0;
+            }
+        }
+    }
+}
+
+.cropper-widget-circular {
+    .cropper-view-box {
+        border-radius: 50%;
+    }
+
+    .cropper-face {
+        background-color:inherit !important;
+    }
+
+    .cropper-dashed {
+        display: none;
+    }
+}
+
+/*
     simple listed content
 */
 .with-lead {
@@ -3583,6 +3627,15 @@ button {
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
+
+        &.add-reservation {
+            height: 1.25rem;
+            font-size: .675rem;
+            border-radius: .4rem;
+            padding: .2em .4em;
+            margin: 2px 4px;
+            float: right;
+        }
 
         .fc-icon {
             margin-top: -4px;
@@ -7363,7 +7416,7 @@ a#results {
 
         .event-unavailable {
             background-color: $red;
-            cursor: not-allowed;
+            cursor: not-allowed !important;
         }
 
         .event-partly-available {
@@ -7683,4 +7736,8 @@ p.full-text-width {
             border: 2px solid $primary-color !important;
         }
     }
+}
+
+.sidebar-toggler {
+    display: none; // only displayed in Winterthur
 }

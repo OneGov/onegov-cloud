@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from onegov.core.orm import SessionManager
 from onegov.file.attachments import IMAGE_QUALITY

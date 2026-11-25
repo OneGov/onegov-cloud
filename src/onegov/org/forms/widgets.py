@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.form.widgets import UploadWidget, UploadMultipleWidget
 from onegov.org import _

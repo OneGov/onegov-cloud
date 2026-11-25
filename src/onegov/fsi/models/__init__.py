@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent

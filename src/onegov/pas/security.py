@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
@@ -21,8 +19,8 @@ from onegov.user import User
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
-    from morepath import Identity
 
 
 """

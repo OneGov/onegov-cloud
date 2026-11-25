@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
@@ -8,6 +6,7 @@ from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired, Email
 
@@ -49,11 +48,12 @@ class CourseAttendeeForm(Form):
     @cached_property
     def unique_permission_codes(self) -> tuple[str, ...]:
         return tuple(
-            code for code, in self.request.session.query(
-                CourseAttendee.organisation.distinct().label('code')
+            code  # type: ignore[misc]
+            for code, in self.request.session.query(
+                CourseAttendee.organisation.label('code')
             ).order_by(CourseAttendee.organisation).filter(
                 CourseAttendee.organisation.isnot(None)
-            )
+            ).distinct()
         )
 
     def update_model(self, model: CourseAttendee) -> None:
@@ -86,7 +86,9 @@ class CourseAttendeeForm(Form):
         if external_attendee_org not in organisations:
             organisations = (external_attendee_org, *organisations)
 
-        self.organisation.choices = [(org, org) for org in organisations]
+        self.organisation.choices = [
+            SelectChoice(org) for org in organisations
+        ]
 
     def on_request(self) -> None:
         # is an external
@@ -95,7 +97,7 @@ class CourseAttendeeForm(Form):
         else:
             self.delete_field('email')
             self.permissions.choices = [
-                (code, code) for code in self.unique_permission_codes
+                SelectChoice(code) for code in self.unique_permission_codes
             ]
         if self.model.user_id or not self.request.is_manager:
             self.delete_field('organisation')

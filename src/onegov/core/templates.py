@@ -32,8 +32,6 @@ The folder can either be a directory relative to the app class or an absolute
 path.
 
 """
-from __future__ import annotations
-
 import os.path
 
 from chameleon import PageTemplate as PageTemplateBase

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
@@ -348,8 +346,11 @@ class SliderWidget:
     template = """
         <xsl:template match="slider">
             <div metal:use-macro="layout.macros['slider']"
-            tal:define="height_m '{@height-m}';
-            height_d '{@height-d}'; searchbox '{@searchbox}';"
+            tal:define="
+                height_m {ogc:safe-string(@height-m)};
+                height_d {ogc:safe-string(@height-d)};
+                searchbox {ogc:safe-string(@searchbox)};
+            "
             />
         </xsl:template>
     """

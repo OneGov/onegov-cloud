@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem

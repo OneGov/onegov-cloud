@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
@@ -22,8 +20,8 @@ from sqlalchemy.orm import object_session
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity
     from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
     from sqlalchemy.orm import Session
 

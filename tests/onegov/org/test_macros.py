@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.core.templates import render_macro
 from onegov.core.utils import append_query_param, Bunch

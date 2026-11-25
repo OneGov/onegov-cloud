@@ -1,7 +1,5 @@
 """Type definitions for JSON import data structures."""
 
-from __future__ import annotations
-
 import logging
 from typing import Literal, TypedDict
 
@@ -80,7 +78,14 @@ class OrganizationData(TypedDict):
     modified: str
     name: str
     organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+        Literal[
+            'Kommission',
+            'Interkantonale Kommission',
+            'Fraktion',
+            'Kantonsrat',
+            'Sonstige',
+        ]
+        | None
     )
     primaryEmail: None
     status: int
@@ -98,7 +103,14 @@ class OrganizationDataWithinMembership(TypedDict):
     modified: str
     name: str
     organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+        Literal[
+            'Kommission',
+            'Interkantonale Kommission',
+            'Fraktion',
+            'Kantonsrat',
+            'Sonstige',
+        ]
+        | None
     )
     primaryEmail: EmailData | None
     status: int

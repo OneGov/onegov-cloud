@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import MessageCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.orm.audit import AuditEntryCollection

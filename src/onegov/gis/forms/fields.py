@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from base64 import b64decode, b64encode
 from markupsafe import Markup
 from onegov.core.custom import json

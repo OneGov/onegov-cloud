@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security.permissions import Intent
@@ -9,7 +7,7 @@ from onegov.election_day import ElectionDayApp
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity
+    from onegov.core import Identity
 
 
 class MaybePublic(Intent):

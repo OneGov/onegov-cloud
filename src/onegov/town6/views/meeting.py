@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import os
 import zipfile
@@ -7,6 +5,7 @@ import zipfile
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+from sqlalchemy import or_
 from webob.exc import HTTPNotFound
 from webob.response import Response
 
@@ -21,18 +20,35 @@ from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
 from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
+from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
 from onegov.town6.layout import MeetingLayout
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
     from onegov.core.request import CoreRequest
+
+
+def get_meeting_item_business(
+    item: MeetingItem,
+    request: TownRequest,
+) -> PoliticalBusiness | None:
+    if item.political_business_link_id:
+        return (
+            request.session.query(PoliticalBusiness)
+            .filter(
+                PoliticalBusiness.meta['self_id'].astext
+                == item.political_business_link_id
+            )
+            .first()
+        )
+    return item.political_business
 
 
 def get_meeting_form_class(
@@ -150,35 +166,67 @@ def view_meeting(
 
     # Construct meeting items with political business links
     meeting_items_with_links = []
+    businesses = PoliticalBusinessCollection(request)
     for item in self.meeting_items or []:
-        item_data = {
+        item_data: dict[str, Any] = {
             'number': item.number,
             'title': item.title,
             'business_type': None,
             'political_business_link': None
         }
 
-        if item.political_business_link_id:
-            business = request.session.query(PoliticalBusiness).filter(
-                PoliticalBusiness.meta['self_id'].astext ==
-                item.political_business_link_id
-            ).first()
-            if business is not None:
-                item_data['political_business_link'] = request.link(business)
-                item_data['business_type'] = (
-                    POLITICAL_BUSINESS_TYPE)[business.political_business_type]
-        else:
-            if item.political_business:
-                item_data['political_business_link'] = (
-                    request.link(item.political_business))
-                item_data['business_type'] = (
-                    POLITICAL_BUSINESS_TYPE)[item.political_business.political_business_type]
+        primary = get_meeting_item_business(item, request)
+        candidates = list(
+            dict.fromkeys(
+                ([primary] if primary is not None else [])
+                + item.political_businesses
+            )
+        )
+        visible = [
+            business
+            for business in candidates
+            if businesses.is_listed(business)
+        ]
+        if candidates and not visible:
+            continue
+        item_data['additional_businesses'] = [
+            {'title': business.title, 'url': request.link(business)}
+            for business in visible[1:]
+        ]
+        business = visible[0] if visible else None
+        if business is not None:
+            item_data['political_business_link'] = request.link(business)
+            item_data['business_type'] = POLITICAL_BUSINESS_TYPE[
+                business.political_business_type
+            ]
 
         meeting_items_with_links.append(item_data)
 
     meeting_items_with_links.sort(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
+
+    conditions = [
+        PoliticalBusiness.meta['self_id'].astext.in_(
+            self.meta.get('ogi_business_ids', [])
+        )
+    ]
+    source = self.meta.get('meeting_id')
+    if source:
+        conditions.append(
+            PoliticalBusiness.meta['ogi_meeting_ids'].contains([source])
+        )
+    agenda_ids = {item.political_business_id for item in self.meeting_items}
+    agenda_ids.update(
+        business.id
+        for item in self.meeting_items
+        for business in item.political_businesses
+    )
+    related_businesses = [
+        business
+        for business in businesses.query().filter(or_(*conditions))
+        if business.id not in agenda_ids and businesses.is_listed(business)
+    ]
 
     links: list[tuple[str, str]] = []
     if self.audio_link.strip():
@@ -192,6 +240,8 @@ def view_meeting(
     return {
         'layout': layout,
         'page': self,
+        'address': sanitize_html(self.address or ''),
+        'description': sanitize_html(self.description or ''),
         'text': '',
         'lead': '',
         'people': getattr(self, 'people', None),
@@ -200,6 +250,7 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'related_businesses': related_businesses,
         'show_side_panel': True if links else False,
         'sidepanel_links': links,
     }
@@ -288,6 +339,13 @@ def view_meeting_export(
     request: TownRequest,
     form: MeetingExportPoliticalBusinessForm
 ) -> RenderData | Response:
+    businesses = PoliticalBusinessCollection(request)
+    meeting_items = [
+        item
+        for item in self.meeting_items
+        if (business := get_meeting_item_business(item, request)) is None
+        or businesses.is_listed(business)
+    ]
 
     def build_zip_response() -> Response:
         meeting_doc_ids = form.get_selected_meeting_documents_ids()
@@ -318,7 +376,7 @@ def view_meeting_export(
                             )
 
                 # agenda item documents
-                for meeting_item in self.meeting_items:
+                for meeting_item in meeting_items:
                     business = meeting_item.political_business
                     if business:
                         for file in business.files:
@@ -352,7 +410,7 @@ def view_meeting_export(
 
     file_count = 0
     file_count += len(self.files)
-    for meeting_item in self.meeting_items:
+    for meeting_item in meeting_items:
         if meeting_item.political_business:
             file_count += len(meeting_item.political_business.files)
 
@@ -363,7 +421,7 @@ def view_meeting_export(
     meeting_items_no_docs = []
     if not self.files:
         meeting_items_no_docs.append(self.display_name)
-    for meeting_item in self.meeting_items:
+    for meeting_item in meeting_items:
         if not meeting_item.political_business:
             meeting_items_no_docs.append(meeting_item.display_name)
         else:

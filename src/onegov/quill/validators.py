@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.html import html_to_text
 from wtforms.validators import ValidationError
 

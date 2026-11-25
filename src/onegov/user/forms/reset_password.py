@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.form.validators import ValidPassword
 from onegov.user import _
@@ -77,5 +75,6 @@ class PasswordResetForm(Form):
             return False
 
         user.password = self.password.data
+        user.logout_all_sessions(request.app)
 
         return True

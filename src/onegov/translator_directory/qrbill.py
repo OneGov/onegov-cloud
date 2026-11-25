@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from onegov.translator_directory import log
 from onegov.translator_directory.constants import FINANZSTELLE
@@ -26,6 +24,15 @@ def is_valid_iban(value: str | None) -> bool:
         return True
     except Exception:
         return False
+
+
+def translator_to_creditor(translator: Translator) -> dict[str, str | None]:
+    return {
+        'name': f'{translator.first_name} {translator.last_name}',
+        'street': translator.address,
+        'pcode': translator.zip_code,
+        'city': translator.city,
+    }
 
 
 def generate_translator_qr_bill(
@@ -55,12 +62,7 @@ def generate_translator_qr_bill(
         log.error(f'Incomplete address for translator {translator.id}')
         return None
 
-    # Creditor (translator)
-    creditor = {
-        'name': f'{translator.first_name} {translator.last_name}',
-        'line1': translator.address,
-        'line2': f'{translator.zip_code} {translator.city}',
-    }
+    creditor = translator_to_creditor(translator)
 
     debtor_name = 'Polizei Schaffhausen'
     debtor_street = 'Beckenstube 1'

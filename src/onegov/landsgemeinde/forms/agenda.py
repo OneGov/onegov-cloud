@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 import zipfile
 import os
@@ -35,6 +33,7 @@ from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -61,7 +60,10 @@ class AgendaItemForm(NamedFileForm):
     state = RadioField(
         _('State'),
         fieldset=_('General'),
-        choices=list(STATES.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in STATES.items()
+        ],
         validators=[
             InputRequired()
         ],
@@ -173,6 +175,7 @@ class AgendaItemForm(NamedFileForm):
     def on_request(self) -> None:
         layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
+        self.request.include('cropper')
         self.request.include('editor')
         self.request.include('tags-input')
         self.memorial_page.description = _(

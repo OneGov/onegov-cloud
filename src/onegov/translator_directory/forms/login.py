@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user.forms import LoginForm as LoginFormBase
 
 

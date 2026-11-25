@@ -13,8 +13,6 @@ templates directly is faster.
 This module should eventually replace the elements.py module.
 
 """
-from __future__ import annotations
-
 from onegov.core.templates import render_macro
 
 

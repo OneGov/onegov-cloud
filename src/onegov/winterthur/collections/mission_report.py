@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import sedate
 
 from datetime import datetime, date
@@ -8,7 +6,7 @@ from onegov.org.models.file import BaseImageFileCollection
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportFile
 from onegov.winterthur.models import MissionReportVehicle
-from sqlalchemy import and_, or_, desc, func
+from sqlalchemy import and_, or_, func
 
 
 from typing import TYPE_CHECKING
@@ -104,7 +102,7 @@ class MissionReportCollection(
                 MissionReport.meta['access'] == None
             ))
 
-        return query.order_by(desc(MissionReport.date))
+        return query.order_by(MissionReport.date.desc())
 
     def query_current_year(self) -> Query[MissionReport]:
         return self.filter_by_year(self.query_all())

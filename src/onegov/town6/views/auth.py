@@ -1,6 +1,4 @@
 """ The authentication views. """
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.auth import MTANAuth
 from onegov.org.forms import CitizenLoginForm, ConfirmCitizenLoginForm

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.server.application import Application
 from onegov.server.core import Server
 from onegov.server.config import Config

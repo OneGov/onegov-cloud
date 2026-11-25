@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import chain
 from onegov.election_day import _
 from onegov.election_day.models import Election

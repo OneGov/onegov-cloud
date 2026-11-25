@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.forms import EventForm as OrgEventForm
 
 

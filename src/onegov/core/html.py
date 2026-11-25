@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 import turbohtml
 
@@ -156,12 +154,9 @@ def html_to_text(
         ),
         # NOTE: We don't care about producing valid markdown as much
         #       as producing something human-readable, the escaped
-        #       markdown would be a nuisance. This minimizes the
-        #       amount of escaping that will happen, although it would
-        #       be nice to have a `mode='none' that will attemp no
-        #       escaping whatsoever.
+        #       markdown would be a nuisance.
         escaping=turbohtml.Markdown.Escaping(
-            mode='minimal',
+            mode='none',
             asterisks=False,
             underscores=False,
         ),
@@ -195,8 +190,29 @@ def html_to_text(
     # use double newlines to get paragraphs
     plaintext = '\n\n'.join(lines)
 
-    # in an attempt to create proper markdown html2text will escape
-    # dots. Since markdown is not something we care about here, we undo that
-    plaintext = plaintext.replace('\\.', '.')
-
     return plaintext
+
+
+def truncate_node(node: turbohtml.Node, limit: int) -> int:
+    """ Safely truncates a parsed `turbohtml` node to `limit` characters.
+
+    This avoids splitting HTML tags in the middle or leaving some tags
+    unclosed, it also ensures the limit only applies to the actual
+    text, not to the markup that doesn't get rendered.
+
+    Based on the recipe provided by the turbohtml docs on truncating:
+    https://turbohtml.readthedocs.io/en/stable/how-to/truncating.html
+    """
+    budget = limit
+    for child in list(node):
+        if budget <= 0:
+            child.decompose()
+        elif isinstance(child, turbohtml.Text):
+            if len(child.data) > budget:
+                child.data = child.data[:budget].rstrip() + '...'
+                budget = 0
+            else:
+                budget -= len(child.data)
+        elif isinstance(child, turbohtml.Element):
+            budget = truncate_node(child, budget)
+    return budget

@@ -1,6 +1,4 @@
 """ The settings view, defining things like the logo or color of the org. """
-from __future__ import annotations
-
 from itertools import groupby
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
@@ -358,8 +356,13 @@ def handle_ticket_data_deletion_settings(
     request: OrgRequest,
     form: DataRetentionPolicyForm
 ) -> RenderData | Response:
-    request.message(_('Proceed with caution. Tickets and the data they '
-                      'contain may be irrevocable deleted.'), 'alert')
+    request.message(
+        _(
+            'Proceed with caution. Tickets and the data they contain, as well '
+            'as audit trail entries, may be irreversibly deleted.'
+        ),
+        'alert',
+    )
     return handle_generic_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),

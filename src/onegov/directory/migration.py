@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
 from sqlalchemy.orm import object_session, joinedload, undefer
@@ -295,6 +293,11 @@ class FieldTypeMigrations:
         return '{:%H:%M}'.format(value) if value else ''
 
     def radio_to_checkbox(self, value: str) -> list[str]:
+        return [value] if value else []
+
+    def fileinput_to_multiplefileinput(
+        self, value: dict[str, Any] | None
+    ) -> list[dict[str, Any]]:
         return [value] if value else []
 
     def text_to_url(self, value: str) -> str:

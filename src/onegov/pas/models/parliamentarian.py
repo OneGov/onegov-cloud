@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.parliament.models import Parliamentarian
 from onegov.pas.i18n import _
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
@@ -21,6 +19,10 @@ if TYPE_CHECKING:
 
 
 class PASParliamentarian(Parliamentarian, ORMSearchable):
+
+    @property
+    def title(self) -> str:
+        return f'{self.last_name} {self.first_name}'.strip()
 
     __mapper_args__ = {
         'polymorphic_identity': 'pas_parliamentarian',

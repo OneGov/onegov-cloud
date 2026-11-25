@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pdftotext import PDF  # type:ignore
 from onegov.pdf import log
 

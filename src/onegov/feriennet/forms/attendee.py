@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
@@ -9,6 +7,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.utils import encode_name, decode_name
+from onegov.feriennet.utils import tos_accepted_periods
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
@@ -19,6 +18,7 @@ from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, NumberRange
@@ -116,8 +116,8 @@ class AttendeeForm(AttendeeBase):
     gender = RadioField(
         label=_('Gender'),
         choices=[
-            ('female', _('Girl')),
-            ('male', _('Boy')),
+            SelectChoice('female', _('Girl')),
+            SelectChoice('male', _('Boy')),
         ],
         validators=[InputRequired()]
     )
@@ -225,8 +225,8 @@ class AttendeeSignupForm(AttendeeBase):
     gender = RadioField(
         label=_('Gender'),
         choices=[
-            ('female', _('Girl')),
-            ('male', _('Boy')),
+            SelectChoice('female', _('Girl')),
+            SelectChoice('male', _('Boy')),
         ],
         validators=[InputRequired()],
         depends_on=('attendee', 'other')
@@ -347,18 +347,21 @@ class AttendeeSignupForm(AttendeeBase):
             .order_by(Attendee.name)
         )
 
-        self.attendee.choices = [(a.id.hex, a.name) for a in attendees]
-        self.attendee.choices.append(('other', _('Add a new attendee')))
+        self.attendee.choices = [
+            *(SelectChoice(a.id.hex, a.name) for a in attendees),
+            SelectChoice('other', _('Add a new attendee')),
+        ]
 
         # override the default
         if self.attendee.data == '0xdeadbeef':
-            self.attendee.data = self.attendee.choices[0][0]
+            self.attendee.data = self.attendee.choices[0].value
 
     def populate_tos(self) -> None:
         assert self.request.current_user is not None
 
         url = self.request.app.org.meta.get('tos_url', None)
-        if not url or self.request.current_user.data.get('tos_accepted', None):
+        accepted = tos_accepted_periods(self.request.current_user.data)
+        if not url or self.model.period_id.hex in accepted:
             self.delete_field('accept_tos')
             return
 

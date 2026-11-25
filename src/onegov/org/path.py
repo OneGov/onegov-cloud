@@ -1,6 +1,4 @@
 """ Contains the paths to the different models served by onegov.org. """
-from __future__ import annotations
-
 import sedate
 from datetime import date, datetime
 from libres.db.models import ReservationBlocker
@@ -637,7 +635,11 @@ def get_allocation(app: OrgApp, resource: UUID, id: int) -> Allocation | None:
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        allocation = res.scheduler.allocations_by_ids((id, )).first()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        allocation = scheduler.allocations_by_ids((id, )).first()
 
         # always get the master, even if another id is requested
         return allocation and allocation.get_master()  # type:ignore
@@ -655,7 +657,11 @@ def get_reservation(
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        query = res.scheduler.managed_reservations()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        query = scheduler.managed_reservations()
         query = query.filter(Reservation.id == id)
 
         return query.first()  # type:ignore[return-value]
@@ -676,7 +682,11 @@ def get_reservation_blocker(
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        query = res.scheduler.managed_blockers()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        query = scheduler.managed_blockers()
         query = query.filter(ReservationBlocker.id == id)
 
         return query.first()
@@ -741,20 +751,20 @@ def get_person_move(
     target: str
 ) -> PagePersonMove | None:
 
-    if subject == target:
-        raise exc.HTTPBadRequest()
-
     session = app.session()
     page = PageCollection(session).by_id(key)
 
     if isinstance(page, PersonLinkExtension):
-        return PagePersonMove(  # type:ignore[unreachable]
+        move = PagePersonMove(  # type:ignore[unreachable]
             session,
             page,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 
@@ -775,13 +785,16 @@ def get_form_move(
     form = FormCollection(session).definitions.by_name(key)
 
     if isinstance(form, PersonLinkExtension):
-        return FormPersonMove(  # type:ignore[unreachable]
+        move = FormPersonMove(  # type:ignore[unreachable]
             session,
             form,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 
@@ -802,13 +815,16 @@ def get_resource_move(
     resource = ResourceCollection(app.libres_context).by_id(key)
 
     if isinstance(resource, PersonLinkExtension):
-        return ResourcePersonMove(  # type:ignore[unreachable]
+        move = ResourcePersonMove(  # type:ignore[unreachable]
             session,
             resource,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 

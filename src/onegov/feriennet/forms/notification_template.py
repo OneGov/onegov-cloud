@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from functools import cached_property
-from markupsafe import Markup, escape
+from markupsafe import escape
 
 from onegov.activity import Activity, Attendee, OccasionNeed, Volunteer
 from onegov.activity import Booking, BookingCollection
@@ -16,8 +14,9 @@ from onegov.form import Form
 from onegov.form.fields import (MultiCheckboxField, HtmlField,
                                 TranslatedSelectField)
 from onegov.user import User, UserCollection
-from sqlalchemy import distinct, or_, and_, select, exists
+from sqlalchemy import or_, and_, select, exists
 from uuid import uuid4
+from wtforms import SelectChoice
 from wtforms.fields import BooleanField, StringField, RadioField
 from wtforms.validators import InputRequired, ValidationError
 
@@ -66,37 +65,49 @@ class NotificationTemplateSendForm(Form):
     send_to = TranslatedSelectField(
         label=_('Send to'),
         choices=[
-            ('myself', _(
-                'Myself'
-            )),
-            ('active_organisers', _(
-                'Organisers with an occasion'
-            )),
-            ('inactive_organisers', _(
-                'Organisers without occasions'
-            )),
-            ('volunteers', _(
-                'Volunteers'
-            )),
-            ('by_role', _(
-                'Users of a given role'
-            )),
-            ('with_wishlist', _(
-                'Users with wishes'
-            )),
-            ('with_accepted_bookings', _(
-                'Users with accepted bookings'
-            )),
-            ('with_no_wishes_or_bookings', _(
-                'Users with attendees that have no wishes or bookings'
-            )),
-            ('with_unpaid_bills', _(
-                'Users with unpaid bills'
-            )),
-            ('by_occasion', _(
-                'Users with attenedees that have an occasion on their '
-                'wish- or booking-list'
-            ))
+            SelectChoice(
+                'myself',
+                _('Myself')
+            ),
+            SelectChoice(
+                'active_organisers',
+                _('Organisers with an occasion')
+            ),
+            SelectChoice(
+                'inactive_organisers',
+                _('Organisers without occasions')
+            ),
+            SelectChoice(
+                'volunteers',
+                _('Volunteers')
+            ),
+            SelectChoice(
+                'by_role',
+                _('Users of a given role')
+            ),
+            SelectChoice(
+                'with_wishlist',
+                _('Users with wishes')
+            ),
+            SelectChoice(
+                'with_accepted_bookings',
+                _('Users with accepted bookings')
+            ),
+            SelectChoice(
+                'with_no_wishes_or_bookings',
+                _('Users with attendees that have no wishes or bookings')
+            ),
+            SelectChoice(
+                'with_unpaid_bills',
+                _('Users with unpaid bills')
+            ),
+            SelectChoice(
+                'by_occasion',
+                _(
+                    'Users with attenedees that have an occasion on '
+                    'their wish- or booking-list'
+                )
+            )
         ],
         default='by_role'
     )
@@ -104,10 +115,10 @@ class NotificationTemplateSendForm(Form):
     volunteer_state = RadioField(
         label=_('State'),
         choices=[
-            ('all', _('All')),
-            ('open', _('Open')),
-            ('contacted', _('Contacted')),
-            ('confirmed', _('Confirmed')),
+            SelectChoice('all', _('All')),
+            SelectChoice('open', _('Open')),
+            SelectChoice('contacted', _('Contacted')),
+            SelectChoice('confirmed', _('Confirmed')),
         ],
         depends_on=('send_to', 'volunteers'),
         default='all',
@@ -116,9 +127,9 @@ class NotificationTemplateSendForm(Form):
     roles = MultiCheckboxField(
         label=_('Role'),
         choices=[
-            ('admin', _('Administrators')),
-            ('editor', _('Organisers')),
-            ('member', _('Members'))
+            SelectChoice('admin', _('Administrators')),
+            SelectChoice('editor', _('Organisers')),
+            SelectChoice('member', _('Members'))
         ],
         depends_on=('send_to', 'by_role')
     )
@@ -132,8 +143,8 @@ class NotificationTemplateSendForm(Form):
     state = MultiCheckboxField(
         label=_('Useraccounts'),
         choices=[
-            ('active', _('Active users')),
-            ('inactive', _('Inactive users')),
+            SelectChoice('active', _('Active users')),
+            SelectChoice('inactive', _('Inactive users')),
         ],
         default=['active'],
         depends_on=(
@@ -213,7 +224,7 @@ class NotificationTemplateSendForm(Form):
         elif self.state.data != ['active', 'inactive']:
             return set()
 
-        return {u.username for u in users.with_entities(User.username)}
+        return {username for username, in users.with_entities(User.username)}
 
     def recipients_by_role(self, roles: Collection[str]) -> set[str]:
         if not roles:
@@ -232,9 +243,9 @@ class NotificationTemplateSendForm(Form):
 
         q = bookings.query().order_by(None)
         q = q.filter_by(period_id=self.period.id)
-        q = q.with_entities(distinct(Booking.username).label('username'))
+        uq = q.with_entities(Booking.username)
 
-        return {b.username for b in q}
+        return {username for username, in uq.distinct()}
 
     def recipients_with_accepted_bookings(self) -> set[str]:
         bookings = BookingCollection(self.request.session)
@@ -247,9 +258,9 @@ class NotificationTemplateSendForm(Form):
             period_id=self.period.id,
             state='accepted')
 
-        q = q.with_entities(distinct(Booking.username).label('username'))
+        uq = q.with_entities(Booking.username)
 
-        return {b.username for b in q}
+        return {username for username, in uq.distinct()}
 
     def recipients_with_no_wishes_or_bookings(self) -> set[str]:
         session = self.request.session
@@ -259,12 +270,12 @@ class NotificationTemplateSendForm(Form):
         q_with = bookings.query().order_by(None)
         q_with = q_with.filter_by(period_id=self.period.id)
         q_with = q_with.with_entities(
-            distinct(Booking.username).label('username'))
+            Booking.username.label('username'))
         usernames_with = {b.username for b in q_with}
 
         # Alle Usernames die mindestens einen Attendee haben
-        q_all = session.query(distinct(Attendee.username))
-        usernames_with_attendees = {row[0] for row in q_all}
+        q_all = session.query(Attendee.username)
+        usernames_with_attendees = {username for username, in q_all.distinct()}
 
         return usernames_with_attendees - usernames_with
 
@@ -275,9 +286,9 @@ class NotificationTemplateSendForm(Form):
         q = q.join(Activity)
         q = q.filter(Occasion.cancelled == False)
 
-        uq = q.with_entities(distinct(Activity.username))
+        uq = q.with_entities(Activity.username)
 
-        return {username for username, in uq}
+        return {username for username, in uq.distinct()}
 
     def recipients_which_are_inactive_organisers(self) -> set[str]:
         organisers = UserCollection(self.request.session).query().filter_by(
@@ -331,9 +342,9 @@ class NotificationTemplateSendForm(Form):
     ) -> set[str]:
 
         q = self.recipients_by_occasion_query(occasions)
-        q = q.with_entities(distinct(Booking.username).label('username'))
+        uq = q.with_entities(Booking.username.label('username'))
 
-        attendees = {r.username for r in q}
+        attendees = {username for username, in uq.distinct()}
 
         if not include_organisers:
             return attendees
@@ -341,18 +352,19 @@ class NotificationTemplateSendForm(Form):
         q2 = OccasionCollection(self.request.session).query()
         q2 = q2.join(Activity)
         q2 = q2.filter(Occasion.id.in_(occasions))
-        uq = q2.with_entities(distinct(Activity.username))
+        uq = q2.with_entities(Activity.username)
 
-        organisers = {username for username, in uq}
+        organisers = {username for username, in uq.distinct()}
 
         return attendees | organisers
 
     def recipients_volunteers(self, state: str) -> set[str]:
         query = (
-            self.request.session.query(distinct(Volunteer.email))
+            self.request.session.query(Volunteer.email)
             .join(OccasionNeed)
             .join(Occasion)
             .filter(Occasion.period_id == self.period.id)
+            .distinct()
         )
 
         if state != 'all':
@@ -361,7 +373,7 @@ class NotificationTemplateSendForm(Form):
         return {v for v, in query}
 
     @property
-    def occasion_choices(self) -> Iterator[tuple[str, Markup]]:
+    def occasion_choices(self) -> Iterator[SelectChoice]:
         layout = DefaultLayout(self.model, self.request)
 
         stmt = as_selectable_from_path(
@@ -397,4 +409,4 @@ class NotificationTemplateSendForm(Form):
                     layout.format_datetime_range(*d) for d in record.dates
                 )
             })
-            yield record.occasion_id.hex, label
+            yield SelectChoice(record.occasion_id.hex, label)

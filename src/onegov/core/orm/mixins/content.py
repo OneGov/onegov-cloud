@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import escape, Markup
 from onegov.core.orm.types import MarkupText
 from sqlalchemy import func, literal, type_coerce
@@ -416,7 +414,7 @@ class dict_markup_property[MarkupT: (Markup, Markup | None)](  # ruff:ignore[inv
     def _default_expr(self, owner: type[Any]) -> ColumnElement[MarkupT]:
         return type_coerce(
             getattr(owner, self.attribute)[self.key].as_string(),
-            MarkupText()  # type: ignore[arg-type]
+            MarkupText()
         )
 
     @overload

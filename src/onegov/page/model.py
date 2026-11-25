@@ -4,8 +4,6 @@ of content in a hierarchy.
 See also: `<https://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
 
 """
-from __future__ import annotations
-
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 

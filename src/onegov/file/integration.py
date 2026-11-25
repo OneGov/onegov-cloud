@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import os.path
 import shlex
@@ -38,7 +36,7 @@ from tempfile import SpooledTemporaryFile
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable, Generator
     from depot.io.interfaces import FileStorage
     from functools import cached_property
     from onegov.core.orm import SessionManager
@@ -434,7 +432,7 @@ class DepotApp(App):
         depot_storage_path: str | None = None,
         # FIXME: Remove this parameter
         **ignored: Any
-    ) -> Iterator[None]:
+    ) -> Generator[None]:
         """ Temporarily use another depot. """
 
         original_depot_backend = self.depot_backend

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from onegov.election_day.formats import import_ech
 from onegov.election_day.models import Canton

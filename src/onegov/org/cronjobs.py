@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 import pytz
 import logging
@@ -15,6 +13,7 @@ from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.audit import AuditEntry
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory import DirectoryEntry
@@ -60,6 +59,7 @@ from onegov.search.utils import get_polymorphic_base
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
+from operator import attrgetter
 from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
@@ -620,11 +620,14 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         )
         .order_by(Resource.group, Resource.name, Resource.id)
     )
-
     resources = OrderedDict(
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
+    virtual_ids: dict[UUID, UUID] = {
+        r.id: Resource.get_virtual_id(r.id)
+        for r in all_resources
+    }
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -633,7 +636,10 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     # load all approved reservations for all required resources
     all_reservations = (
         request.session.query(Reservation)
-        .filter(Reservation.resource.in_(resource_ids))
+        .filter(Reservation.resource.in_(
+            # internal reservations happen on the virtual id
+            resources.keys() | virtual_ids.values()
+        ))
         .filter(Reservation.status == 'approved')
         .filter(Reservation.data['accepted'] == True)
         .filter(and_(start <= Reservation.start, Reservation.start <= end))
@@ -660,11 +666,26 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
             reservation.submission = submission  # type:ignore
 
     # group the reservations by resource
-    reservations = {
+    reservations: dict[str, tuple[Reservation, ...]] = {
         resid.hex: tuple(reservations) for resid, reservations in groupby(
-            all_reservations, key=lambda r: r.resource
+            all_reservations, key=attrgetter('resource')
         )
     }
+
+    # merge reservations from virtual id into resource id
+    for resource_id, virtual_id in virtual_ids.items():
+        pending = reservations.pop(virtual_id.hex, None)
+        if pending is None:
+            continue
+
+        if existing := reservations.get(resource_id.hex):
+            # when merging we need to re-sort the reservations
+            merged = [*existing, *pending]
+            merged.sort(key=attrgetter('start'))
+            reservations[resource_id.hex] = tuple(merged)
+        else:
+            # no merging required just assign it to the correct id
+            reservations[resource_id.hex] = pending
 
     # send out the e-mails
     args: RenderData = {
@@ -676,11 +697,11 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         ),
         'organisation': request.app.org.title,
         'resources': resources,
+        'reservations': reservations,
     }
 
     for address, included_resources in recipients:
         args['included_resources'] = included_resources
-        args['reservations'] = reservations
 
         content = render_template(
             'mail_daily_resource_usage_overview.pt', request, args
@@ -724,10 +745,12 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
     # load the resources these reservations belong to
     resources = ResourceCollection(request.app.libres_context)
     resources_by_id = {
-        resource.id: resource
+        resource_id: resource
         for resource in resources.query()
         .filter(Resource.id.in_({r.resource for r in all_reservations}))
         .filter(Resource.enable_reservation_reminders)
+        # add a key for both the real and virtual resource id
+        for resource_id in (resource.id, resource.virtual_id)
     }
 
     # load the linked form submissions (the reservation confirmation)
@@ -894,6 +917,18 @@ def delete_old_tickets(request: OrgRequest) -> None:
     delete_tickets_and_related_data(request, query)
 
 
+@OrgApp.cronjob(hour=5, minute=45, timezone='Europe/Zurich')
+def delete_old_audit_entries(request: OrgRequest) -> None:
+    delete_timespan = request.app.org.audit_trail_delete_timespan
+    if not delete_timespan:
+        return
+
+    cutoff_date = utcnow() - timedelta(days=delete_timespan)
+    request.session.query(AuditEntry).filter(
+        AuditEntry.created <= cutoff_date
+    ).delete(synchronize_session=False)
+
+
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
 def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
@@ -970,7 +1005,7 @@ def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
     ).filter(and_(
         func.extract('year', SigningRequest.created) == year,
         func.extract('month', SigningRequest.created) == month,
-    )).group_by(SigningRequest.service_name).tuples())
+    )).group_by(SigningRequest.service_name))
     if not signing_request_counts:
         # don't send a mail if we generated no mTANs
         return

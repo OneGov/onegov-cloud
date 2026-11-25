@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Secret
 from onegov.org.views.dashboard import citizen_dashboard, dashboard
 from onegov.town6 import TownApp

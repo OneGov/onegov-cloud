@@ -1,6 +1,4 @@
 """ Renders and handles defined forms, turning them into submissions. """
-from __future__ import annotations
-
 import morepath
 from datetime import date
 from onegov.core.elements import Link

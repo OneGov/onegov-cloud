@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import ModelBase
 from onegov.core.orm import SessionManager
 from onegov.core.orm.mixins import ContentMixin

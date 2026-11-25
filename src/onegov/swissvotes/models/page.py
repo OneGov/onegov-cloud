@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Mapping
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid

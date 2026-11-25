@@ -1,11 +1,10 @@
-from __future__ import annotations
-
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.org.forms.fields import HtmlField
 from onegov.user import User, UserCollection
+from wtforms import SelectChoice
 from wtforms.fields import TextAreaField, SelectField, StringField
 from wtforms.validators import InputRequired
 
@@ -13,10 +12,9 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
-    from wtforms.fields.choices import _Choice
 
 
-TAGS = tuple((tag, tag) for tag in (
+TAGS = tuple(SelectChoice(tag) for tag in (
     _('Accessible'),
     _('Adventure'),
     _('Animals'),
@@ -92,7 +90,7 @@ class VacationActivityForm(Form):
     )
 
     @property
-    def username_choices(self) -> list[_Choice]:
+    def username_choices(self) -> list[SelectChoice]:
         assert self.request.is_admin  # safety net
 
         users = (
@@ -101,11 +99,11 @@ class VacationActivityForm(Form):
             .with_entities(User.username, User.title)
         )
 
-        def by_title(choice: _Choice) -> str:
-            return normalize_for_url(choice[1])
+        def by_title(choice: SelectChoice) -> str:
+            return normalize_for_url(choice.label)
 
         return sorted((
-            (username, title) for username, title in users
+            SelectChoice(username, title) for username, title in users
         ), key=by_title)
 
     def set_username_default(self, value: str) -> None:

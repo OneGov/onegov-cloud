@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html i18n:domain="onegov.pas">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <header class="report-heading">
+            <h1>${type_label}</h1>
+            <p class="report-subtitle" tal:condition="commission">
+                ${commission}
+            </p>
+        </header>
+        <table class="session-details">
+            <tbody>
+                <tr>
+                    <th i18n:translate="">Session date</th>
+                    <td>${date_label}</td>
+                    <th i18n:translate="">Duration</th>
+                    <td>
+                        <span tal:content="python:format(duration / 60, '.2f')">0</span>
+                        h
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="attendee-count">
+            <strong>${len(attendances)}</strong>
+            <span i18n:translate="">Parliamentarians</span>
+        </p>
+        <table class="attendances">
+            <thead>
+                <tr>
+                    <th i18n:translate="">Parliamentarian</th>
+                    <th i18n:translate="">Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="attendance attendances">
+                    <td>${attendance.parliamentarian.title}</td>
+                    <td>
+                        <span tal:content="python:format(attendance.duration / 60, '.2f')">0</span>
+                        h
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
@@ -24,7 +22,6 @@ from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
-from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -142,6 +139,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
     #: when the source of the event was last updated (if imported)
     source_updated: dict_property[str | None] = meta_property()
+
+    #: whether an imported event has been edited locally, in which case
+    #: its contents are no longer overwritten by subsequent imports
+    locally_modified: dict_property[bool] = meta_property(default=False)
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence: Mapped[str | None]
@@ -323,7 +324,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         past = base.filter(
             Occurrence.end <= now
-        ).order_by(desc(Occurrence.start))
+        ).order_by(Occurrence.start.desc())
 
         return current.union_all(future, past).first()
 

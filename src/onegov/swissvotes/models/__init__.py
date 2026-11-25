@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.column_mapper import ColumnMapperDataset
 from onegov.swissvotes.models.column_mapper import ColumnMapperMetadata

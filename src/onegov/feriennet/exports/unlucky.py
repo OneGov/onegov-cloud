@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import AttendeeCollection, Attendee, Booking
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -61,8 +59,12 @@ class UnluckyExport(FeriennetExport):
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for user in self.query(session, period):
-            yield ((k, v) for k, v in self.fields(user))
+            yield ((k, v) for k, v in self.fields(period, user))
 
-    def fields(self, attendee: Attendee) -> Iterator[tuple[str, Any]]:
+    def fields(
+        self,
+        period: BookingPeriod | BookingPeriodMeta,
+        attendee: Attendee
+    ) -> Iterator[tuple[str, Any]]:
         yield from self.attendee_fields(attendee)
-        yield from self.user_fields(attendee.user)
+        yield from self.user_fields(attendee.user, period.id)

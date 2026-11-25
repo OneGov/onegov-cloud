@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.forms.allocation import AllocationRuleForm
 from onegov.org.forms.allocation import BatchCopyAllocationRulesForm
 from onegov.org.forms.allocation import DaypassAllocationEditForm

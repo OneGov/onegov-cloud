@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import or_
 
 from onegov.core.collection import Pagination, GenericCollection

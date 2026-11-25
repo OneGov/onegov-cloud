@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import escape, Markup
 from sqlalchemy.types import TypeDecorator, TEXT
 

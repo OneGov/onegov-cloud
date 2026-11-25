@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from io import BytesIO
 from onegov.core.csv import convert_list_of_dicts_to_csv

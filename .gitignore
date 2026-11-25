@@ -110,3 +110,5 @@ dump.rdb
 .aider*
 
 .DS_Store
+
+.playwright-mcp

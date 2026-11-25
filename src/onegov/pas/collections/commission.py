@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.parliament.collections import CommissionCollection
 from onegov.pas.models import PASCommission
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from typing import NamedTuple
 from onegov.translator_directory import _
@@ -249,6 +247,14 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
         'Schlichtungsstelle für Mietsachen',
         'Herrenacker 26, 8200 Schaffhausen'
     ),
+    'betreibungsamt': (
+        'Betreibungsamt Schaffhausen',
+        'Münsterplatz 31, 8200 Schaffhausen'
+    ),
+    'konkursamt': (
+        'Konkursamt Schaffhausen',
+        'Kronengässchen 3, 8200 Schaffhausen'
+    ),
 }
 
 
@@ -329,5 +335,12 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         zip_code='8200',
         city='Schaffhausen',
         kostenstelle='3035',
+    ),
+    'betreibungs_und_konkursamt': Finanzstelle(
+        name='Betreibungs- und Konkursamt',
+        street='Münsterplatz 31',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='3095',
     ),
 }

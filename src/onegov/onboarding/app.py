@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.onboarding.theme import OnboardingTheme

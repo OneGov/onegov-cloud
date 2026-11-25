@@ -1,6 +1,4 @@
 """ The authentication views. """
-from __future__ import annotations
-
 import morepath
 
 from onegov.core.markdown import render_untrusted_markdown
@@ -425,7 +423,11 @@ def handle_mtan_second_factor(
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
-    if user is None:
+    if user is None or not user.active:
+        request.browser_session.pop('pending_username')
+        request.browser_session.pop('mtan_setup_username')
+        request.browser_session.pop('mtan_setup')
+
         if request.current_user:
             # redirect already logged in users to the redirect_to
             return self.redirect(request, self.to)
@@ -453,6 +455,7 @@ def handle_mtan_second_factor(
             del request.browser_session['pending_username']
             if is_mtan_setup:
                 factor.complete_activation(user, mobile_number)
+                del request.browser_session['mtan_setup_username']
                 del request.browser_session['mtan_setup']
 
             response = self.complete_login(user, request)
@@ -532,6 +535,9 @@ def handle_mtan_second_factor_setup(
             _('Failed to continue login, please ensure cookies are allowed.')
         )
         return morepath.redirect(request.link(self, name='login'))
+    elif request.browser_session.get('mtan_setup_username') != username:
+        # this must've leaked from a previous login attempt with another user
+        raise exc.HTTPNotFound()
 
     if form.submitted(request):
         phone_number = form.phone_number.formatted_data
@@ -582,7 +588,8 @@ def handle_totp_second_factor(
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
-    if user is None:
+    if user is None or not user.active:
+        request.browser_session.pop('pending_username')
         if request.current_user:
             # redirect already logged in users to the redirect_to
             return self.redirect(request, self.to)

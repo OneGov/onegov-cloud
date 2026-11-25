@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 import stripe
 import transaction
@@ -18,9 +16,10 @@ from sqlalchemy.orm import object_session
 from uuid import UUID, uuid4, uuid5
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Callable, Iterator, Mapping
+    from collections.abc import (
+        Collection, Callable, Generator, Iterator, Mapping)
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
     from sqlalchemy.orm import Mapped, Query, Session
@@ -28,7 +27,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def stripe_api_key(key: str | None) -> Iterator[None]:
+def stripe_api_key(key: str | None) -> Generator[None]:
     old_key = stripe.api_key
     stripe.api_key = key
     try:
@@ -124,7 +123,7 @@ class StripeFeePolicy:
 class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy: FeePolicy = StripeFeePolicy
+    fee_policy: ClassVar[FeePolicy] = StripeFeePolicy
 
     #: the date of the payout
     payout_date: dict_property[datetime | None] = meta_property()
@@ -209,7 +208,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy: FeePolicy = StripeFeePolicy
+    fee_policy: ClassVar[FeePolicy] = StripeFeePolicy
 
     #: The Stripe Connect client id
     client_id: dict_property[str | None] = meta_property()

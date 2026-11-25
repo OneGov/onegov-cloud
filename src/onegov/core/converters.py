@@ -1,6 +1,4 @@
 """ Contains custom converters. """
-from __future__ import annotations
-
 import isodate
 import morepath
 

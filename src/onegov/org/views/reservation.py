@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 import isodate
 import morepath
+import secrets
 import pytz
 import sedate
 import transaction
@@ -14,6 +13,7 @@ from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
+from onegov.form.errors import UnableToComplete
 from onegov.org import _, log, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
@@ -34,7 +34,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationAdjustedMessage,
     ReservationMessage, ResourceRecipient, ResourceRecipientCollection)
-from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.resource import FindYourSpotCollection, RoomResource
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import emails_for_new_ticket, group_invoice_items
@@ -43,11 +43,9 @@ from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
-from onegov.user import Auth
-from onegov.user.collections import TANCollection
 from purl import URL
 from sqlalchemy import and_, or_
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc, Response
 from wtforms import HiddenField
 
@@ -176,8 +174,11 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
             start_time = time(0, 0)
             end_time = time(23, 59)
         else:
-            start_time = sedate.parse_time(start_str)
-            end_time = sedate.parse_time(end_str)
+            try:
+                start_time = sedate.parse_time(start_str)
+                end_time = sedate.parse_time(end_str)
+            except ValueError:
+                raise exc.HTTPBadRequest() from None
 
         try:
             start, end = sedate.get_date_range(
@@ -269,7 +270,7 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         blocking_resources = resource.blocking_resources()
         # Remove all the temporary reservations that would overlap this one
         for reservation in scheduler.session.query(Reservation).filter(
-            Reservation.resource.in_(blocking_resources)
+            Reservation.resource.in_(scheduler.blocking_resources)
         ).filter(Reservation.status != 'approved').filter(
             or_(
                 and_(
@@ -288,7 +289,153 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
             if reservation.session_id != session_id:
                 continue
 
-            blocking_resource.scheduler.remove_reservation(
+            if reservation.is_virtual:
+                blocking_scheduler = blocking_resource.virtual_scheduler
+            else:
+                blocking_scheduler = blocking_resource.scheduler
+
+            blocking_scheduler.remove_reservation(
+                reservation.token,
+                reservation.id
+            )
+
+    return respond_with_success(request)
+
+
+@OrgApp.json(
+    model=RoomResource,
+    name='internal-reserve',
+    request_method='POST',
+    permission=Private,
+    open_data=False
+)
+def internal_reserve(self: Resource, request: OrgRequest) -> JSON_ro:
+    """ Adds a single reservation to the list of reservations bound to the
+    current browser session.
+
+    In contrast to `reserve_allocation` this operates on the virtual resource
+    and creates an allocation if necessary. Therefore this is resource-scoped.
+
+    It is also only supported on room resources currently.
+
+    """
+
+    if self.date is None:
+        raise exc.HTTPBadRequest()
+
+    date = sedate.replace_timezone(
+        sedate.as_datetime(self.date),
+        self.timezone
+    )
+    quota = 1
+    whole_day = request.params.get('whole_day') == '1'
+    consider_blocking = request.params.get('consider_blocking') == '1'
+
+    if whole_day:
+        start_time = time(0, 0)
+        end_time = time(23, 59)
+    else:
+        start_str = request.params.get('start')
+        end_str = request.params.get('end')
+        if not isinstance(start_str, str) or not isinstance(end_str, str):
+            raise exc.HTTPBadRequest()
+        try:
+            start_time = sedate.parse_time(start_str)
+            end_time = sedate.parse_time(end_str)
+        except ValueError:
+            raise exc.HTTPBadRequest() from None
+
+    try:
+        start, end = sedate.get_date_range(
+            date,
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        err = request.translate(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return respond_with_error(request, err)
+
+    # does a virtual allocation already exist for this date?
+    scheduler = self.virtual_scheduler
+    allocation_range = sedate.get_date_range(
+        date,
+        time(0, 0),
+        time(23, 59)
+    )
+    if not request.session.query(
+        scheduler.allocations_in_range(*allocation_range).exists()
+    ).scalar():
+        savepoint = transaction.savepoint()
+        # if not create it
+        scheduler.allocate(
+            allocation_range,
+            partly_available=True,
+            whole_day=True,
+            quota=1,
+            quota_limit=1,
+        )
+    else:
+        savepoint = None
+
+    # FIXME: should this method be moved to the base class?
+    assert hasattr(self, 'bound_session_id')
+
+    # store the current pricing settings on the reservation
+    data: dict[str, Any] = {}
+    self.store_pricing_settings(data, None)
+
+    # try to reserve
+    try:
+        # Todo: This entry created remained after a reservation
+        # and the session id got lost
+        scheduler.reserve(
+            email='0xdeadbeef@example.org',  # will be set later
+            dates=(start, end),
+            data=data,
+            quota=quota,
+            session_id=self.bound_session_id(request),
+            single_token_per_session=True
+        )
+    except LibresError as e:
+        # if we created an allocation and failed to reserve, then we
+        # don't want that allocation to stick around.
+        if savepoint is not None:
+            savepoint.rollback()
+        return respond_with_error(request, utils.get_libres_error(e, request))
+
+    if consider_blocking and scheduler.blocking_names:
+        blocking_resources = self.blocking_resources()
+        # Remove all the temporary reservations that would overlap this one
+        for reservation in scheduler.session.query(Reservation).filter(
+            Reservation.resource.in_(scheduler.blocking_resources)
+        ).filter(Reservation.status != 'approved').filter(
+            or_(
+                and_(
+                    Reservation.start <= start,
+                    start < Reservation.end
+                ),
+                and_(
+                    start <= Reservation.start,
+                    Reservation.start < end
+                )
+            )
+        ):
+            blocking_resource = blocking_resources[reservation.resource]
+            # we ignore reservations from different sessions
+            session_id = blocking_resource.bound_session_id(request)  # type: ignore[attr-defined]
+            if reservation.session_id != session_id:
+                continue
+
+            if reservation.is_virtual:
+                blocking_scheduler = blocking_resource.virtual_scheduler
+            else:
+                blocking_scheduler = blocking_resource.scheduler
+
+            blocking_scheduler.remove_reservation(
                 reservation.token,
                 reservation.id
             )
@@ -321,14 +468,40 @@ def delete_reservation(self: Reservation, request: OrgRequest) -> JSON_ro:
     tickets = TicketCollection(request.session)
     ticket = tickets.by_handler_id(self.token.hex)
 
+    if self.is_virtual:
+        scheduler = resource.virtual_scheduler
+        virtual_allocation = self._target_allocations().first()
+    else:
+        scheduler = resource.scheduler
+        virtual_allocation = None
+
     try:
         if ticket:
             ticket.create_snapshot(request)
-        resource.scheduler.remove_reservation(self.token, self.id)
+        scheduler.remove_reservation(self.token, self.id)
     except LibresError as e:
         return respond_with_error(request, utils.get_libres_error(e, request))
-    else:
-        return respond_with_success(request)
+
+    # try to delete the virtual allocation, if we no longer need it
+    if (
+        virtual_allocation
+        and len(virtual_allocation.reserved_slots) == 0
+        and virtual_allocation.pending_reservations.count() == 0
+    ):
+        savepoint = transaction.savepoint()
+        try:
+            scheduler.remove_allocation(virtual_allocation.id)
+        except LibresError:
+            # ignore the error, since it's not critical, if we're worried
+            # about polluting the table, we can run `remove_unused_allocations`
+            # inside a cronjob or add a CLI command for it
+            log.warning(
+                'Failed to clean up unused virtual allocation',
+                exc_info=True
+            )
+            savepoint.rollback()
+
+    return respond_with_success(request)
 
 
 def get_reservation_form_class(
@@ -336,7 +509,7 @@ def get_reservation_form_class(
     request: OrgRequest
 ) -> type[ReservationForm]:
 
-    if resource.definition:
+    if resource.parsed is not None:
         form_class = resource.form_class
         assert form_class is not None
         return merge_forms(ReservationForm, form_class)
@@ -367,7 +540,11 @@ def handle_reservation_form(
             expiration_date=sedate.utcnow() - timedelta(hours=2)
         )
 
-    reservations_query = self.bound_reservations(request, with_data=True)  # type: ignore[attr-defined]
+    reservations_query = self.bound_reservations(  # type: ignore[attr-defined]
+        request,
+        with_data=True,
+        with_virtual=request.is_manager
+    )
     reservations: tuple[Reservation, ...] = tuple(reservations_query)
 
     assert_access_only_if_there_are_reservations(reservations)
@@ -415,7 +592,7 @@ def handle_reservation_form(
                     data['ticket_tag_meta'] = filtered_meta
 
         # add the submission if it doesn't yet exist
-        if self.definition and not submission:
+        if self.parsed is not None and not submission:
             form_class = self.form_class
             assert form_class is not None
             submission = forms.submissions.add_external(
@@ -426,11 +603,18 @@ def handle_reservation_form(
                 minimum_price_total=self.minimum_price_total,
             )
 
-        # update the data on the submission
+        # make any necessary changes to the submission
         if submission:
-            forms.submissions.update(
-                submission, form, exclude=form.reserved_fields
-            )
+            if self.parsed is None:
+                # the definition has been removed in the meantime
+                # so we can delete the submission
+                forms.submissions.delete(submission)
+                submission = None
+            else:
+                # update the data on the submission
+                forms.submissions.update(
+                    submission, form, exclude=form.reserved_fields
+                )
 
     # enforce the zip-code block if configured
     if request.POST:
@@ -455,14 +639,11 @@ def handle_reservation_form(
     else:
         data = {}
 
-        # the email is the same for all reservations
-        # Todo: This entry created remained after a reservation
-        if reservations[0].email != '0xdeadbeef@example.org':
-            data['email'] = reservations[0].email
-
+        if submission:
+            data.update(submission.data)
         # set defaults based on remembered submissions from session
         # TODO: should we first apply defaults based on the remembered tag?
-        if not request.POST and (remembered := {
+        elif not request.POST and (remembered := {
             field_id: value
             for key, value in request.browser_session.get(
                 'field_submissions', {}).items()
@@ -471,10 +652,25 @@ def handle_reservation_form(
         }):
             data.update(remembered)
 
-        if submission:
-            data.update(submission.data)
+        # the email is the same for all reservations
+        # Todo: This entry created remained after a reservation
+        if reservations[0].email != '0xdeadbeef@example.org':
+            data['email'] = reservations[0].email
+
+        # the same goes for the ticket tag
+        if 'ticket_tag' in form and reservations[0].data:
+            data['ticket_tag'] = reservations[0].data.get('ticket_tag', '')
 
         form.process(data=data)
+
+        if submission and not request.POST:
+            # ensure we don't generate a missing input error for the email
+            if form.email.data:
+                form.email.raw_data = [form.email.data]
+            # ensure we see the correct validation errors based on the
+            # already submitted data when we navigate back to edit it
+            form.validate()
+            form.ignore_csrf_error()
 
     if not form.errors and blocked:
         request.alert(_(
@@ -547,7 +743,10 @@ def handle_find_your_spot_reservation_form(
     reservations = {
         resource: bound
         for resource in request.exclude_invisible(self.query())
-        if (bound := list(resource.bound_reservations(request)))  # type:ignore
+        if (bound := list(resource.bound_reservations(  # type:ignore[attr-defined]
+            request,
+            with_virtual=request.is_manager
+        )))
     }
 
     assert_access_only_if_there_are_reservations(reservations)
@@ -602,10 +801,13 @@ def confirm_reservation(
     self: Resource,
     request: OrgRequest,
     layout: ReservationLayout | None = None
-) -> RenderData:
+) -> RenderData | Response:
 
     reservations: list[Reservation]
-    reservations = self.bound_reservations(request).all()  # type: ignore[attr-defined]
+    reservations = self.bound_reservations(  # type: ignore[attr-defined]
+        request,
+        with_virtual=request.is_manager
+    ).all()
     assert_access_only_if_there_are_reservations(reservations)
 
     token = reservations[0].token
@@ -615,6 +817,10 @@ def confirm_reservation(
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
+        form.validate()
+        form.ignore_csrf_error()
+        if form.errors:
+            return morepath.redirect(request.link(self, 'form'))
         item_extra = {'submission_id': submission.id}
         extras = form.invoice_items(
             cost_object=self.cost_object,
@@ -714,8 +920,13 @@ def confirm_reservation(
     request_method='POST'
 )
 def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
+    with_virtual = request.is_manager
     reservations: list[Reservation]
-    reservations = self.bound_reservations(request, with_data=True).all()  # type: ignore[attr-defined]
+    reservations = self.bound_reservations(  # type: ignore[attr-defined]
+        request,
+        with_data=True,
+        with_virtual=with_virtual
+    ).all()
     assert_access_only_if_there_are_reservations(reservations)
 
     session_id = self.bound_session_id(request)  # type:ignore
@@ -723,6 +934,16 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
+
+    # NOTE: We should try this first, we don't want to have to roll back
+    #       after we have already processed the payments.
+    if submission:
+        try:
+            forms.submissions.complete_submission(submission)
+        except UnableToComplete:
+            transaction.abort()
+            return morepath.redirect(request.link(self, name='form'))
+
     provider = request.app.default_payment_provider
     if request.method == 'GET' and (
         provider is None or not provider.payment_via_get
@@ -798,7 +1019,17 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 reservation.payment = payment
 
         self.scheduler.queries.confirm_reservations_for_session(session_id)
-        self.scheduler.approve_reservations(token)
+        if with_virtual:
+            # FIXME: This is a little clunky, maybe we should extend libres
+            #        with a version of this function that can include more
+            #        than one resource id, so we can approve both types of
+            #        reservations in a single call.
+            if any(r.is_virtual for r in reservations):
+                self.virtual_scheduler.approve_reservations(token)
+            if any(not r.is_virtual for r in reservations):
+                self.scheduler.approve_reservations(token)
+        else:
+            self.scheduler.approve_reservations(token)
 
     except LibresError as e:
         transaction.abort()
@@ -809,9 +1040,6 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             'failed_reservations', str(e.reservation.id))
 
         return morepath.redirect(url_obj.as_string())
-
-    if submission:
-        forms.submissions.complete_submission(submission)
 
     with request.session.no_autoflush:
         order_id = request.browser_session.get('ticket_order_id')
@@ -930,7 +1158,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         resource: bound
         for resource in request.exclude_invisible(collection.query())
         if (bound := list(
-            resource.bound_reservations(request)  # type:ignore
+            resource.bound_reservations(request, with_virtual=with_virtual)  # type:ignore
         ))
     }
 
@@ -972,28 +1200,64 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     return morepath.redirect(url)
 
 
-def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+def get_my_reservations_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: UUID | None = None
+) -> str | None:
+    """ Durable magic link to a limited summary of the recipient's
+    reservations, with an option to log in for full details.
+
+    When ``reservation_token`` is given, the limited view is restricted to
+    the reservations of that single ticket. """
     if not request.app.org.citizen_login_enabled:
         return None
 
-    auth = Auth.from_request(
-        request,
-        to=request.class_link(
-            ResourceCollection,
-            name='my-reservations'
-        )
+    salt = secrets.token_urlsafe(16)
+    payload = {
+        'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
+    }
+    return request.class_link(
+        ResourceCollection,
+        name='my-reservations',
+        query_params={
+            'token': request.new_url_safe_token(payload, salt),
+            'salt': salt,
+        }
     )
-    tans = TANCollection(request.session, scope='citizen-login')
-    tan_obj = tans.add(
-        client='unknown',
-        email=email,
-        redirect_to=auth.to,
-    )
-    return request.link(
-        auth,
-        name='confirm-citizen-login',
-        query_params={'token': tan_obj.tan}
-    )
+
+
+def get_reservations_subscribe_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: UUID | None = None
+) -> str | None:
+    """ Durable magic link to the recipient's reservations calendar feed.
+
+    When ``reservation_token`` is given, the feed is restricted to the
+    reservations of that single ticket. """
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.class_link(
+        ResourceCollection, name='my-reservations-ical'
+    ))
+    payload = {
+        'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
+    }
+    token = request.new_url_safe_token(payload, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    return url_obj.as_string()
 
 
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
@@ -1010,8 +1274,13 @@ def accept_reservation(
     assert resource is not None
     reservations = [
         reservation
-        for reservation in resource.scheduler
-                           .reservations_by_token(self.token)
+        for reservation in request.session
+                           .query(Reservation)
+                           .filter(Reservation.token == self.token)
+                           .filter(Reservation.resource.in_([
+                                resource.id,
+                                resource.virtual_id
+                            ]))
                            .order_by(Reservation.start)
         if not (reservation.data or {}).get('accepted')
     ]
@@ -1080,8 +1349,8 @@ def accept_reservation(
                             end=end,
                             components=group,
                         )
-                    except (KeyError, KabaApiError) as exc:
-                        if isinstance(exc, KabaApiError):
+                    except (KeyError, KabaApiError) as error:
+                        if isinstance(error, KabaApiError):
                             log.info('Kaba API error', exc_info=True)
 
                         # roll back previous changes
@@ -1147,7 +1416,10 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
-                    request, self.email
+                    request, self.email, self.token
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, self.email, self.token
                 ),
                 'cancel_url': _cancel_url,
             },
@@ -1170,7 +1442,7 @@ def accept_reservation(
             )
 
             for res in q:
-                if self.resource.hex in res.content[
+                if resource.id.hex in res.content[
                     'resources'
                 ] and res.content.get('new_reservations', False):
                     yield res.address
@@ -1342,8 +1614,15 @@ def _remove_reservation(
     assert resource is not None
     reservation_id_str = request.params.get('reservation-id')
     all_reservations: list[Reservation] = (
-        resource.scheduler.reservations_by_token(token)  # type:ignore
-        .order_by(Reservation.start).all()
+        request.session
+        .query(Reservation)
+        .filter(Reservation.token == token)
+        .filter(Reservation.resource.in_([
+            resource.id,
+            resource.virtual_id
+         ]))
+        .order_by(Reservation.start)
+        .all()
     )
     targeted: Sequence[Reservation]
     if targeted_ids is not None:
@@ -1446,7 +1725,7 @@ def _remove_reservation(
 
         for res in q:
             if (
-                self.resource.hex in res.content['resources']
+                resource.id.hex in res.content['resources']
                 and res.content.get('rejected_reservations', {})
             ):
                 yield res.address
@@ -1535,7 +1814,12 @@ def _remove_reservation(
             # we can only revoke future visits
             if start > sedate.utcnow():
                 kaba_visits_to_revoke.extend(visit_ids.items())
-        resource.scheduler.remove_reservation(token, reservation.id)
+
+        if reservation.is_virtual:
+            scheduler = resource.virtual_scheduler
+        else:
+            scheduler = resource.scheduler
+        scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
         # pretend we already deleted the submission
@@ -1911,7 +2195,10 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
-                    request, recipient
+                    request, recipient, self.handler.reservations[0].token
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, recipient, self.handler.reservations[0].token
                 ),
             }
         )
@@ -2002,28 +2289,51 @@ def add_reservation(
         ))
         return show_form()
 
-    # if the matched allocation isn't partly available expand it to the
-    # whole allocation for a better user experience, but don't ever shrink
-    # it, since that's most certainly not what they want to have happen.
-    for allocation in resource.scheduler.allocations_in_range(start, end):
-        if not allocation.overlaps(start, end):
-            continue
-
-        if allocation.partly_available:
-            break
-
-        if allocation.contains(start, end):
-            start, end = allocation.start, allocation.end
-        else:
-            request.alert(_(
-                'The targeted availability is not partially reservable '
-                'and does not fully cover the selected time range.'
-            ))
-            return show_form()
-
     savepoint = transaction.savepoint()
+    if 'internal' in form and form.internal.data == 'yes':
+        scheduler = resource.virtual_scheduler
+
+        # if the allocation for this day does not yet exist, create it
+        allocation_range = sedate.get_date_range(
+            dt,
+            time(0, 0),
+            time(23, 59)
+        )
+        if not request.session.query(
+            scheduler.allocations_in_range(*allocation_range).exists()
+        ).scalar():
+            # if not create it
+            scheduler.allocate(
+                allocation_range,
+                partly_available=True,
+                whole_day=True,
+                quota=1,
+                quota_limit=1,
+            )
+    else:
+        scheduler = resource.scheduler
+
+        # if the matched allocation isn't partly available expand it to the
+        # whole allocation for a better user experience, but don't ever shrink
+        # it, since that's most certainly not what they want to have happen.
+        for allocation in scheduler.allocations_in_range(start, end):
+            if not allocation.overlaps(start, end):
+                continue
+
+            if allocation.partly_available:
+                break
+
+            if allocation.contains(start, end):
+                start, end = allocation.start, allocation.end
+            else:
+                request.alert(_(
+                    'The targeted availability is not partially reservable '
+                    'and does not fully cover the selected time range.'
+                ))
+                return show_form()
+
     try:
-        temp_token = resource.scheduler.reserve(
+        temp_token = scheduler.reserve(
             self.email,
             (start, end),
             # NOTE: Copy all of the settings apart from kaba, we will
@@ -2036,16 +2346,17 @@ def add_reservation(
             quota=form.quota.data
         )
     except LibresError as e:
+        savepoint.rollback()
         request.alert(utils.get_libres_error(e, request))
         return show_form()
 
     reservation: Reservation = (
-        resource.scheduler.reservations_by_token(temp_token).one()  # type:ignore
+        scheduler.reservations_by_token(temp_token).one()  # type:ignore
     )
     # change the temporary token back to the shared reservation token
     reservation.token = token
     try:
-        resource.scheduler._approve_reservation_record(reservation)
+        scheduler._approve_reservation_record(reservation)
     except LibresError as e:
         request.session.flush()
         savepoint.rollback()
@@ -2196,7 +2507,13 @@ def adjust_reservation(
         raise exc.HTTPNotFound()
 
     reservation: Reservation | None = (
-        resource.scheduler.reservations_by_token(token)  # type:ignore
+        request.session
+        .query(Reservation)
+        .filter(Reservation.token == token)
+        .filter(Reservation.resource.in_([
+            resource.id,
+            resource.virtual_id
+         ]))
         .filter(Reservation.id == reservation_id)
         .one_or_none()
     )
@@ -2305,7 +2622,11 @@ def adjust_reservation(
         # deletes the old reservation, which will fail, if there is a payment
         reservation.payment = None
         request.session.flush()
-        new_reservation = resource.scheduler.change_reservation(
+        if reservation.is_virtual:
+            scheduler = resource.virtual_scheduler
+        else:
+            scheduler = resource.scheduler
+        new_reservation = scheduler.change_reservation(
             token,
             reservation.id,
             new_start,

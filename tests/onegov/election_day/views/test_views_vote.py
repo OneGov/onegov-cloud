@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from onegov.core.utils import module_path
 from tests.onegov.election_day.common import import_ech_from_file

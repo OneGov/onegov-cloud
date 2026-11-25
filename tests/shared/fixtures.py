@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import os
 import platform
@@ -64,7 +62,7 @@ def monkeysession(request: pytest.FixtureRequest) -> Iterator[MonkeyPatch]:
 
 @pytest.fixture(scope='session', autouse=True)
 def scan_onegov() -> None:
-    import importscan  # type: ignore[import-untyped]
+    import importscan
     import onegov
     importscan.scan(onegov, ignore=['.test', '.tests'])
 
@@ -150,15 +148,20 @@ def postgres(
         yield None
         return
 
-    postgres_args = ' '.join((
-        "-h 127.0.0.1",
-        "-F",
-        "-c logging_collector=off",
-        "-c fsync=off",
-        "-c full_page_writes=off",
-        # schema-heavy tests drop many schemas CASCADE in one teardown tx
-        "-c max_locks_per_transaction=1024",
-    ))
+    postgres_args = ' '.join(
+        (
+            "-h 127.0.0.1",
+            "-F",
+            # UTCDateTime stores naive UTC values; publication queries compare
+            # them with now(), which requires the DB timezone to be UTC.
+            '-c timezone=UTC',
+            "-c logging_collector=off",
+            "-c fsync=off",
+            "-c full_page_writes=off",
+            # schema-heavy tests drop many schemas CASCADE in one teardown tx
+            "-c max_locks_per_transaction=1024",
+        )
+    )
 
     postgres = Postgresql(  # type: ignore[no-untyped-call]
         postgres_args=postgres_args,
@@ -178,17 +181,13 @@ def postgres_dsn(
 
     """
     if pytestconfig.getoption('nopg'):
-        yield 'postgresql+psycopg://postgres:postgres@127.0.0.1:55432/postgres'
+        yield 'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
         return
 
     assert postgres is not None
     postgres.reset_snapshots()
 
-    # HACK: We rewrite the DSN so that SQLAlchemy picks the correct backend
-    postgres_dsn = postgres.url().replace(
-        'postgresql://',
-        'postgresql+psycopg://'
-    )
+    postgres_dsn = postgres.url()
 
     yield postgres_dsn
 
@@ -403,8 +402,7 @@ def browser(playwright_browser: Browser) -> Iterator[ExtendedBrowser]:
     """
     wrapped = ExtendedBrowser(playwright_browser)
     yield wrapped
-    for context in wrapped._spawned_contexts:
-        context.close()
+    wrapped.close_contexts()
 
 
 @pytest.fixture(scope="function")

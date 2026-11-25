@@ -1,11 +1,10 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.form.fields import TranslatedSelectField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
 from onegov.parliament.models.commission import TYPES
 from wtforms.fields import DateField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -30,7 +29,7 @@ class CommissionForm(Form):
 
     type = TranslatedSelectField(
         label=_('Type'),
-        choices=list(TYPES.items()),
+        choices=[SelectChoice(value, label) for value, label in TYPES.items()],
         validators=[InputRequired()],
         default='normal'
     )

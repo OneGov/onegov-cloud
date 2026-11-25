@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 
 from itsdangerous import URLSafeSerializer, BadData
@@ -142,7 +140,7 @@ class Auth:
         if not user.second_factor:
             for factor in self.factors.values():
                 if factor.self_activation:
-                    response = factor.start_activation(request, self)
+                    response = factor.start_activation(request, user, self)
                     if response is not None:
                         return response
             return True
@@ -346,6 +344,7 @@ class Auth:
 
         """
         assert user is not None
+        assert user.active
 
         identity = self.as_identity(user)
 

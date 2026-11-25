@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import ContentMixin
@@ -65,7 +63,7 @@ class UserGroup(Base, ContentMixin, TimestampMixin):
     )
 
     #: the name of this group
-    name: Mapped[str | None]
+    name: Mapped[str | None] = mapped_column(active_history=True)
 
     #: the members of this group
     users: DynamicMapped[User] = relationship(

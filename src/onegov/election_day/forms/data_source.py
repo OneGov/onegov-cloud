@@ -1,11 +1,10 @@
-from __future__ import annotations
-
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
@@ -28,7 +27,10 @@ class DataSourceForm(Form):
 
     upload_type = RadioField(
         _('Type'),
-        choices=list(UPLOAD_TYPE_LABELS),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in UPLOAD_TYPE_LABELS
+        ],
         validators=[
             InputRequired()
         ],
@@ -79,7 +81,7 @@ class DataSourceItemForm(Form):
         self.type = source.type
         self.item.label.text = dict(UPLOAD_TYPE_LABELS).get(self.type, '')
         self.item.choices = [
-            (
+            SelectChoice(
                 item.id,
                 '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),

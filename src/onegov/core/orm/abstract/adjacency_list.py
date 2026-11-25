@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 from decimal import Decimal
 from itertools import chain
@@ -18,7 +16,7 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
-from sqlalchemy.sql.expression import column, nullsfirst
+from sqlalchemy.sql.expression import column
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -140,7 +138,6 @@ class AdjacencyList(Base):
     @declared_attr.directive
     @classmethod
     def __table_args__(cls) -> tuple[Any, ...]:
-
         prefix: str = cls.__name__.lower()
         return (
             # make sure that no children of a single parent share a name
@@ -160,8 +157,8 @@ class AdjacencyList(Base):
             # and order by children/siblings
             Index(
                 prefix + '_order',
-                nullsfirst('parent_id'),  # type:ignore[arg-type]
-                nullsfirst('"order"')  # type:ignore[arg-type]
+                cls.parent_id.nullsfirst(),
+                cls.order.nullsfirst()
             )
         )
 

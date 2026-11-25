@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private, Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection

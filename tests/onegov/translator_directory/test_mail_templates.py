@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import docx
 import pytest
 from docxtpl import DocxTemplate  # type: ignore[import-untyped]

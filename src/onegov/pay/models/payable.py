@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 
 from onegov.core.orm.abstract import associated
@@ -40,7 +38,7 @@ class PayableBase:
 
         tablename = self.__tablename__
 
-        keys = inspect(self.__class__).primary_key  # type: ignore[union-attr]
+        keys = inspect(self.__class__).primary_key
         values = '/'.join(str(getattr(self, key.name, None)) for key in keys)
 
         return f'{tablename}/{hash_primary_key(values)}'

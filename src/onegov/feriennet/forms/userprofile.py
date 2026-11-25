@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import string
 
 from wtforms import BooleanField
@@ -9,6 +7,7 @@ from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.form.validators import Stdnum
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -43,20 +42,40 @@ class UserProfileForm(Form):
         'show_contact_data_to_others',
     )
 
+    show_contact_data_to_others = BooleanField(
+        label=_('Allow Contact'),
+        description=_(
+            'If this is selected, email address, phone number and '
+            'municipality are displayed to parents whose child has signed up '
+            'for the same occurrence. This makes it possible to get in touch, '
+            'for example, to organize carpools.'
+        ),
+        fieldset=_('Privacy'),
+        default=False
+    )
+
     ticket_statistics = RadioField(
         label=_('Send a periodic status e-mail.'),
         fieldset=_('General'),
         default='weekly',
         validators=[InputRequired()],
         choices=(
-            ('daily', _(
-                'Daily (exluding the weekend)')),
-            ('weekly', _(
-                'Weekly (on mondays)')),
-            ('monthly', _(
-                'Monthly (on first monday of the month)')),
-            ('never', _(
-                'Never')),
+            SelectChoice(
+                'daily',
+                _('Daily (exluding the weekend)')
+            ),
+            SelectChoice(
+                'weekly',
+                _('Weekly (on mondays)')
+            ),
+            SelectChoice(
+                'monthly',
+                _('Monthly (on first monday of the month)')
+            ),
+            SelectChoice(
+                'never',
+                _('Never')
+            ),
         )
     )
 
@@ -64,8 +83,8 @@ class UserProfileForm(Form):
         label=_('Salutation'),
         fieldset=_('Personal'),
         choices=[
-            ('mr', _('Mr.')),
-            ('ms', _('Ms.')),
+            SelectChoice('mr', _('Mr.')),
+            SelectChoice('ms', _('Ms.')),
         ],
         validators=[InputRequired()]
     )
@@ -148,12 +167,6 @@ class UserProfileForm(Form):
         fieldset=_('Personal'),
     )
 
-    show_contact_data_to_others = BooleanField(
-        label=_('Allow contact for carpooling'),
-        fieldset=_('Privacy'),
-        default=False
-    )
-
     @property
     def name(self) -> str:
         assert self.first_name.data is not None
@@ -170,6 +183,11 @@ class UserProfileForm(Form):
     def on_request(self) -> None:
         self.toggle_political_municipality()
         self.toggle_ticket_statistics()
+        self.toggle_carpooling()
+
+    def toggle_carpooling(self) -> None:
+        if not self.request.app.carpooling_enabled:
+            self.delete_field('show_contact_data_to_others')
 
     @property
     def show_political_municipality(self) -> bool | None:
@@ -215,6 +233,10 @@ class UserProfileForm(Form):
 
         if key == 'ticket_statistics':
             if not self.show_ticket_statistics:
+                return True
+
+        if key == 'show_contact_data_to_others':
+            if not self.request.app.carpooling_enabled:
                 return True
 
         return False

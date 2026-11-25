@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.models.election.candidate import Candidate
 from onegov.election_day.models.election.candidate_panachage_result import \
     CandidatePanachageResult

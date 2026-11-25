@@ -122,7 +122,7 @@
                                 <dd>${parliamentarian.party}</dd>
                             </div>
                             <div tal:condition="parliamentarian.private_address">
-                                <dt i18n:translate>Private address</dt>
+                                <dt i18n:translate>Address</dt>
                                 <dd>
                                     <span tal:condition="parliamentarian.private_address">${parliamentarian.private_address}<br></span>
                                     <span tal:condition="parliamentarian.private_address_addition">${parliamentarian.private_address_addition}<br></span>
@@ -185,15 +185,28 @@
                             </div>
                             <div tal:condition="parliamentarian.email_primary">
                                 <dt i18n:translate>Primary email address</dt>
-                                <dd>${parliamentarian.email_primary}</dd>
+                                <dd>
+                                    <a
+                                        tal:attributes="href
+                                'mailto:' + parliamentarian.email_primary"
+                                    >${parliamentarian.email_primary}</a>
+                                </dd>
                             </div>
                             <div tal:condition="parliamentarian.email_secondary">
                                 <dt i18n:translate>Secondary email address</dt>
-                                <dd>${parliamentarian.email_secondary}</dd>
+                                <dd>
+                                    <a
+                                        tal:attributes="href
+                                'mailto:' + parliamentarian.email_secondary"
+                                    >${parliamentarian.email_secondary}</a>
+                                </dd>
                             </div>
                             <div tal:condition="parliamentarian.website">
                                 <dt i18n:translate>Website</dt>
-                                <dd>${parliamentarian.website}</dd>
+                                <dd>
+                                    <a href="${parliamentarian.website}"
+                                    >${parliamentarian.website}</a>
+                                </dd>
                             </div>
                             <div tal:condition="parliamentarian.remarks">
                                 <dt i18n:translate>Remarks</dt>

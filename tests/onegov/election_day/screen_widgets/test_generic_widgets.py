@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from lxml import etree
 from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch

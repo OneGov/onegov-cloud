@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 class OnegovUserError(Exception):
     """ Base class for all errors raised by onegov.user. """
     def __init__(self, message: str):

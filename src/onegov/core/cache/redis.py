@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dogpile.cache import CacheRegion
 from dogpile.cache.api import CantDeserializeException
 from dogpile.cache.api import NO_VALUE

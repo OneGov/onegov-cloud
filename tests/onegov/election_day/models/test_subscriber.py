@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber

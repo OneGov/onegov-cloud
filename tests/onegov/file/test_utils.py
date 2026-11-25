@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import module_path
 from onegov.file.utils import content_type_from_fileobj, word_count
 

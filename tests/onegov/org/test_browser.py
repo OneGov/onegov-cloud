@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 import os
 import pytest

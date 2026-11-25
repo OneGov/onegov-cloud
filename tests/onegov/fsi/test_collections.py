@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import timedelta
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection

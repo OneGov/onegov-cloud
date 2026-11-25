@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import Identity
 from morepath.authentication import NoIdentity
 from onegov.election_day.security import MaybePublic

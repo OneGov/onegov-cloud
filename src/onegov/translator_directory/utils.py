@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 import json
 from babel import Locale
 from niquests.exceptions import JSONDecodeError
+from wtforms import SelectChoice
 
 from onegov.user import UserGroup, UserGroupCollection
 from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
+from onegov.translator_directory.constants import FINANZSTELLE
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
@@ -15,7 +15,6 @@ from onegov.translator_directory import _
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import niquests
-    from wtforms.fields.choices import _Choice
     from collections.abc import Collection
     from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
     from onegov.org.request import OrgRequest
@@ -275,19 +274,24 @@ def geocode_translator_addresses(
     return trs_total, total, geocoded, skipped, coords_not_found
 
 
-def nationality_choices(locale: str | None) -> list[_Choice]:
+def nationality_choices(locale: str | None) -> list[SelectChoice]:
     assert locale
 
     country_names = country_code_to_name(locale)
     pinned = ('CH', 'DE', 'FR', 'IT', 'AT', 'LI')
-    nationalities: list[_Choice]
-    nationalities = [(code, name) for code, name in
-                     country_names.items() if code not in pinned]
+    nationalities = [
+        SelectChoice(code, name)
+        for code, name in country_names.items()
+        if code not in pinned
+    ]
     # pin common countries on top of the list
-    nationalities.insert(0, ('', '------'))  # add divider
+    nationalities.insert(0, SelectChoice('', '------'))  # add divider
     for code in reversed(pinned):
-        nationalities.insert(0, (code, country_names.get(code, code)))
-    nationalities.insert(0, ('', ''))  # add empty choices
+        nationalities.insert(0, SelectChoice(
+            code,
+            country_names.get(code, code)
+        ))
+    nationalities.insert(0, SelectChoice(''))  # add empty choices
 
     return nationalities
 
@@ -321,6 +325,25 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         key,
         _("Error: No custom text found for '${key}'", mapping={'key': key})
     )
+
+
+def get_finanzstellen_without_accountants(
+    request: TranslatorAppRequest,
+) -> list[str]:
+    """Returns the names of all Finanzstellen which have no user group
+    with accountant emails assigned."""
+
+    configured = set()
+    groups = request.session.query(UserGroup).filter(
+        UserGroup.meta['finanzstelle'].astext.isnot(None)
+    )
+    for group in groups:
+        if group.meta.get('accountant_emails'):
+            configured.add(group.meta['finanzstelle'])
+
+    return [
+        fs.name for key, fs in FINANZSTELLE.items() if key not in configured
+    ]
 
 
 def get_accountant_emails_for_finanzstelle(

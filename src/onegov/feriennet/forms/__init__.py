@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.feriennet.forms.activity import VacationActivityForm
 from onegov.feriennet.forms.attendee import AttendeeForm
 from onegov.feriennet.forms.attendee import AttendeeLimitForm

@@ -1,6 +1,4 @@
 
-from __future__ import annotations
-
 from collections import defaultdict
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Block
 from onegov.core.security import Private

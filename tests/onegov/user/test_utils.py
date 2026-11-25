@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user.sync import UserSource
 from onegov.user.utils import password_reset_url
 from onegov.user.collections import UserCollection

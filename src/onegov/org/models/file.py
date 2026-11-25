@@ -1,6 +1,4 @@
 """ Contains the models describing files and images. """
-from __future__ import annotations
-
 import sedate
 
 from datetime import datetime
@@ -27,7 +25,6 @@ from typing import overload, Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from typing import IO, Self
-    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
 
@@ -369,8 +366,8 @@ class GeneralFileCollection(
         return stmt.order_by(nullslast(direction(order)))
 
     @property
-    def files(self) -> Result[FileRow]:
-        return self.session.execute(self.statement)
+    def files(self) -> Iterable[FileRow]:
+        return self.session.execute(self.statement)  # type: ignore[return-value]
 
     def group(self, record: FileRow) -> str:
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin

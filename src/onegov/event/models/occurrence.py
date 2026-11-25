@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.orm import Base

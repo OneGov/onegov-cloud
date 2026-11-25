@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 from onegov.org import _
 from onegov.org.views.homepage import view_org

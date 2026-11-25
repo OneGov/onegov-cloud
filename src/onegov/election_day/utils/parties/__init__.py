@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.utils.parties.parties import get_party_results
 from onegov.election_day.utils.parties.parties import get_party_results_deltas
 from onegov.election_day.utils.parties.parties import get_party_results_data

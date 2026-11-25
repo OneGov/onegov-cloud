@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from firebase_admin import messaging  # type:ignore[import-untyped]
 from firebase_admin.exceptions import (  # type:ignore[import-untyped]
     FirebaseError

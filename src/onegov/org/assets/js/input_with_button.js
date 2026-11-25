@@ -136,11 +136,14 @@ var on_internal_link_button_click = function(input, type) {
     var form = $(input).closest('form');
 
     var virtual = $('<textarea><p></p></textarea>').redactor({
-        plugins: ['imagemanager', 'filemanager', 'definedlinks'],
+        plugins: ['imagemanager', 'imagecropper', 'filemanager', 'definedlinks'],
         fileUpload: form.data('file-upload-url'),
         fileManagerJson: form.data('file-list-url'),
         imageUpload: form.data('image-upload-url'),
         imageManagerJson: form.data('image-list-url'),
+        imageCropperInitialAspectRatio: $(input).data('initial-aspect-ratio') || 'free',
+        imageCropperFixedAspectRatio: $(input).data('initial-aspect-ratio') || false,
+        imageCropperCircular: $(input).data('circular') || false,
         definedLinks: form.data('sitecollection-url'),
         lang: window.locale.language,
         fileUploadErrorCallback: handleUploadError,

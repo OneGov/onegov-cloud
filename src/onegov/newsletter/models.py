@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from email_validator import validate_email
 from onegov.core.crypto import random_token

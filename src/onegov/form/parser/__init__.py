@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.parser.core import find_field
 from onegov.form.parser.core import flatten_fields
 from onegov.form.parser.core import parse_formcode

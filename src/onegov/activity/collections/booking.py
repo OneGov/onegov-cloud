@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.models import Booking, BookingPeriod
 from onegov.core.collection import GenericCollection
 from onegov.activity.matching.utils import unblockable, booking_order

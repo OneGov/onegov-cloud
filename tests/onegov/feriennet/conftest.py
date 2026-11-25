@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 import pytest
 
@@ -83,6 +81,7 @@ def browser(
 
     browser.baseurl = feriennet_app_url
     yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope='function')

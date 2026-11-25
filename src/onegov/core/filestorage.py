@@ -6,8 +6,6 @@ Based on `<https://docs.pyfilesystem.org/en/latest/>`_
 See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 
 """
-from __future__ import annotations
-
 import os
 import os.path
 import re

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.elements import Link
 from onegov.core.utils import Bunch
 from onegov.landsgemeinde import _

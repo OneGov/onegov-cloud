@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pay.models.invoice import Invoice
 from onegov.pay.models.invoice_item import InvoiceItem
 from onegov.pay.models.invoice_reference import InvoiceReference

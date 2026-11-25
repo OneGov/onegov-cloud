@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import pytest
 import pickle
@@ -894,7 +892,7 @@ def test_extensions_schema(postgres_dsn: str) -> None:
         assert obj.data['schema'] == schema
 
     assert mgr.created_extensions == {
-        'btree_gist', 'hstore', 'intarray', 'unaccent'
+        'btree_gist', 'hstore', 'intarray', 'unaccent', 'uuid-ossp'
     }
 
 
@@ -2340,7 +2338,7 @@ def test_selectable_sql_query(session: Session) -> None:
                 stmt.c.is_updatable == True
             )
         ).order_by(stmt.c.column_name)
-    ).tuples().all()
+    ).all()
 
     assert columns == [('groname', ), ('grosysid', )]
     assert columns[0].column_name == 'groname'
@@ -2353,7 +2351,7 @@ def test_selectable_sql_query(session: Session) -> None:
                 stmt.c.is_updatable == False
             )
         ).order_by(stmt.c.column_name)
-    ).tuples().all()
+    ).all()
 
     assert columns == [('grolist', )]
     assert columns[0].column_name == 'grolist'

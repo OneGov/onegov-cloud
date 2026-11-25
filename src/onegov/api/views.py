@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from onegov.api import ApiApp
@@ -209,6 +208,8 @@ def view_api_endpoint(
                     }
                     for target, item in self.batch.items()
                 ],
+                'total_items_count': self.collection.subset_count,
+                'total_pages_count': self.collection.pages_count,
             }
         }
         if form := self.form(None, request):

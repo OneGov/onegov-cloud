@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 from onegov.org.views.people import (
     view_people, view_person, handle_new_person, handle_edit_person)

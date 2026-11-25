@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.directory.models.directory import Directory
 from onegov.directory.models.directory_entry import DirectoryEntry
 

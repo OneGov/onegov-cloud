@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_vote
 from time import sleep

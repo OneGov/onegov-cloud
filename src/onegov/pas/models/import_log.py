@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.custom import json
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin

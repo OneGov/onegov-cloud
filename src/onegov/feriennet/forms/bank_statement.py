@@ -1,17 +1,10 @@
-from __future__ import annotations
-
 from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from wtforms.fields import SelectField
+from wtforms.fields import SelectChoice, SelectField
 from wtforms.validators import InputRequired, DataRequired, ValidationError
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from wtforms.fields.choices import _Choice
 
 
 class BankStatementImportForm(Form):
@@ -38,9 +31,9 @@ class BankStatementImportForm(Form):
     )
 
     @property
-    def period_choices(self) -> list[_Choice]:
+    def period_choices(self) -> list[SelectChoice]:
         return [
-            (period_id.hex, title)
+            SelectChoice(period_id.hex, title)
             for period_id, title in (
                 BookingPeriodCollection(self.request.session).query()
                 .with_entities(BookingPeriod.id, BookingPeriod.title)
@@ -55,7 +48,7 @@ class BankStatementImportForm(Form):
         self.period.choices = self.period_choices
 
         if self.period.data == '0xdeadbeef':
-            self.period.data = self.period.choices[0][0]
+            self.period.data = self.period.choices[0].value
 
     def on_request(self) -> None:
         self.load_periods()

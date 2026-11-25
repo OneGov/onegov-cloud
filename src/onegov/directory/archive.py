@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import mimetypes
 import shutil
 import os

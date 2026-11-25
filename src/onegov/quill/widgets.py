@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from json import dumps
 from markupsafe import Markup
 from random import choice

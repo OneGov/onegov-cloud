@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.org.views.resource_recipient import (
     view_resource_recipients, handle_new_resource_recipient,

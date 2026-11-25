@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
@@ -12,6 +10,7 @@ from onegov.core.orm import as_selectable, as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.pay import InvoiceReference
 from onegov.user import User
+from operator import attrgetter
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from ulid import ULID
@@ -19,10 +18,9 @@ from ulid import ULID
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterator
+    from collections.abc import Collection, Iterable, Iterator
     from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Subquery
     from typing import Protocol, Self
@@ -116,7 +114,7 @@ class BillingCollection:
             module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
 
     @property
-    def invoices_by_period(self) -> Result[InvoicesByPeriodRow]:
+    def invoices_by_period(self) -> Iterable[InvoicesByPeriodRow]:
         invoices = self.invoices_by_period_query.c
 
         query = select(*invoices).where(invoices.period_id == self.period_id)
@@ -127,7 +125,7 @@ class BillingCollection:
         if self.state in ('paid', 'unpaid'):
             query = query.where(invoices.paid == (self.state == 'paid'))
 
-        return self.session.execute(query)
+        return self.session.execute(query)  # type: ignore[return-value]
 
     class Bill(NamedTuple):
         items: tuple[InvoicesByPeriodRow, ...]
@@ -145,9 +143,10 @@ class BillingCollection:
     @property
     def bills(self) -> dict[str, Bill]:
         bills = OrderedDict()
-        invoices = self.invoices_by_period.tuples()
-
-        for username, items_ in groupby(invoices, lambda i: i.username):
+        for username, items_ in groupby(
+            self.invoices_by_period,
+            key=attrgetter('username')
+        ):
             items = tuple(items_)
             first = items[0]
 
@@ -411,7 +410,7 @@ class BookingInvoiceBridge:
             )
         }
 
-        self.users = dict(session.query(User.username, User.id).tuples())
+        self.users = dict(session.query(User.username, User.id))
 
     def process(self, booking: HasBookingAttrs) -> None:
         """ Processes a single booking. This may be a tuple that includes

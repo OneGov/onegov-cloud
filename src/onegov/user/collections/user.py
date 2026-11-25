@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle
@@ -215,7 +213,7 @@ class UserCollection:
     def sources(self) -> tuple[str, ...]:
         """ All available sources. """
 
-        records = self.session.query(User.source)
+        records: Query[tuple[str]] = self.session.query(User.source)
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 

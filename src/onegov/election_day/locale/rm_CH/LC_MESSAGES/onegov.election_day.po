@@ -74,6 +74,10 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
+msgid "Line ${line} contains fewer values than there are columns."
+msgstr "La lingia ${line} cuntegna main valurs che quai che i dat colonnas."
+
+#, python-format
 msgid "Not a valid eCH xml file: ${error}"
 msgstr "Betg ina datoteca XML eCH valaivla: ${error}"
 

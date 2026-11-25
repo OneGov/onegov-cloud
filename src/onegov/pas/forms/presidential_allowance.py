@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -18,8 +16,8 @@ from sqlalchemy import extract, func
 from uuid import UUID
 from wtforms.validators import InputRequired
 
-from typing import TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from typing import Any

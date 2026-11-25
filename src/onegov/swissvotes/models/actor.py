@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from markupsafe import Markup
 from onegov.swissvotes import _

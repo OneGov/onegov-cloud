@@ -1,11 +1,10 @@
-from __future__ import annotations
-
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
+from wtforms.fields import SelectChoice
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -23,7 +22,7 @@ class UploadElectionBaseForm(Form):
     file_format = RadioField(
         _('File format'),
         choices=[
-            ('internal', 'OneGov Cloud'),
+            SelectChoice('internal', 'OneGov Cloud'),
         ],
         validators=[
             InputRequired()
@@ -52,8 +51,8 @@ class UploadElectionBaseForm(Form):
         assert hasattr(election, 'data_sources')
         if election.data_sources:
             self.file_format.choices = [
-                ('internal', 'OneGov Cloud'),
-                ('wabsti_c', 'WabstiCExport')
+                SelectChoice('internal', 'OneGov Cloud'),
+                SelectChoice('wabsti_c', 'WabstiCExport')
             ]
 
 

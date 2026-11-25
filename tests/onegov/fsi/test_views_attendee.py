@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
 

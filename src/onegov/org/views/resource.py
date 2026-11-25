@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 import collections
 import hashlib
 import icalendar
+import math
 import morepath
 import secrets
 import sedate
@@ -39,13 +38,14 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
+from onegov.user import Auth
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import and_, cast as sa_cast, delete, func, or_, select
 from sqlalchemy import Boolean, UUID as UUIDType
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
@@ -53,6 +53,7 @@ from webob import exc
 
 from typing import cast, Any, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from uuid import UUID
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
     from libres.db.models import Reservation as BaseReservation
@@ -62,7 +63,6 @@ if TYPE_CHECKING:
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
     from typing import TypedDict
-    from uuid import UUID
     from webob import Response as BaseResponse
 
     type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
@@ -409,22 +409,15 @@ def view_find_your_spot(
             if duration.total_seconds() < 600
             else duration
         )
+        internal = form.internal.data == 'yes' if form.internal else False
 
         if form.rooms:
             assert form.rooms.data is not None
             # filter rooms according to the form selection
             rooms = [room for room in rooms if room.id in form.rooms.data]
 
-        def included_dates() -> Iterator[date_t]:
-            # yields all the dates that should be part of our result set
-            current = start.date()
-            max_date = end.date()
-            while current <= max_date:
-                if not form.is_excluded(current):
-                    yield current
-                current += timedelta(days=1)
-
         def spot_infos_for_free_slots(
+            resource: Resource,
             allocation: Allocation,
             free: list[tuple[datetime, datetime]],
             target_range: timedelta,
@@ -444,6 +437,7 @@ def view_find_your_spot(
                     availability = (slot_end - slot_start) / target_range
                     availability *= 100.0
                     yield utils.FindYourSpotEventInfo(
+                        resource,
                         allocation,
                         (sedate.to_timezone(
                             slot_start, allocation.timezone),
@@ -463,6 +457,7 @@ def view_find_your_spot(
             availability = (slot_end - slot_start) / target_range
             availability *= 100.0
             yield utils.FindYourSpotEventInfo(
+                resource,
                 allocation,
                 (sedate.to_timezone(slot_start, allocation.timezone),
                  sedate.to_timezone(slot_end, allocation.timezone)),
@@ -475,16 +470,56 @@ def view_find_your_spot(
         # initialize the room slots with all the included dates and rooms
         room_slots = {
             d: {room.id: [] for room in rooms}
-            for d in included_dates()
+            for d in form.included_dates
         }
+        temporary_allocation_ids: set[int] = set()
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            scheduler = room.scheduler
-            allocations = request.exclude_invisible(
-                scheduler.search_allocations(
+            if internal:
+                scheduler = room.virtual_scheduler
+                allocations = scheduler.search_allocations(
                     start, end, days=form.weekdays.data, strict=True
                 )
-            )
+                existing_dates = {
+                    allocation.display_start().date()
+                    for allocation in allocations
+                }
+                # any virtual allocations for included dates that don't
+                # exist need to be created at least temporarily
+                allocation_dates = [
+                    sedate.align_range_to_day(
+                        dt := sedate.replace_timezone(
+                            sedate.as_datetime(date),
+                            room.timezone
+                        ),
+                        dt,
+                        room.timezone
+                    )
+                    for date in form.included_dates
+                    if date not in existing_dates
+                ]
+                if allocation_dates:
+                    new_allocations = scheduler.allocate(
+                        allocation_dates,
+                        partly_available=True,
+                        whole_day=True,
+                        quota=1,
+                        quota_limit=1,
+                    )
+                    temporary_allocation_ids.update(
+                        allocation.id
+                        for allocation in new_allocations
+                    )
+                    allocations.extend(new_allocations)
+                    allocations.sort(key=attrgetter('_start'))
+            else:
+                scheduler = room.scheduler
+                allocations = request.exclude_invisible(
+                    scheduler.search_allocations(
+                        start, end, days=form.weekdays.data, strict=True
+                    )
+                )
+
             if not allocations:
                 continue
 
@@ -518,7 +553,10 @@ def view_find_your_spot(
                         (
                             allocation.quota
                             if slot in blocked
-                            else reserved.get(slot, 0)
+                            else math.ceil(
+                                allocation.quota
+                                * reserved.get(slot, 0)
+                            )
                             for slot, __ in rasterizer.iterate_span(
                                 allocation._start,
                                 allocation._end,
@@ -536,6 +574,7 @@ def view_find_your_spot(
                             availability = 100.0
 
                     slots.append(utils.FindYourSpotEventInfo(
+                        room,
                         allocation,
                         None,
                         availability if quota_left else 0.0,
@@ -584,6 +623,7 @@ def view_find_your_spot(
                             # render an unavailable slot
                             added_slots += 1
                             slots.append(utils.FindYourSpotEventInfo(
+                                room,
                                 allocation,
                                 (
                                     max(
@@ -608,13 +648,14 @@ def view_find_your_spot(
                         continue
 
                     spot_infos = list(spot_infos_for_free_slots(
+                        room,
                         allocation,
                         free,
                         target_slot_end - target_slot_start
                     ))
                     if (
                         len(spot_infos) != 1
-                        or spot_infos[0].availability < 100.0
+                        or spot_infos[0].quota_left < 1
                     ):
                         total_availability = sum(
                             info.availability
@@ -622,6 +663,7 @@ def view_find_your_spot(
                         )
                         # render a partially available slot
                         slots.append(utils.FindYourSpotEventInfo(
+                            room,
                             allocation,
                             (
                                 max(
@@ -670,6 +712,7 @@ def view_find_your_spot(
                 slots.extend(
                     slot
                     for slot in spot_infos_for_free_slots(
+                        room,
                         allocation,
                         # we want to render the entire available time
                         # span, as long as it overlaps with our target
@@ -704,7 +747,10 @@ def view_find_your_spot(
         if auto_reserve != 'no':
             rooms_dict = {room.id: room for room in rooms}
             reservations: dict[UUID, list[Reservation]] = {
-                room.id: room.bound_reservations(request).all()  # type: ignore[attr-defined]
+                room.id: room.bound_reservations(  # type: ignore[attr-defined]
+                    request,
+                    with_virtual=request.is_manager
+                ).all()
                 for room in rooms
             }
             skipped_due_to_existing_reservation = {
@@ -775,7 +821,11 @@ def view_find_your_spot(
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
-                                room.scheduler.reserve(
+                                if internal:
+                                    scheduler = room.virtual_scheduler
+                                else:
+                                    scheduler = room.scheduler
+                                scheduler.reserve(
                                     email='0xdeadbeef@example.org',
                                     dates=slot.slot_time or (
                                         slot.allocation.display_start(),
@@ -792,6 +842,8 @@ def view_find_your_spot(
                                 continue
                             else:
                                 # we managed to reserve a slot
+                                # so the allocation can no longer be temporary
+                                temporary_allocation_ids.discard(slot.allocation.id)
                                 break
                     else:
                         # no slot reserved, move on to the next room
@@ -826,6 +878,12 @@ def view_find_your_spot(
                 for date in room_slots.keys()
                 if len(room_ids := reserved_dates.get(date, set())) < wanted
             } if auto_reserve != 'for_first_day' else {}
+
+        if temporary_allocation_ids:
+            # emit a bulk delete for all temporary allocations
+            request.session.execute(delete(Allocation).where(
+                Allocation.id.in_(temporary_allocation_ids)
+            ))
 
     holidays: dict[date_t, list[str]] = {}
     if room_slots:
@@ -881,7 +939,10 @@ def get_find_your_spot_reservations(
             # FIXME: Maybe we should move bound_reservations to the base
             #        Resource class?
             if hasattr(resource, 'bound_reservations')
-            for reservation in resource.bound_reservations(request)),
+            for reservation in resource.bound_reservations(
+                request,
+                with_virtual=request.is_manager
+            )),
         key=itemgetter('date', 'title')
     )
 
@@ -916,6 +977,8 @@ def delete_all_find_your_spot_reservations(
     if request.is_logged_in:
         request.assert_valid_csrf_token()
 
+    with_virtual = request.is_manager
+
     # TODO: We might be able to make this a lot more efficient by taking
     #       advantage of the fact that we use a single shared token for
     #       all reservations in the same session (although that might
@@ -925,12 +988,43 @@ def delete_all_find_your_spot_reservations(
         # FIXME: Maybe we should move bound_reservations to the base
         #        Resource class?
         assert hasattr(resource, 'bound_reservations')
-        for reservation in resource.bound_reservations(request):
+        cleanup_virtual_allocations: bool = False
+        min_date = max_date = None
+        for reservation in resource.bound_reservations(
+            request,
+            with_virtual=with_virtual
+        ):
+            if reservation.is_virtual:
+                assert with_virtual is True
+                scheduler = resource.virtual_scheduler
+                cleanup_virtual_allocations = True
+                if min_date is None or reservation.start < min_date:
+                    min_date = reservation.start
+                if max_date is None or reservation.end > max_date:
+                    max_date = reservation.end
+            else:
+                scheduler = resource.scheduler
             # these shouldn't have a ticket yet, so we don't need
             # to worry about it
-            resource.scheduler.remove_reservation(
+            scheduler.remove_reservation(
                 reservation.token,
                 reservation.id
+            )
+
+        if cleanup_virtual_allocations:
+            assert with_virtual and min_date and max_date
+            request.session.flush()
+            # NOTE: Since allocations always cover the whole day
+            #       we need to align the start and end of the range
+            #       to the day
+            min_date, max_date = sedate.align_range_to_day(
+                min_date,
+                max_date,
+                resource.timezone
+            )
+            resource.virtual_scheduler.remove_unused_allocations(
+                min_date,
+                max_date
             )
 
     return {
@@ -1261,6 +1355,11 @@ def handle_cleanup_allocations(
         assert start is not None and end is not None
         count = self.scheduler.remove_unused_allocations(start, end, days=days)
 
+        # we also sneakily clean up the virtual allocations in the same
+        # time range, ignoring the week day restrictions, we don't need
+        # to report these cleanups since they're supposed to be invisible
+        self.virtual_scheduler.remove_unused_allocations(start, end)
+
         request.success(
             _('Successfully removed ${count} unused allocations', mapping={
                 'count': count
@@ -1330,7 +1429,10 @@ def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
     # FIXME: Maybe we should move bound_reservations to the base
     #        Resource class?
     assert hasattr(self, 'bound_reservations')
-    reservations = tuple(self.bound_reservations(request))
+    reservations = tuple(self.bound_reservations(
+        request,
+        with_virtual=request.is_manager
+    ))
     prediction = predict_next_reservation(self, request, reservations)
 
     return {
@@ -1403,7 +1505,17 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
+    # NOTE: Since we include all visible reservations/blockers we don't need
+    #       to worry about virtual vs. regular scheduler, either one will
+    #       include everything we want to display.
     scheduler = self.scheduler
+
+    blocking_resources = self.blocking_resources()
+    all_occupancy_field_ids = sorted({
+        as_internal_id(occupancy_field)
+        for resource in blocking_resources.values()
+        for occupancy_field in resource.occupancy_fields
+    })
 
     # get all reservations and tickets
     query: Query[tuple[Reservation, Ticket, *tuple[str, ...]]]
@@ -1413,21 +1525,35 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
         only_managed=False
     ).with_entities(Reservation, Ticket)
     query = query.options(undefer(Reservation.data))
-    if self.occupancy_fields:
+    if all_occupancy_field_ids:
         query = query.outerjoin(
             FormSubmission,
             FormSubmission.id == Reservation.token
         ).add_columns(*(
-            FormSubmission.data[as_internal_id(field)].astext.label(field)
-            for field in self.occupancy_fields
+            FormSubmission.data[field_id].astext.label(field_id)
+            for field_id in all_occupancy_field_ids
         ))
+        extra_mapping = {
+            resource_id: [
+                all_occupancy_field_ids.index(as_internal_id(field))
+                for field in resource.occupancy_fields
+            ]
+            for resource_id, resource in blocking_resources.items()
+            if resource.occupancy_fields
+        }
+        if self.occupancy_fields:
+            extra_mapping[self.id] = [
+                all_occupancy_field_ids.index(as_internal_id(field))
+                for field in self.occupancy_fields
+            ]
+    else:
+        extra_mapping = {}
 
     # get all blockers
     blockers = scheduler.visible_blockers()
     blockers = blockers.filter(start <= ReservationBlocker.start)
     blockers = blockers.filter(ReservationBlocker.end <= end)
 
-    blocking_resources = self.blocking_resources()
     return *(
         holiday.as_dict()
         for holiday in utils.HolidayEventInfo.from_request(
@@ -1439,7 +1565,8 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
             request,
             self,
             query,
-            blocking_resources
+            blocking_resources,
+            extra_mapping
         )
     ), *(
         blk.as_dict()
@@ -1493,7 +1620,6 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
         ))
         .group_by(accepted)
         .with_entities(accepted, func.count(Reservation.id))
-        .tuples()
     )
 
     layout = DefaultLayout(self, request)
@@ -1527,6 +1653,9 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'block_url': request.csrf_protected_url(
+            request.link(self, 'add-blocker')
+        ) if request.is_manager else None,
         'stats_url': request.link(self, name='occupancy-stats'),
         'resources_url': request.class_link(
             ResourceCollection,
@@ -1534,6 +1663,24 @@ def view_occupancy(
             query_params={'view': 'occupancy'}
         )
     }
+
+
+def resolve_reservations_access(
+    request: OrgRequest
+) -> tuple[str | None, bool, UUID | None]:
+    """Returns (email, limited, reservation_token). A logged-in citizen sees
+    the full view (limited=False); a magic-link token grants only the limited
+    view (limited=True): reservations linked to token, no key codes, no ticket
+    links. When the magic link carries a reservation_token, the limited view is
+    restricted to that single ticket/token."""
+    if request.authenticated_email:
+        return request.authenticated_email, False, None
+    payload = request.load_url_safe_token(
+        request.GET.get('token'), request.GET.get('salt'), None
+    )
+    if not isinstance(payload, dict):
+        return None, False, None
+    return payload['email'], True, payload.get('token')
 
 
 @OrgApp.json(
@@ -1555,7 +1702,8 @@ def view_my_reservations_json(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, limited, reservation_token = resolve_reservations_access(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1566,11 +1714,16 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+    conditions = [
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
-        stmt.c.start <= end
-    )))
+        stmt.c.start <= end,
+    ]
+
+    if reservation_token:
+        conditions.append(stmt.c.token == reservation_token)
+
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     return [
         utils.MyReservationEventInfo(
@@ -1586,7 +1739,8 @@ def view_my_reservations_json(
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
             key_code=r.key_code,
-            request=request
+            request=request,
+            limited=limited
         ).as_dict() for r in records
     ]
 
@@ -1604,7 +1758,8 @@ def view_my_reservations_pdf(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, limited, reservation_token = resolve_reservations_access(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1616,12 +1771,15 @@ def view_my_reservations_pdf(
     stmt = as_selectable_from_path(path)
 
     conditions = [
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
 
-    if request.GET.get('accepted') == '1':
+    if reservation_token:
+        conditions.append(stmt.c.token == reservation_token)
+
+    if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
@@ -1640,16 +1798,17 @@ def view_my_reservations_pdf(
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
             key_code=r.key_code,
-            request=request
+            request=request,
+            limited=limited
         ) for r in records
     ], start, end)
 
     return Response(
         content.read(),
         content_type='application/pdf',
-        content_disposition='attachment; filename='
-        'my-reservations-{}-{}-{}.pdf'.format(
-            request.authenticated_email,
+        # limited: no email in the filename
+        content_disposition='attachment; filename={}-{}-{}.pdf'.format(
+            'my-reservations' if limited else f'my-reservations-{email}',
             start.strftime('%Y%m%d'),
             end.strftime('%Y%m%d')
         )
@@ -1668,7 +1827,13 @@ def view_my_reservations(
     layout: DefaultLayout | None = None
 ) -> RenderData:
 
-    assert_citizen_logged_in(request)
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    email, limited, _reservation_token = resolve_reservations_access(request)
+    if email is None:
+        # no session, no valid token: redirect to login
+        assert_citizen_logged_in(request)
 
     # NOTE: For some reason we need to manually include common
     #       and fullcalendar in addition to occupancycalendar
@@ -1677,6 +1842,12 @@ def view_my_reservations(
     request.include('fullcalendar')
     request.include('occupancycalendar')
 
+    # limited visitors carry their token into the feeds
+    feed_params = {
+        'token': request.GET.get('token') or '',
+        'salt': request.GET.get('salt') or '',
+    } if limited else {}
+
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
@@ -1684,7 +1855,7 @@ def view_my_reservations(
         Link(_('My Reservations'), '#')
     ]
 
-    layout.editbar_links = [
+    layout.editbar_links = [] if limited else [
         Link(
             _('Subscribe'),
             request.link(self, 'my-reservations-subscribe'),
@@ -1709,8 +1880,16 @@ def view_my_reservations(
             default_view='timeGridWeek'
         ),
         'layout': layout,
-        'feed': request.link(self, name='my-reservations-json'),
-        'pdf_url': request.link(self, name='my-reservations-pdf'),
+        'feed': request.link(
+            self, name='my-reservations-json', query_params=feed_params
+        ),
+        'pdf_url': request.link(
+            self, name='my-reservations-pdf', query_params=feed_params
+        ),
+        'limited': limited,
+        'login_url': request.link(
+            Auth.from_request_path(request), name='citizen-login'
+        ),
     }
 
 
@@ -1778,14 +1957,20 @@ def view_my_reservations_ical(
     request: OrgRequest
 ) -> Response:
 
-    token = request.GET.get('token')
     salt = request.GET.get('salt')
-    email = request.load_url_safe_token(token, salt, None)
+    token = request.GET.get('token')
+    payload = request.load_url_safe_token(token, salt, None)
     include_key_code = False
-    if email is None:
+    reservation_token: UUID | None = None
+    if isinstance(payload, list):  # existing handed-out key-code links
+        email, include_key_code = payload
+    elif isinstance(payload, dict):  # per-ticket magic links
+        email = payload.get('email')
+        reservation_token = payload.get('token')
+    else:  # plain-string tokens / durable feed links
+        email = payload
+    if not isinstance(email, str):
         raise exc.HTTPForbidden()
-    elif isinstance(email, list):
-        email, include_key_code = email
 
     s = utcnow() - timedelta(days=30)
     e = utcnow() + timedelta(days=365)
@@ -1811,12 +1996,15 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
+    conditions = [
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)
-    )))
+    ]
+    if reservation_token:
+        conditions.append(stmt.c.token == reservation_token)
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     ticket_label = request.translate(_('Check request status'))
     key_code_label = request.translate(_('Key Code'))
@@ -1845,8 +2033,9 @@ def view_my_reservations_ical(
 
         cal.add_component(evt)
 
+    # durable magic-link feed: no email in the filename
     suffix = '-with-key-codes' if include_key_code else ''
-    filename = f'inline; filename=my-reservations-{email}{suffix}.ics'
+    filename = f'inline; filename=my-reservations{suffix}.ics'
     return Response(
         cal.to_ical(),
         content_type='text/calendar',
@@ -1923,7 +2112,10 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     if blocking_resources:
         resources = self.blocking_resources()
     else:
-        resources = {}
+        # even if we exclude blocking resources we want to include our
+        # virtual resource, since those reservations still apply to the
+        # same physical resource
+        resources = {self.virtual_id: self}
     resources[self.id] = self
 
     all_ical_fields = {
@@ -1960,10 +2152,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)
     )
-    if len(resources) > 1:
-        query = query.filter(Reservation.resource.in_(resources.keys()))
-    else:
-        query = query.filter(Reservation.resource == self.id)
+    query = query.filter(Reservation.resource.in_(resources.keys()))
     if all_ical_fields:
         query = query.outerjoin(
             FormSubmission,
@@ -2063,17 +2252,15 @@ def view_export_all(
     self: ResourceCollection,
     request: OrgRequest,
     form: AllResourcesExportForm,
-    layout: ResourceLayout | None = None
+    layout: ResourcesLayout | None = None
 ) -> RenderData | BaseResponse:
 
-    # FIXME: Why are we using ResouceLayout and not ResourcesLayout?
-    #        this is a weird hack, if you want to be able to use the
-    #        ResourceLayout with ResourceCollection, then make it work
-    #        in the Layout, not by patching the collection...
     self.title = _('Export All')  # type:ignore
-    layout = layout or ResourceLayout(self, request)  # type:ignore
-    layout.editbar_links = None
+    layout = layout or ResourcesLayout(self, request)
     layout.edit_mode = True
+    layout.editmode_links[0].text = _('Export')  # type:ignore
+    layout.editmode_links[0].attrs['class'].discard('save-link')  # type:ignore
+    layout.editmode_links[0].attrs['class'].add('export-link')  # type:ignore
 
     if form.submitted(request):
 
@@ -2178,7 +2365,10 @@ def run_export(
     start, end = sedate.align_range_to_day(start, end, resource.timezone)
 
     query: Query[ReservationExportRow]
-    query = resource.reservations_with_tickets_query(start, end)  # type:ignore
+    query = resource.reservations_with_tickets_query(  # type: ignore[attr-defined]
+        start, end,
+        include_virtual=True
+    )
     # FormSubmission is optional
     query = query.outerjoin(
         FormSubmission, Reservation.token == FormSubmission.id

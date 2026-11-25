@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.crypto.password import hash_password, verify_password
 from onegov.core.crypto.random import random_password
 from onegov.core.crypto.token import random_token

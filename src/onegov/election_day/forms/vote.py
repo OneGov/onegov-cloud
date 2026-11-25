@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -14,6 +12,7 @@ from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
@@ -74,8 +73,8 @@ class VoteForm(Form):
         label=_('Type'),
         fieldset=_('Properties'),
         choices=[
-            ('simple', _('Simple Vote')),
-            ('complex', _('Vote with Counter-Proposal')),
+            SelectChoice('simple', _('Simple Vote')),
+            SelectChoice('complex', _('Vote with Counter-Proposal')),
         ],
         validators=[
             InputRequired()
@@ -87,8 +86,8 @@ class VoteForm(Form):
         label=_('Counter Proposal'),
         fieldset=_('Properties'),
         choices=[
-            ('direct', _('Direct (Counter Proposal)')),
-            ('indirect', _('Indirect (Counter Proposal)')),
+            SelectChoice('direct', _('Direct (Counter Proposal)')),
+            SelectChoice('indirect', _('Indirect (Counter Proposal)')),
         ],
         validators=[
             InputRequired()
@@ -148,8 +147,8 @@ class VoteForm(Form):
         label=_('Counter Proposal'),
         fieldset=_('View options'),
         choices=[
-            ('direct', _('Direct (Counter Proposal)')),
-            ('indirect', _('Indirect (Counter Proposal)')),
+            SelectChoice('direct', _('Direct (Counter Proposal)')),
+            SelectChoice('indirect', _('Indirect (Counter Proposal)')),
         ],
         validators=[
             InputRequired()
@@ -347,21 +346,27 @@ class VoteForm(Form):
             self.delete_field('tie_breaker_vocabulary')
             self.delete_field('direct_vocabulary')
 
-        self.domain.choices = list(principal.domains_vote.items())
-
-        entities_year = date.today().year
-        if entities_year not in principal.entities and principal.entities:
-            entities_year = max(principal.entities)
-        municipalities = {
-            m for entity in principal.entities.get(entities_year, {}).values()
-            for m in (entity.get('name'),) if m
-        }
-        self.municipality.choices = [
-            (item, item) for item in sorted(municipalities)
+        self.domain.choices = [
+            SelectChoice(value, label)
+            for value, label in principal.domains_vote.items()
         ]
+
         if principal.domain == 'municipality':
             assert principal.name is not None
-            self.municipality.choices = [(principal.name, principal.name)]
+            self.municipality.choices = [SelectChoice(principal.name)]
+        else:
+            entities_year = date.today().year
+            if entities_year not in principal.entities and principal.entities:
+                entities_year = max(principal.entities)
+            municipalities = {
+                m for entity in principal.entities.get(
+                    entities_year, {}
+                ).values()
+                for m in (entity.get('name'),) if m
+            }
+            self.municipality.choices = [
+                SelectChoice(item) for item in sorted(municipalities)
+            ]
 
         self.title_de.validators = []
         self.title_fr.validators = []
@@ -517,7 +522,7 @@ class VoteForm(Form):
         if model.type == 'complex':
             model = cast('ComplexVote', model)
             self.type.choices = [
-                ('complex', _('Vote with Counter-Proposal'))
+                SelectChoice('complex', _('Vote with Counter-Proposal'))
             ]
             self.type.data = 'complex'
 
@@ -538,7 +543,7 @@ class VoteForm(Form):
             self.tie_breaker_title_rm.data = titles.get('rm_CH')
 
         else:
-            self.type.choices = [('simple', _('Simple Vote'))]
+            self.type.choices = [SelectChoice('simple', _('Simple Vote'))]
             self.type.data = 'simple'
 
             for fieldset in self.fieldsets:

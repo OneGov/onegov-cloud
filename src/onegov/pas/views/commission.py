@@ -1,4 +1,3 @@
-from __future__ import annotations
 from datetime import date
 from itertools import groupby
 
@@ -11,7 +10,8 @@ from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
-from onegov.pas.utils import is_active_kantonsrat_member
+from onegov.pas.utils import get_attendance_parliamentarians
+from onegov.pas.utils import get_attendance_settlement_run
 from onegov.user import User
 
 from typing import TYPE_CHECKING
@@ -117,10 +117,15 @@ def commissions_parliamentarians_json(
 
     session = request.session
     today = date.today()
+    run = get_attendance_settlement_run(request)
+    start = run.start if run else today
+    end = run.end if run else today
+    eligible = {p.id for p in get_attendance_parliamentarians(request)}
     memberships = [
         membership
         for membership in session.query(PASCommissionMembership).all()
-        if membership.is_active_on(today)
+        if (membership.start is None or membership.start <= end)
+        and (membership.end is None or membership.end >= start)
     ]
 
     # If user is parliamentarian, filter to only their commissions
@@ -135,7 +140,7 @@ def commissions_parliamentarians_json(
 
         # Get commission IDs where this parliamentarian is a member
         parliamentarian_commission_ids = {
-            str(m.commission_id)
+            m.commission_id.hex
             for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
                 on_date=today,
             )
@@ -145,7 +150,7 @@ def commissions_parliamentarians_json(
         valid_memberships = (
             m for m in memberships
             if m.parliamentarian
-            and str(m.commission_id) in parliamentarian_commission_ids
+            and m.commission_id.hex in parliamentarian_commission_ids
         )
     # If user is commission_president, filter to only their commissions
     elif (hasattr(request.identity, 'role')
@@ -159,7 +164,7 @@ def commissions_parliamentarians_json(
 
         # Get commission IDs where this user is president
         president_commission_ids = {
-            str(m.commission_id)
+            m.commission_id.hex
             for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
                 on_date=today,
                 role='president',
@@ -170,14 +175,14 @@ def commissions_parliamentarians_json(
         valid_memberships = (
             m for m in memberships
             if m.parliamentarian
-            and str(m.commission_id) in president_commission_ids
+            and m.commission_id.hex in president_commission_ids
         )
     else:
         # Admin gets all commissions
         valid_memberships = (m for m in memberships if m.parliamentarian)
 
     def key_func(m: PASCommissionMembership) -> str:
-        return str(m.commission_id)
+        return m.commission_id.hex
 
     # Note: Iterable passed into groupby needs to be sorted
     sorted_memberships = sorted(valid_memberships, key=key_func)
@@ -185,11 +190,11 @@ def commissions_parliamentarians_json(
     return {
         commission_id: [
             {
-                'id': str(m.parliamentarian.id),
+                'id': m.parliamentarian.id.hex,
                 'title': m.parliamentarian.title
             }
             for m in group
-            if is_active_kantonsrat_member(m.parliamentarian)
+            if m.parliamentarian_id in eligible
         ]
         for commission_id, group in groupby(sorted_memberships, key=key_func)
     }

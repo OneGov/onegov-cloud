@@ -1,11 +1,8 @@
-from __future__ import annotations
-
 import transaction
 
 from datetime import datetime, timezone
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.upgrade import UpgradeContext
 from onegov.core.utils import Bunch
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
@@ -17,6 +14,7 @@ from onegov.file.utils import as_fileintent
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
     from sqlalchemy.orm import Session
 
 
@@ -409,8 +407,9 @@ def test_upgrade_preserves_modified_timestamp(session: Session) -> None:
     session.flush()
 
     context = Bunch(session=session, has_column=lambda table, col: True)
-    calc_content_hash_for_directory_entries(cast(UpgradeContext, context))
+    calc_content_hash_for_directory_entries(cast('UpgradeContext', context))
     session.flush()
+    session.refresh(conference)
 
     assert conference.content_hash is not None
     assert conference.modified == original_modified

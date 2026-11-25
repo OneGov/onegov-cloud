@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
@@ -18,6 +16,7 @@ from onegov.pas.collections.parliamentarian import (
 from onegov.pas import _
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
@@ -56,7 +55,10 @@ class PASParliamentarianForm(NamedFileForm):
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
-        choices=list(GENDERS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in GENDERS.items()
+        ],
         validators=[InputRequired()],
         default='male'
     )
@@ -83,7 +85,10 @@ class PASParliamentarianForm(NamedFileForm):
     shipping_method = TranslatedSelectField(
         label=_('Shipping method'),
         fieldset=_('Shipping address'),
-        choices=list(SHIPPING_METHODS.items()),
+        choices=[
+            SelectChoice(value, label)
+            for value, label in SHIPPING_METHODS.items()
+        ],
         validators=[InputRequired()],
         default='a'
     )

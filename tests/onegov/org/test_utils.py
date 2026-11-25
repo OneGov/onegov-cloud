@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date, datetime
 from markupsafe import Markup
 from onegov.core.utils import Bunch, generate_fts_phonenumbers

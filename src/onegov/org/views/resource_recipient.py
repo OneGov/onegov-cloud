@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.forms import ResourceRecipientForm
@@ -56,7 +54,6 @@ def view_resource_recipients(
             ResourceCollection(request.app.libres_context).query()
             .with_entities(Resource.group, Resource.title, Resource.id)
             .order_by(Resource.group, Resource.name)
-            .tuples()
         )
     }
 

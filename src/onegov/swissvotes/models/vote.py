@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from datetime import date as date_t
 from decimal import Decimal

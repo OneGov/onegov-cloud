@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.models.election_compound.mixins import (
     DerivedAttributesMixin)
 from onegov.election_day.models.party_result.mixins import (

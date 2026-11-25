@@ -24,6 +24,10 @@
             <a href="${my_reservations_url}" i18n:translate>See all your reservations</a>
         </p>
 
+        <p tal:condition="subscribe_url|nothing">
+            <a href="${subscribe_url}" i18n:translate>Subscribe to your reservations calendar</a>
+        </p>
+
         <tal:b condition="changes">
             <hr class="large">
             <p><b i18n:translate>Changes to your submitted reservations:</b></p>

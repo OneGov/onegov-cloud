@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import math
 import morepath
@@ -988,9 +986,9 @@ def test_suggestions(postgres_dsn: str) -> None:
     suggestions = session.query(
         func.unnest(
             SearchIndex.suggestion
-        ).distinct().label('suggestion'),
+        ).label('suggestion'),
         SearchIndex.public.label('public'),
-    ).subquery()
+    ).distinct().subquery()
     query = session.query(suggestions.c.suggestion)
 
     assert {s for s, in query.filter(
@@ -1212,7 +1210,7 @@ def test_date_decay(postgres_dsn: str) -> None:
     session.add(one)
     session.add(two)
 
-    def search(title: str) -> list[int]:
+    def search(title: str) -> list[int | None]:
         transaction.commit()
 
         search = session.query(SearchIndex.owner_id_int)

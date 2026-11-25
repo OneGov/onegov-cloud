@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.core import Framework
@@ -91,6 +89,7 @@ def browser(
     browser.baseurl = wsgi_server.url
     browser.websocket_server_url = websocket_server.url
     yield browser
+    browser.close_contexts()
 
 
 @pytest.fixture(scope="session", autouse=True)

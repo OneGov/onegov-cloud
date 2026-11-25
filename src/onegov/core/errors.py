@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -33,6 +31,11 @@ class EmptyFileError(CSVError):
 
 class EmptyLineInFileError(CSVError):
     pass
+
+
+class MissingValuesInLineError(CSVError):
+    def __init__(self, line: int):
+        self.line = line
 
 
 class AlreadyLockedError(Exception):

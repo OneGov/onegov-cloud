@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from depot.manager import DepotManager
@@ -180,3 +178,4 @@ def browser(
 ) -> Iterator[ExtendedBrowser]:
     browser.baseurl = form_app_url
     yield browser
+    browser.close_contexts()

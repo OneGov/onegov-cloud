@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import Bunch
 from onegov.user import UserCollection
 from onegov.user.upgrade import fix_stringified_user_tags

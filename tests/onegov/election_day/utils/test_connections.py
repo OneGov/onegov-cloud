@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.election.connections import (

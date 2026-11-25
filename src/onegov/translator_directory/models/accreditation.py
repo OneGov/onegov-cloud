@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from functools import cached_property
 from onegov.translator_directory.models.translator import Translator

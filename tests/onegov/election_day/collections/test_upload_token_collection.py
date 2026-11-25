@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.collections import UploadTokenCollection
 
 

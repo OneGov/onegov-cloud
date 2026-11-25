@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 import transaction
 
@@ -22,7 +20,7 @@ from uuid import UUID, uuid4, uuid5
 from wtforms.widgets import html_params
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
@@ -270,7 +268,7 @@ class DatatransFeePolicy:
 class DatatransPayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'datatrans'}
 
-    fee_policy: FeePolicy = DatatransFeePolicy
+    fee_policy: ClassVar[FeePolicy] = DatatransFeePolicy
 
     #: the refno of the transaction
     refno: dict_property[str | None] = meta_property()
@@ -375,7 +373,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
 
     __mapper_args__ = {'polymorphic_identity': 'datatrans'}
 
-    fee_policy: FeePolicy = DatatransFeePolicy
+    fee_policy: ClassVar[FeePolicy] = DatatransFeePolicy
 
     #: Whether or not this is a Sandbox account
     sandbox: dict_property[bool] = meta_property(default=False)

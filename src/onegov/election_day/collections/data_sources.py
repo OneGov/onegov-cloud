@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from sqlalchemy import desc
-
 from onegov.core.collection import Pagination
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
@@ -38,7 +34,7 @@ class DataSourceCollection(Pagination[DataSource]):
 
     def query(self) -> Query[DataSource]:
         return self.session.query(DataSource).order_by(
-            desc(DataSource.created))
+            DataSource.created.desc())
 
     def by_id(self, id: UUID) -> DataSource | None:
         return self.query().filter(DataSource.id == id).first()
