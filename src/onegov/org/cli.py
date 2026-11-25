@@ -1869,11 +1869,13 @@ def import_news(
             image_counter = 0
             article_number = article_name.split('.')[0]
 
-            article_date = datetime.strptime(article_name.split('_')[0],
-                                             '%Y-%m-%d')
             publication_start = datetime.strptime(
                         news_item['metadata']['published'],
                         '%Y-%m-%dT%H:%M:%S')
+            # the --start/--end-date filter uses the article's own publication
+            # date from its metadata, not the filename, so plain ``<id>.json``
+            # files (as the scraper writes them) work too
+            article_date = publication_start
             publication_start = publication_start.replace(
                         tzinfo=pytz.UTC)
 
