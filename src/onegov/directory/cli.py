@@ -141,6 +141,13 @@ def import_directory_from_ogi_scraper(
                 f'Recreating directory {title!r} (dropping '
                 f'{len(directory.entries)} existing entry/entries)',
                 fg='yellow')
+            # delete entries (and unlink files) before the directory itself,
+            # otherwise the entries' directory_id is nulled instead of removed
+            if hasattr(directory, 'files'):
+                directory.files = []
+                session.flush()
+            for entry in list(directory.entries):
+                session.delete(entry)
             directories.delete(directory)
             session.flush()
             directory = None
