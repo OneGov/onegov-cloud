@@ -79,11 +79,7 @@ class OneGovCloudIntegration(Integration):
                     request.path,
                     SegmentNameSource.URL
                 )
-                scope = get_isolation_scope()
-                if user_id := request.identity.userid:
-                    scope.set_user({'id': user_id})
-
-                scope.add_event_processor(
+                get_isolation_scope().add_event_processor(
                     _make_event_processor(
                         weakref.ref(request), integration
                     )
