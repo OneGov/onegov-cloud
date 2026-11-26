@@ -240,18 +240,24 @@ def test_create_directory_accordion_layout(
             assert page.text.count(question) == 2
             if 'Question' in hide_labels:
                 assert question_label not in page
+                assert f'{question}' in page
             else:
                 assert question_label in page
+                # string field renders inline: label, then value, no <br>
+                assert f'{question_label} {question}' in page
         else:
             assert page.text.count(question) == 1
             assert question_label not in page
+            assert f'{question}' in page
 
         if 'Answer' in content_labels:
             assert answer in page
             if 'Answer' in hide_labels:
                 assert answer_label not in page
+                assert f'{answer_label} {answer}' not in page
             else:
                 assert answer_label in page
+                assert f'{answer_label} {answer}' in page
         else:
             assert answer not in page
             assert answer_label not in page
@@ -284,6 +290,52 @@ def test_create_directory_accordion_layout(
     page = client.get(
         f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
     test_labels()
+
+
+def test_accordion_layout_renders_field_types(client: Client) -> None:
+    # radio/checkbox/textarea in accordion mode must render via
+    # form.render_display (checkmarks, line breaks), not raw values
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Recycling'
+    page.form['structure'] = dedent("""
+        Name *= ___
+        Kosten *=
+            (x) kostenlos
+            ( ) kostenpflichtig
+        Abgabestelle *=
+            [ ] Ökihof
+            [ ] Landfill
+            [ ] Verbrennungsanlage
+        Details = ...
+    """)
+    page.form['title_format'] = '[Name]'
+    page.form['layout'] = 'accordion'
+    page.form['content_fields'] = 'Name\nKosten\nAbgabestelle\nDetails'
+    page.form.submit().follow()
+
+    entry = client.get('/directories/recycling').click('Eintrag')
+    entry.form['name'] = 'Aluminium'
+    entry.form['kosten'] = 'kostenlos'
+    entry.form['abgabestelle'] = ['Ökihof', 'Landfill']
+    entry.form['details'] = 'Besuch https://example.org\nTelefon 041 499 66 88'
+    entry.form.submit().follow()
+
+    page = client.get('/directories/recycling')
+
+    # radio: checkmark, label on its own line
+    assert '<strong>Kosten</strong>: <br>✓ kostenlos' in page
+
+    # checkbox: each selected value on its own line with a checkmark
+    assert '<strong>Abgabestelle</strong>: <br>✓ Ökihof<br>✓ Landfill' in page
+
+    # textarea: newlines become <br>, raw list/value never leaks
+    assert '<strong>Details</strong>: <br>Besuch ' in page
+
+    # links: urls, phone numbers and emails in free text get linkified
+    assert '<a href="https://example.org" rel="nofollow">' in page
+    assert '<a href="tel:+41414996688">041 499 66 88</a>' in page
 
 
 def test_directory_entry_hash_shown_without_change_requests(
