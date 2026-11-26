@@ -16,6 +16,7 @@ dependencies = [
     "attrs",
     "babel",
     "bad-passwords",
+    "bcrypt",
     "bjoern",
     "blinker",
     "bs4",
@@ -671,4 +672,4 @@ docstring-code-line-length = "dynamic"
 known_first_party = ["onegov"]
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["cssmin"]
+DEP002 = ["bcrypt", "cssmin"]
