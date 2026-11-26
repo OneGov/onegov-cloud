@@ -40,7 +40,6 @@ def monkeypatch_test_transport(
 class MyTestTransport(Transport):
     def __init__(self) -> None:
         Transport.__init__(self)
-        self.capture_event = lambda event: None  # type: ignore[method-assign]
         self._queue = None
 
     def capture_envelope(self, envelope: object) -> None:
@@ -78,22 +77,14 @@ def capture_events(
         events = []
         test_client = sentry_sdk.get_client()
         assert test_client.transport is not None
-        old_capture_event = test_client.transport.capture_event
         old_capture_envelope = test_client.transport.capture_envelope
-
-        def append_event(event: Event) -> str | None:
-            events.append(event)
-            return old_capture_event(event)
 
         def append_envelope(envelope: Envelope) -> str | None:
             for item in envelope:
-                if item.headers.get('type') in ('event', 'transaction'):
-                    assert test_client.transport is not None
-                    test_client.transport.capture_event(item.payload.json)  # type: ignore[arg-type]
+                if (event := item.get_event()) is not None:
+                    events.append(event)
             return old_capture_envelope(envelope)
 
-        monkeypatch.setattr(
-            test_client.transport, 'capture_event', append_event)
         monkeypatch.setattr(
             test_client.transport, 'capture_envelope', append_envelope)
         return events
@@ -163,7 +154,32 @@ def sentry_app(
     sentry_init(
         # we allow ourselves to optionally parametrize whether
         # or not to send personally identifiable information
-        send_default_pii=with_ppi,
+        data_collection={} if with_ppi else {
+            'user_info': False,
+            'http_bodies': [],
+            'graphql': {'document': False, 'variables': False},
+            'gen_ai': {'inputs': False, 'outputs': False},
+            'mcp': {'inputs': False, 'outputs': False},
+            'database_query_data': False,
+            'queues': False,
+            'stack_frame_variables': {'mode': 'denylist'},
+            'http_headers': {
+                'request': {
+                    'mode': 'denylist',
+                    'terms': [
+                        'forwarded', '-ip', 'remote-', 'via', '-user'
+                    ],
+                },
+            },
+            'cookies': {
+                'mode': 'denylist',
+                'terms': ['forwarded', '-ip', 'remote-', 'via', '-user'],
+            },
+            'url_query_params': {
+                'mode': 'denylist',
+                'terms': ['forwarded', '-ip', 'remote-', 'via', '-user'],
+            },
+        },
         integrations=[OneGovCloudIntegration()]
     )
 
@@ -294,23 +310,14 @@ def test_has_context(
             'ip_address': None,
             'email': None
         }
-        assert event['request'] == {
-            'env': {'SERVER_NAME': 'localhost', 'SERVER_PORT': '80'},
-            'cookies': {},
-            'headers': {'Host': 'localhost:80'},
-            'method': 'GET',
-            'query_string': '',
-            'url': 'http://localhost/test',
-        }
     else:
         assert event['user'] == {'id': None, 'data': {'role': 'anonymous'}}
-        assert event['request'] == {
-            'env': {'SERVER_NAME': 'localhost', 'SERVER_PORT': '80'},
-            'headers': {'Host': 'localhost:80'},
-            'method': 'GET',
-            'query_string': '',
-            'url': 'http://localhost/test',
-        }
+    assert event['request'] == {
+        'env': {'SERVER_NAME': 'localhost', 'SERVER_PORT': '80'},
+        'headers': {'Host': 'localhost:80'},
+        'method': 'GET',
+        'url': 'http://localhost/test',
+    }
     assert event['transaction'] == '/test'
 
     extra = event['extra']

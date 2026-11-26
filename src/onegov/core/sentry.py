@@ -6,12 +6,13 @@ from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
 from more.transaction.main import transaction_tween_factory
 from sentry_sdk import capture_event, get_client
+from sentry_sdk import get_current_scope, get_isolation_scope
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
-from sentry_sdk.scope import Scope, should_send_default_pii
-from sentry_sdk.tracing import SOURCE_FOR_STYLE
+from sentry_sdk.traces import SegmentNameSource
 from sentry_sdk.utils import (
     capture_internal_exceptions,
+    ensure_integration_enabled,
     event_from_exception,
 )
 from webob.exc import HTTPException, HTTPServiceUnavailable
@@ -42,7 +43,7 @@ class OneGovCloudIntegration(Integration):
     """
 
     identifier = 'onegov-cloud'
-    transaction_style = 'path'
+    origin = f'auto.http.{identifier}'
 
     def __init__(self, with_wsgi_middleware: bool = True):
         self.with_wsgi_middleware = with_wsgi_middleware
@@ -68,19 +69,21 @@ class OneGovCloudIntegration(Integration):
         ) -> Callable[[CoreRequest], Response]:
 
             def sentry_tween(request: CoreRequest) -> Response:
-                """ Configures scope and starts transaction """
-
                 integration = get_client().get_integration(
                     OneGovCloudIntegration
                 )
                 if integration is None:
                     return handler(request)
 
-                Scope.get_current_scope().set_transaction_name(
+                get_current_scope().set_transaction_name(
                     request.path,
-                    SOURCE_FOR_STYLE[integration.transaction_style]
+                    SegmentNameSource.URL
                 )
-                Scope.get_isolation_scope().add_event_processor(
+                scope = get_isolation_scope()
+                if user_id := request.identity.userid:
+                    scope.set_user({'id': user_id})
+
+                scope.add_event_processor(
                     _make_event_processor(
                         weakref.ref(request), integration
                     )
@@ -116,6 +119,9 @@ class OneGovCloudIntegration(Integration):
 class CoreRequestExtractor(RequestExtractor):
     request: CoreRequest
 
+    def url(self) -> str:
+        return self.request.path_url
+
     def env(self) -> WSGIEnvironment:
         return self.request.environ
 
@@ -147,13 +153,13 @@ class CoreRequestExtractor(RequestExtractor):
             return 0
 
 
+@ensure_integration_enabled(OneGovCloudIntegration)
 def _capture_exception(exc_info: ExcInfo) -> None:
     if exc_info[0] is None or issubclass(exc_info[0], HTTPException):
         return
 
     event, hint = event_from_exception(
         exc_info,
-        client_options=get_client().options,
         mechanism={'type': 'onegov-cloud', 'handled': False},
     )
 
@@ -194,7 +200,7 @@ def _make_event_processor(
 
             user_data.setdefault(
                 'role', getattr(request.identity, 'role', 'anonymous'))
-            if should_send_default_pii():
+            if get_client().options['data_collection']['user_info']:
                 user_info.setdefault(
                     'ip_address', request.environ.get('HTTP_X_REAL_IP'))
                 user_info.setdefault('email', request.identity.userid)
