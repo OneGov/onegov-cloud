@@ -1976,11 +1976,25 @@ def import_reservations(
     Creates no resources. Reservations are made as internal reservations,
     so they ignore the regular allocations (availability periods).
 
+    Rows with the same shopping cart id (Warenkorb-Nr.) are merged into one
+    reservation if all their imported columns match. Rows whose details
+    differ become separate reservations, logged as "<id> (2)", "<id> (3)", ...
+
     Output is printed and additionally written to two log files, one for
     successful imports and one for warnings and errors.
     """
 
     fixed_columns = {0, 3, 6, 8, 22, 37}
+
+    # Columns that differ between the rows of the same reservation (order
+    # number, dates, times, weekday, number of dates and duration), so they
+    # aren't compared when deciding whether to merge rows
+    per_date_columns = {2, 6, 7, 8, 9, 10, 11, 12}
+
+    def normalize_detail(value: object) -> str:
+        text = re.sub(
+            r'<br\s*/?>', ' ', str(value or ''), flags=re.IGNORECASE)
+        return ' '.join(text.split())
 
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
         run_logged_reservation_import(
@@ -2006,44 +2020,55 @@ def import_reservations(
         }
         prefilled_fields = yaml_dict.get('prefilled_fields', {})
 
-        # A reservation may span multiple consecutive rows with the same id
+        # Rows of the same shopping cart (Warenkorb-Nr.) are only merged into
+        # one reservation if all imported columns match (e-mail, status and
+        # the shared fields of the mapping)
+        detail_columns = sorted(
+            {22, 37, *(i for i, _ in shared_fields)} - per_date_columns)
+        row_length = max(*fixed_columns, *detail_columns) + 1
+
+        # A reservation may span multiple (not necessarily consecutive) rows
+        # with the same shopping cart id. Rows whose details differ become
+        # separate reservations, keyed as "<id> (2)", "<id> (3)", ...
         reservations: ImportedReservations = {}
-        last_id = ''
+        # resource name -> (id, *details) -> reservation key
+        keys: dict[str, dict[tuple[str, ...], str]] = {}
+        # (resource name, order number) -> reservation key, for the options
+        order_keys: dict[tuple[str, str], str] = {}
         book = load_workbook(reservation_file, read_only=True)
         for row in iter_export_rows(book['Reservationsdaten']):
             if not row or row[0] is None:
                 continue
-            if len(row) < 38:
-                row = (*row, *(None,) * (38 - len(row)))
+            if len(row) < row_length:
+                row = (*row, *(None,) * (row_length - len(row)))
 
             resource_name = str(row[0]).strip()
             id = str(row[3])
             resource_reservations = reservations.setdefault(resource_name, {})
+            resource_keys = keys.setdefault(resource_name, {})
 
-            if id == last_id:
-                found = resource_reservations.get(id)
-                if found is None:  # skipped in a test run
-                    continue
-                reservation = found
-            elif id in resource_reservations:
-                # The rows of a reservation aren't always consecutive
-                last_id = id
-                reservation = resource_reservations[id]
-            else:
-                last_id = id
+            group = (id, *(normalize_detail(row[i]) for i in detail_columns))
+            key = resource_keys.get(group)
+            if key is None:
                 if (
                     test_run
                     and len(resource_reservations)
                     >= RESERVATION_TEST_RUN_LIMIT
                 ):
                     continue
-                reservation = {
+                count = sum(1 for g in resource_keys if g[0] == id)
+                key = id if count == 0 else f'{id} ({count + 1})'
+                resource_keys[group] = key
+                resource_reservations[key] = {
                     'state': '',
                     'general': {},
                     'fields': {},
                     'dates': []
                 }
-                resource_reservations[id] = reservation
+
+            reservation = resource_reservations[key]
+            if row[2] is not None:
+                order_keys[resource_name, str(row[2])] = key
 
             fields = reservation['fields']
             email = row[22] if row[22] is not None else 'info@seantis.ch'
@@ -2076,17 +2101,22 @@ def import_reservations(
         book.close()
 
         options_not_found = set()
-        resource_name = id = ''
+        resource_name = order = id = ''
         book = load_workbook(option_file, read_only=True)
         for row in iter_export_rows(book['Reservationen']):
             if len(row) <= 13:
                 continue
             if row[0] is not None:
                 resource_name = str(row[0]).strip()
+            if row[1] is not None:
+                order = str(row[1])
             if row[2] is not None:
                 id = str(row[2])
 
-            option_reservation = reservations.get(resource_name, {}).get(id)
+            # Match by order number, as one shopping cart may have been
+            # split into several reservations
+            key = order_keys.get((resource_name, order), id)
+            option_reservation = reservations.get(resource_name, {}).get(key)
             if row[13] is None or option_reservation is None:
                 continue
             option_name = str(row[13]).strip()
@@ -2278,6 +2308,173 @@ def import_reservations_for_resource(
         create_imported_blockers(request, app, log, resource_name, blockers)
 
     return import_reservations
+
+
+@cli.command(name='delete-reservations', context_settings={'singular': True})
+@click.option('--resource', 'resource_names', multiple=True,
+              help='Name of the resource (as used in its URL) to delete the '
+                   'reservations of. Can be passed multiple times. Defaults '
+                   'to all resources.')
+@click.option('--include-blockers', is_flag=True, default=False,
+              help='Also delete the blockers of the resources.')
+@click.option('--dry-run', is_flag=True, default=False,
+              help='Show what would be deleted without saving.')
+def delete_reservations(
+    resource_names: tuple[str, ...],
+    include_blockers: bool,
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Deletes the reservations of the given resources (or of all resources)
+    on both the regular and the internal (virtual) layer, together with
+    their tickets, form submissions, ticket messages and invoices.
+
+    Allocations are kept. Meant to clean up a local or test instance, e.g.
+    before repeating a reservation import.
+
+    onegov-org --select '/onegov_town6/oberaegeri' delete-reservations
+        --dry-run
+    """
+
+    def delete(request: OrgRequest, app: OrgApp) -> None:
+        from onegov.org.views.ticket import delete_tickets_and_related_data
+        from onegov.ticket import Ticket
+
+        resources = ResourceCollection(app.libres_context)
+        if resource_names:
+            selected = []
+            for name in resource_names:
+                resource = resources.by_name(name)
+                if resource is None:
+                    abort(f'Resource {name} not found')
+                selected.append(resource)
+        else:
+            selected = resources.query().order_by(Resource.title).all()
+
+        total_reservations = total_blockers = total_tickets = 0
+        for resource in selected:
+            tokens = set()
+            reservation_count = blocker_count = 0
+            for scheduler in (
+                resource.get_scheduler(app.libres_context),
+                resource.get_scheduler(app.libres_context, virtual=True),
+            ):
+                reservations = scheduler.managed_reservations().all()
+                reservation_count += len(reservations)
+                resource_tokens = {r.token for r in reservations}
+                for token in resource_tokens:
+                    scheduler.remove_reservation(token)
+                tokens |= resource_tokens
+
+                if include_blockers:
+                    blockers = scheduler.managed_blockers().all()
+                    blocker_count += len(blockers)
+                    for token in {b.token for b in blockers}:
+                        scheduler.remove_blocker(token)
+
+            ticket_count = 0
+            if tokens:
+                request.session.flush()
+                tickets = request.session.query(Ticket).filter(
+                    Ticket.handler_code == 'RSV',
+                    Ticket.handler_id.in_([t.hex for t in tokens])
+                )
+                not_deletable, deleted = delete_tickets_and_related_data(
+                    request, tickets)
+                ticket_count = len(deleted)
+                for ticket in not_deletable:
+                    click.secho(f'Ticket {ticket.number} could not be '
+                                f'deleted (its data was redacted)',
+                                fg='yellow')
+
+            if reservation_count or blocker_count or ticket_count:
+                message = (f'{resource.title}: {reservation_count} '
+                           f'reservation(s), {ticket_count} ticket(s)')
+                if include_blockers:
+                    message += f', {blocker_count} blocker(s)'
+                click.echo(message)
+
+            total_reservations += reservation_count
+            total_blockers += blocker_count
+            total_tickets += ticket_count
+
+        message = (f'Deleted {total_reservations} reservation(s) and '
+                   f'{total_tickets} ticket(s)')
+        if include_blockers:
+            message += f' and {total_blockers} blocker(s)'
+        click.secho(message, fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.echo('Dry run complete. No changes saved.')
+
+    return delete
+
+
+@cli.command(name='remove-resource-email-field',
+             context_settings={'singular': True})
+@click.option('--resource', 'resource_names', multiple=True,
+              help='Name of the resource (as used in its URL) to change. '
+                   'Can be passed multiple times. Defaults to all resources.')
+@click.option('--dry-run', is_flag=True, default=False,
+              help='Show what would be changed without saving.')
+def remove_resource_email_field(
+    resource_names: tuple[str, ...],
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Removes the "E-Mail *= ___" field from the form of the given
+    resources (or of all resources). The e-mail address is asked for
+    separately during a reservation anyway.
+
+    Existing submissions keep their data.
+
+    onegov-org --select '/onegov_town6/oberaegeri'
+        remove-resource-email-field --dry-run
+    """
+    from onegov.form import parse_formcode
+
+    email_line = re.compile(
+        r'^[ \t]*E-Mail[ \t]*\*?[ \t]*=[ \t]*___[ \t]*(?:\r?\n|\Z)',
+        re.MULTILINE
+    )
+
+    def remove_email_field(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+        if resource_names:
+            selected = []
+            for name in resource_names:
+                resource = resources.by_name(name)
+                if resource is None:
+                    abort(f'Resource {name} not found')
+                selected.append(resource)
+        else:
+            selected = resources.query().order_by(Resource.title).all()
+
+        updated = 0
+        for resource in selected:
+            definition = resource.definition or ''
+            new_definition, count = email_line.subn('', definition)
+            if not count:
+                continue
+
+            try:
+                parse_formcode(new_definition, enable_edit_checks=True)
+            except FormError as e:
+                click.secho(f'Invalid formcode for {resource.title} after '
+                            f'removing the e-mail field, skipping: {e!r}',
+                            fg='red')
+                continue
+
+            resource.definition = new_definition
+            updated += 1
+            click.echo(f'{resource.title}: removed {count} e-mail field(s)')
+
+        click.secho(f'{updated} resource(s) updated', fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.echo('Dry run complete. No changes saved.')
+
+    return remove_email_field
 
 
 @cli.command(context_settings={'default_selector': '*'})
