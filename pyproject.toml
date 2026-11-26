@@ -133,10 +133,7 @@ dependencies = [
     "zope.sqlalchemy",
 ]
 
-[project.entry-points.morepath]
-scan = "onegov"
-
-[project.entry-points.console_scripts]
+[project.scripts]
 onegov-agency = "onegov.agency.cli:cli"
 onegov-core = "onegov.core.cli:cli"
 onegov-directory = "onegov.directory.cli:cli"
@@ -157,6 +154,9 @@ onegov-translator = "onegov.translator_directory.cli:cli"
 onegov-user = "onegov.user.cli:cli"
 onegov-websockets = "onegov.websockets.cli:cli"
 onegov-winterthur = "onegov.winterthur.cli:cli"
+
+[project.entry-points.morepath]
+scan = "onegov"
 
 [project.entry-points.onegov_upgrades]
 "onegov.activity" = "onegov.activity.upgrade"
@@ -646,7 +646,7 @@ multiline-quotes = "double"
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
-[tool.ruff.lint.ruff]
+[tool.ruff.lint.flake8-bandit]
 extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.lint.flake8-bugbear]
