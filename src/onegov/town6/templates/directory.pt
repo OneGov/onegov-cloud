@@ -165,5 +165,9 @@
             </div>
 
         </div>
+
+        <tal:b tal:define="imageset directory.photo_album|None;">
+            <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+        </tal:b>
     </tal:b>
 </div>
