@@ -85,7 +85,6 @@ RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4 \
 # build onegov-cloud
 COPY MANIFEST.in /app/src/MANIFEST.in
 COPY pyproject.toml /app/src/pyproject.toml
-COPY setup.cfg /app/src/setup.cfg
 COPY src /app/src/src
 COPY .git /app/.git
 WORKDIR /app

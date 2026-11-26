@@ -129,7 +129,7 @@ jobs:
         python -m pip install --upgrade uv
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
-        uv pip install -e .[test]
+        uv pip install -e . --group test
 
     - name: Prepare test environment
       run: |
