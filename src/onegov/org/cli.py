@@ -804,6 +804,7 @@ def fetch(
                 if prefixed in schemas:
                     # source refers to an entity in the app's own namespace
                     remote_schema = prefixed
+                    source_key = key
                 elif key in schemas:
                     # source is already a full <namespace>-<entity> schema
                     if not cross_namespace:
@@ -812,6 +813,7 @@ def fetch(
                             '--cross-namespace to fetch from another namespace'
                         )
                     remote_schema = key
+                    source_key = key.split('-', 1)[1]
                 else:
                     abort(f'No schema found for source {key!r}')
                 local_schema = app.session_manager.current_schema
@@ -841,7 +843,7 @@ def fetch(
 
                 def remote_events(
                     query: Query[Event] = query,
-                    key: str = key
+                    source_key: str = source_key
                 ) -> Iterator[EventImportItem]:
 
                     for event_ in query:
@@ -857,7 +859,7 @@ def fetch(
                                 content=event_.content,
                                 location=event_.location,
                                 tags=event_.tags,
-                                source=f'fetch-{key}-{event_.name}',
+                                source=f'fetch-{source_key}-{event_.name}',
                                 coordinates=event_.coordinates,
                                 organizer=event_.organizer,
                                 organizer_email=event_.organizer_email,
@@ -908,7 +910,7 @@ def fetch(
                 with app.session_manager.disable_change_signals():
                     added, updated, purged = local_events.from_import(
                         remote_events(),
-                        to_purge=[f'fetch-{key}'],
+                        to_purge=[f'fetch-{source_key}'],
                         publish_immediately=False,
                         valid_state_transfers=valid_state_transfers,
                         published_only=published_only,
