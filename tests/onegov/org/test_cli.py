@@ -480,6 +480,7 @@ def test_fetch_multi_namespace(
     assert get_session('space2', 'qux').query(Event).count() == 0
     event = get_session('space2', 'bar').query(Event).first()
     assert event is not None and event.state == 'published'
+    assert event.source == f'fetch-bar-{event.name}'
 
     # space1-bar[*] -> space2-bar, now including the imported events
     result = runner.invoke(cli, [
