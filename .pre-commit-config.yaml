@@ -29,6 +29,7 @@ repos:
       - id: flake8
         files: '^src.*\.py'
         additional_dependencies:
+        - flake8-pyproject
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
     rev: v18.1.0
@@ -60,7 +61,13 @@ repos:
         language_version: python3.12
   - repo: local
     hooks:
-      - id: system
+      - id: deptry
+        name: deptry
+        entry: ./deptry.sh
+        language: system
+        always_run: true
+        pass_filenames: false
+      - id: mypy
         name: mypy
         entry: ./mypy.sh
         language: system
@@ -69,7 +76,7 @@ repos:
         exclude: '.*'
         always_run: true
         pass_filenames: false
-      - id: system
+      - id: stubtest
         name: stubtest
         entry: ./stubtest.sh
         language: system

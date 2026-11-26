@@ -2,7 +2,9 @@ DART_SASS_VERSION := 1.100.0
 
 install: ensure_uv ensure_sass
 	# install all dependencies
-	uv pip compile setup.cfg --all-extras | uv pip install -r /dev/stdin
+	echo "-e onegov-cloud @ ." \
+	| uv pip compile pyproject.toml --group dev \
+	| uv pip install -r /dev/stdin
 
 	# install source in editable mode
 	uv pip install -e . --config-settings editable_mode=compat
@@ -21,7 +23,9 @@ install: ensure_uv ensure_sass
 
 update: ensure_uv
 	# update all dependencies
-	uv pip compile setup.cfg -U --all-extras | uv pip install -U -r /dev/stdin
+	echo "-e onegov-cloud @ ." \
+	| uv pip compile pyproject.toml -U --group dev \
+	| uv pip install -U -r /dev/stdin
 
 	# update the pre-commit hooks
 	prek autoupdate
