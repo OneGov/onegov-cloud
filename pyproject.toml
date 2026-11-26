@@ -101,8 +101,7 @@ dependencies = [
     "requests-oauthlib",
     "rjsmin",
     "sedate",
-    # FIXME: OGC-3689
-    "sentry_sdk<3",
+    "sentry_sdk",
     "sortedcontainers",
     "sqlalchemy>=2.1, < 2.2",
     "sqlalchemy-utils",
@@ -286,6 +285,7 @@ dev = [
 ]
 
 [tool.setuptools]
+include-package-data = true
 package-dir = { "" = "src" }
 packages = [
     "onegov.activity",
@@ -589,7 +589,7 @@ preview = true
     "line-too-long",
 ]
 "src/onegov/*/upgrade.py" = [
-    "T2",
+    "T20",
 ]
 "tests/**/*.py" = [
     "C4",
