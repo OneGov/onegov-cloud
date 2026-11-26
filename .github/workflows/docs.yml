@@ -79,3 +79,5 @@ jobs:
       with:
         python_version: '3.14'
         pypi_installer: uv
+        pyproject_extras:
+        pyproject_group: docs
