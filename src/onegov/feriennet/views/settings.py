@@ -14,6 +14,7 @@ from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
+from qrbill.bill import Address
 from stdnum import iban
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
@@ -281,11 +282,19 @@ class FeriennetSettingsForm(Form):
                 ))
                 return False
 
-            if not beneficiary_to_creditor(self.bank_beneficiary.data):
+            # reject unparseable/invalid beneficiary here (ONEGOV-CLOUD-615)
+            creditor = beneficiary_to_creditor(self.bank_beneficiary.data)
+            if creditor:
+                try:
+                    Address.create(**creditor)
+                except ValueError:
+                    creditor = None
+            if not creditor:
                 assert isinstance(self.bank_beneficiary.errors, list)
                 self.bank_beneficiary.errors.append(_(
-                    'QR-Bills require the beneficiary to be in the form: '
-                    'name, street number, code city'
+                    'The beneficiary must have the form "name, street, code '
+                    'city", for example: Ferienpass Musterlingen, '
+                    'Bahnhofstr. 2, 1234 Beispiel'
                 ))
                 return False
         return None
