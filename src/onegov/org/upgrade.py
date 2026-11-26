@@ -1136,3 +1136,22 @@ def enable_directory_search(context: UpgradeContext) -> None:
     for directory in directories:
         if directory.enable_search is None:
             directory.enable_search = True
+
+
+@upgrade_task('Clear deprecated exivo credentials and kaba components')
+def clear_exivo_credentials_and_kaba_components(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('resources'):
+        return
+
+    org = context.session.query(Organisation).first()
+    if not org or 'kaba_configurations' not in org.meta:
+        return
+
+    del org.meta['kaba_configurations']
+    context.session.execute(text("""
+        UPDATE resources
+           SET meta = meta - 'kaba_components'
+         wHERE meta ? 'kaba_components'
+    """))
