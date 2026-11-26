@@ -3340,8 +3340,7 @@ def test_qrbill_settings_reject_invalid_beneficiary(client: Client) -> None:
     page.form['bank_beneficiary'] = (
         'Ferienpass, Öffentliche Sicherheit, Einwohnergemeinde 3550 Langnau'
     )
-    # parsing puts "Einwohnergemeinde" (17 chars) into pcode -> rejected,
-    # the form is redisplayed with the format hint telling the expected form
+    # parsing puts "Einwohnergemeinde" (17 chars) into pcode -> rejected
     page = page.form.submit()
     assert page.status_code == 200
     assert 'die Form "Name, Strasse, Postleitzahl Ort" haben' in page
