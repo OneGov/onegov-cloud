@@ -1654,6 +1654,8 @@ def test_reserve_allocation(
     assert 'Foobar' in ticket
     assert '28. August 2015' in ticket
     assert '4' in ticket
+    # the reservation summary shows the resource title (OGC-3564)
+    assert 'Tageskarte - Freitag, 28. August 2015' in ticket
 
     # accept it
     assert 'Alle Reservationen annehmen' in ticket
@@ -1776,6 +1778,8 @@ def test_internal_reserve(
     assert 'Foobar' in ticket
     assert '28. August 2015' in ticket
     assert '4' in ticket
+    # the reservation summary shows the resource title (OGC-3564)
+    assert 'Konferenzraum - Freitag, 28. August 2015' in ticket
 
     # accept it
     assert 'Alle Reservationen annehmen' in ticket

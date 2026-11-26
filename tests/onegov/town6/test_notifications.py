@@ -71,6 +71,8 @@ def test_new_reservation_notification(client: Client) -> None:
 
     ticket = client.get('/tickets/ALL/open')
     ticket = ticket.click("Annehmen").follow()
+    # the reservation summary shows the resource title (OGC-3564)
+    assert 'Gymnasium - Montag, 29. Januar 2024' in ticket
     ticket.click("Alle Reservationen annehmen")
 
     # two mails for Jessie, one for John and none for Paul
