@@ -2555,7 +2555,7 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     }
     transaction.commit()
 
-    client.login_translator()
+    client.login_member()
     page = client.get(f'/translator/{translator_id}/add-time-report')
     page.form['assignment_type'] = 'on-site'
     page.form['assignment_location'] = 'obergericht'
@@ -2565,15 +2565,18 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     page.form['end_date'] = '2025-01-11'
     page.form['end_time'] = '10:00'
     page.form['case_number'] = 'SELF-APPROVAL'
-    page = page.form.submit().follow()
+    page.form.submit().follow()
 
     report = session.query(TranslatorTimeReport).one()
     ticket = report.get_ticket(session)
     assert ticket is not None
-    assert ticket.handler.email == 'translator@example.org'
+    assert ticket.handler.email == 'member@example.org'
     assert report.status == 'pending'
     assert ticket.state != 'closed'
 
+    client.logout()
+    client.login_translator()
+    page = client.get(f'/ticket/TRP/{ticket.id}/status')
     csrf_match = re.search(r'csrf-token=([a-zA-Z0-9._-]+)', page.text)
     assert csrf_match is not None
     url = f'/ticket/TRP/{ticket.id}/accept-time-report'
@@ -2587,6 +2590,31 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     assert report.status == 'pending'
     assert ticket.state == 'open'
     assert ticket.closed_on is None
+
+
+def test_translator_cannot_add_own_time_report(client: Client) -> None:
+    session = client.app.session()
+    create_languages(session)
+    translator_id = (
+        TranslatorCollection(client.app)
+        .add(
+            first_name='Test',
+            last_name='Translator',
+            admission='certified',
+            email='translator@example.org',
+        )
+        .id
+    )
+    transaction.commit()
+
+    client.login_translator()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' not in page
+    assert 'add-time-report' not in page
+
+    client.get(f'/translator/{translator_id}/add-time-report', status=403)
+    client.post(f'/translator/{translator_id}/add-time-report', status=403)
+    assert session.query(TranslatorTimeReport).count() == 0
 
 
 @patch('onegov.websockets.integration.connect')

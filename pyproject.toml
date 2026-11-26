@@ -2,6 +2,340 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "onegov-cloud"
+dynamic = ["version"]
+requires-python = ">=3.14"
+dependencies = [
+    "AIS2.py",
+    "Pillow",
+    "PyJWT",
+    "PyYAML",
+    "alembic",
+    "arrow",
+    "attrs",
+    "babel",
+    "bad-passwords",
+    "bjoern",
+    "blinker",
+    "bs4",
+    "chameleon",
+    "click",
+    "click-params",
+    "cryptography",
+    "cssmin",
+    "cssutils",
+    "dectate",
+    "dicttoxml",
+    "docxtpl",
+    "dogpile.cache",
+    "dukpy",
+    "email-validator",
+    "feedgen",
+    "filedepot",
+    "firebase-admin",
+    "genshi",
+    "humanize",
+    "icalendar",
+    "importscan",
+    "isodate",
+    "itsdangerous",
+    "kerberos",
+    "lazy-object-proxy",
+    "ldap3",
+    "legacy-cgi",
+    "libres>=1.5",
+    "lingua-language-detector",
+    "lxml",
+    "markupsafe",
+    "mistletoe>=1.2.0",
+    # FIXME: Remove pins to git versions once 1.0 versions have been released
+    "more.content_security@git+https://github.com/morepath/more.content_security.git#egg=more.content_security",
+    "more.transaction@git+https://github.com/morepath/more.transaction.git#egg=more.transaction",
+    "more.webassets@git+https://github.com/morepath/more.webassets.git#egg=more.webassets",
+    "more_itertools",
+    "morepath>=1",
+    "msal",
+    "niquests[speedups]",
+    "oauthlib",
+    "ordered-set",
+    "orjson",
+    "ormsgpack>1.7.0",
+    "openpyxl",
+    "passlib>=1.9.5",
+    "pdfdocument",
+    "pdfrw2",
+    "pdftotext",
+    "pglast",
+    "phonenumbers",
+    "polib",
+    "psutil",
+    "psycopg[c]",
+    "purl",
+    "pycurl",
+    "pyparsing",
+    "qrbill",
+    "qrcode",
+    "pydantic",
+    "pydantic-core",
+    "pydantic-extra-types[pycountry]",
+    "pyotp",
+    "pysaml2",
+    "python-dateutil",
+    "python-magic",
+    "python-docx",
+    "python-stdnum",
+    "python-ulid",
+    "pytz",
+    "pyyaml",
+    "rapidfuzz",
+    "rcssmin",
+    "redis[hiredis]",
+    "reg",
+    "reportlab",
+    # FIXME: It may be worth to create a fork for niquests or manually
+    #        make use of oauthlib, for the features we need. For now
+    #        we use a compatibility shim to make requests-oauthlib work
+    #        with niquests.
+    "requests-oauthlib",
+    "rjsmin",
+    "sedate",
+    # FIXME: OGC-3689
+    "sentry_sdk<3",
+    "sortedcontainers",
+    "sqlalchemy>=2.1, < 2.2",
+    "sqlalchemy-utils",
+    "sqlparse",
+    "stripe==12.5.1",
+    "svglib",
+    "toposort",
+    "transaction",
+    "translationstring",
+    "turbohtml>=1.11.0",
+    "ua-parser[regex]",
+    "unidecode",
+    "urllib3.future>=2.20.906",
+    "vobject",
+    "watchdog",
+    "weasyprint",
+    "webassets",
+    "webcolors",
+    "webob",
+    "websockets",
+    "webtest",
+    "werkzeug",
+    "wtforms>=3.3",
+    "xlrd",
+    "xlsxwriter!=3.2.4",
+    "xsdata!=23.5",
+    "xsdata-ech",
+    "yubico-client",
+    "zope.sqlalchemy",
+]
+
+[project.entry-points.morepath]
+scan = "onegov"
+
+[project.entry-points.console_scripts]
+onegov-agency = "onegov.agency.cli:cli"
+onegov-core = "onegov.core.cli:cli"
+onegov-directory = "onegov.directory.cli:cli"
+onegov-election-day = "onegov.election_day.cli:cli"
+onegov-event = "onegov.event.cli:cli"
+onegov-feriennet = "onegov.feriennet.cli:cli"
+onegov-foundation = "onegov.foundation6.cli:cli"
+onegov-fsi = "onegov.fsi.cli:cli"
+onegov-landsgemeinde = "onegov.org.cli:cli"
+onegov-org = "onegov.org.cli:cli"
+onegov-people = "onegov.people.cli:cli"
+onegov-pas = "onegov.pas.cli:cli"
+onegov-search = "onegov.search.cli:cli"
+onegov-server = "onegov.server.cli:run"
+onegov-swissvotes = "onegov.swissvotes.cli:cli"
+onegov-town6 = "onegov.org.cli:cli"
+onegov-translator = "onegov.translator_directory.cli:cli"
+onegov-user = "onegov.user.cli:cli"
+onegov-websockets = "onegov.websockets.cli:cli"
+onegov-winterthur = "onegov.winterthur.cli:cli"
+
+[project.entry-points.onegov_upgrades]
+"onegov.activity" = "onegov.activity.upgrade"
+"onegov.agency" = "onegov.agency.upgrade"
+"onegov.chat" = "onegov.chat.upgrade"
+"onegov.core" = "onegov.core.upgrade"
+"onegov.directory" = "onegov.directory.upgrade"
+"onegov.election_day" = "onegov.election_day.upgrade"
+"onegov.event" = "onegov.event.upgrade"
+"onegov.feriennet" = "onegov.feriennet.upgrade"
+"onegov.file" = "onegov.file.upgrade"
+"onegov.form" = "onegov.form.upgrade"
+"onegov.foundation" = "onegov.foundation.upgrade"
+"onegov.fsi" = "onegov.fsi.upgrade"
+"onegov.gis" = "onegov.gis.upgrade"
+"onegov.intranet" = "onegov.intranet.upgrade"
+"onegov.landsgemeinde" = "onegov.landsgemeinde.upgrade"
+"onegov.newsletter" = "onegov.newsletter.upgrade"
+"onegov.onboarding" = "onegov.onboarding.upgrade"
+"onegov.org" = "onegov.org.upgrade"
+"onegov.page" = "onegov.page.upgrade"
+"onegov.parliament" = "onegov.parliament.upgrade"
+"onegov.pas" = "onegov.pas.upgrade"
+"onegov.pay" = "onegov.pay.upgrade"
+"onegov.pdf" = "onegov.pdf.upgrade"
+"onegov.people" = "onegov.people.upgrade"
+"onegov.quill" = "onegov.quill.upgrade"
+"onegov.recipient" = "onegov.recipient.upgrade"
+"onegov.reservation" = "onegov.reservation.upgrade"
+"onegov.search" = "onegov.search.upgrade"
+"onegov.shared" = "onegov.shared.upgrade"
+"onegov.swissvotes" = "onegov.swissvotes.upgrade"
+"onegov.ticket" = "onegov.ticket.upgrade"
+"onegov.town6" = "onegov.town6.upgrade"
+"onegov.translator_directory" = "onegov.translator_directory.upgrade"
+"onegov.user" = "onegov.user.upgrade"
+"onegov.winterthur" = "onegov.winterthur.upgrade"
+
+[dependency-groups]
+lint = [
+    "bandit[toml]",
+    "flake8",
+    "flake8-pyproject",
+    "flake8-type-checking",
+    "ruff",
+]
+mypy = [
+    "dogpile.cache>=1.2.1",
+    "GitPython",
+    "mypy[faster-cache]",
+    "pytest-xdist",
+    "sortedcontainers-stubs",
+    "types-ldap3",
+    "types-lxml",
+    "types-oauthlib",
+    "types-openpyxl",
+    "types-passlib",
+    "types-polib",
+    "types-psutil",
+    "types-pycurl",
+    "types-pysaml2",
+    "types-python-dateutil",
+    "types-pyyaml",
+    "types-pytz",
+    "types-qrbill",
+    "types-qrcode",
+    "types-reportlab",
+    "types-requests-oauthlib",
+    "types-setuptools<80",
+    "types-toposort",
+    "types-translationstring",
+    "types-vobject",
+    "types-waitress",
+    "types-webob",
+    "types-xlrd",
+    {include-group = "test"},
+]
+docs = [
+    "sphinx_rtd_theme",
+    "docutils",
+    "Jinja2",
+    "sphinx==8.2.3",
+    "sphinx-autoapi",
+    "typing-extensions",
+    "myst-parser",
+]
+test = [
+    "aiosmtpd",
+    "collection-json",
+    "coverage",
+    "cssselect",
+    "faker",
+    "findimports",
+    "freezegun",
+    "mirakuru",
+    "mock",
+    "playwright>=1.64",
+    "port-for",
+    "psutil",
+    "pyquery",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-localserver",
+    "pytest-redis",
+    "pytest-rerunfailures<16.0",
+    "pytest-timeout",
+    "niquests-mock",
+    "testing.postgresql",
+    "ulid",
+    "vcrpy",
+]
+dev = [
+    "deptry",
+    "gitpython",
+    "honyaku@git+https://github.com/seantis/honyaku#egg=honyaku",
+    "prek",
+    "pytest-profiling",
+    "pytest-split",
+    "pytest-testmon",
+    "pytest-xdist",
+    "uv",
+    {include-group = "lint"},
+    {include-group = "mypy"},
+    {include-group = "docs"},
+    {include-group = "test"},
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = [
+    "onegov.activity",
+    "onegov.agency",
+    "onegov.api",
+    "onegov.async_http",
+    "onegov.chat",
+    "onegov.core",
+    "onegov.directory",
+    "onegov.election_day",
+    "onegov.event",
+    "onegov.feriennet",
+    "onegov.file",
+    "onegov.form",
+    "onegov.foundation",
+    "onegov.foundation6",
+    "onegov.fsi",
+    "onegov.gever",
+    "onegov.gis",
+    "onegov.intranet",
+    "onegov.landsgemeinde",
+    "onegov.newsletter",
+    "onegov.onboarding",
+    "onegov.org",
+    "onegov.page",
+    "onegov.parliament",
+    "onegov.pas",
+    "onegov.pay",
+    "onegov.pdf",
+    "onegov.people",
+    "onegov.plausible",
+    "onegov.qrcode",
+    "onegov.quill",
+    "onegov.recipient",
+    "onegov.reservation",
+    "onegov.search",
+    "onegov.server",
+    "onegov.shared",
+    "onegov.stepsequence",
+    "onegov.swissvotes",
+    "onegov.ticket",
+    "onegov.town6",
+    "onegov.translator_directory",
+    "onegov.user",
+    "onegov.websockets",
+    "onegov.winterthur",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "onegov.core.__version__"}
+
 [tool.pytest.ini_options]
 log_level = "INFO"
 redis_timeout = 60
@@ -80,6 +414,19 @@ skips = [
     "B403",
     "B404",
     "B405",
+]
+
+[tool.flake8]
+select = ["TC0" , "TC1"]
+per_file_ignores = [
+    "*.pyi: TC",
+    "tests/**.py: TC",
+]
+type-checking-py314plus = true
+type-checking-sqlalchemy-enabled = true
+type-checking-sqlalchemy-mapped-dotted-names = [
+    "onegov.core.orm.mixins.dict_property",
+    "onegov.core.orm.mixins.content.dict_property",
 ]
 
 [tool.ruff]
@@ -319,3 +666,9 @@ skip-magic-trailing-comma = false
 line-ending = "lf"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+
+[tool.deptry]
+known_first_party = ["onegov"]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["cssmin"]

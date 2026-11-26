@@ -40,8 +40,8 @@ class TranslatorDirectorySettingsForm(Form):
     enable_time_tracking = BooleanField(
         label=_('Enable time tracking'),
         description=_(
-            'Shows the "Add Time Report" button and allows translators '
-            'to record their working time.'
+            'Shows the "Add Time Report" button, so that staff can submit '
+            'time reports on behalf of translators.'
         ),
         fieldset=_('Time tracking'),
     )

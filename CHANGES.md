@@ -1,8 +1,71 @@
 # Changes
 
+## 2026.64
+
+`2026-11-26` | [19a771a43e...b968c359cd](https://github.com/OneGov/onegov-cloud/compare/19a771a43e^...b968c359cd)
+
+### Core
+
+##### Increase test coverage [skip-ci]
+
+`Feature` | [NONE](#NONE) | [aaa8f1c264](https://github.com/onegov/onegov-cloud/commit/aaa8f1c2642de559e41a3ae6e04595f4cc8aff4c)
+
+##### Removes bcrypt version pin
+
+The version pin is no longer necessary as of the latest passlib version
+
+`Bugfix` | [OGC-2659](https://linear.app/onegovcloud/issue/OGC-2659) | [ce75576777](https://github.com/onegov/onegov-cloud/commit/ce7557677769078194ff3b527125d9837f5120e2)
+
+##### Adjust tests to babel 2.19 (CLDR 49) group separator
+
+`Fix` | [NONE](#NONE) | [acbb5d31da](https://github.com/onegov/onegov-cloud/commit/acbb5d31da80deead2c99a939e5b4a042dc815b0)
+
+### Feriennet
+
+##### Surface qrbill beneficiary error when saving settings
+
+Checking the beneficiary address on save avoids errors when the QR bill is generated later.
+
+`Bugfix` | [ONEGOV-CLOUD-615](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-615) | [b968c359cd](https://github.com/onegov/onegov-cloud/commit/b968c359cd8f581630c310ce10a3c56f46fee046)
+
+### Org
+
+##### Make in-directory search available to org/town6
+
+Promotes Winterthur's per-directory inline search to a general org feature
+
+`Feature` | [OGC-3458](https://linear.app/onegovcloud/issue/OGC-3458) | [f76f9406dd](https://github.com/onegov/onegov-cloud/commit/f76f9406ddad45fc4979975ac48862ac553d1443)
+
+##### Adds remaining pricing schemes for Horw
+
+This also fixes some robustness issues when multiple pricing schemes
+are enabled at the same time.
+
+`Feature` | [OGC-3193](https://linear.app/onegovcloud/issue/OGC-3193) | [03cfc8fcd6](https://github.com/onegov/onegov-cloud/commit/03cfc8fcd65ee208ecb1719145c1bb458217de55)
+
+##### Includes reservation blockers in occupancy iCal subscription
+
+`Feature` | [OGC-3674](https://linear.app/onegovcloud/issue/OGC-3674) | [aa0587bfe2](https://github.com/onegov/onegov-cloud/commit/aa0587bfe2ca42f275fbe6e109a23e5027e9a6a5)
+
+##### Fixes potential crash in find-your-spot internal reservations
+
+`Bugfix` | [ONEGOV-CLOUD-613](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-613) | [312dabb430](https://github.com/onegov/onegov-cloud/commit/312dabb4305582b3e725604c36260065641db15f)
+
+### Pas
+
+##### Adds more tests complex form submissions.
+
+`Bugfix` | [9fb970ed4d](https://github.com/onegov/onegov-cloud/commit/9fb970ed4d9ce634a8eebd9d175d3e91ce40bb97)
+
+### Reservation
+
+##### Fixes handling of blocking allocations with quotas > 1
+
+`Bugfix` | [OGC-3658](https://linear.app/onegovcloud/issue/OGC-3658) | [d38703b98e](https://github.com/onegov/onegov-cloud/commit/d38703b98ed9fcecfa209ce1c0cc89cdc5daf27d)
+
 ## 2026.63
 
-`2026-11-23` | [9febe046e8...0a949511ae](https://github.com/OneGov/onegov-cloud/compare/9febe046e8^...0a949511ae)
+`2026-11-23` | [9febe046e8...088fbebf8a](https://github.com/OneGov/onegov-cloud/compare/9febe046e8^...088fbebf8a)
 
 ### Core
 
@@ -5422,32 +5485,4 @@ Display private address if available, otherwise show place of residence
 ##### Event import - prevent setting coordiantes to invalid values
 
 `Bugfix` | [OGC-2380](https://linear.app/onegovcloud/issue/OGC-2380) | [867117fc85](https://github.com/onegov/onegov-cloud/commit/867117fc8565efa154eb5e82849ba6aba8d26aa8)
-
-## 2025.35
-
-`2025-07-22` | [bc20e0010f...df94f48648](https://github.com/OneGov/onegov-cloud/compare/bc20e0010f^...df94f48648)
-
-### Org
-
-##### Update for importing reservations
-
-`Feature` | [101a598cd2](https://github.com/onegov/onegov-cloud/commit/101a598cd244cd4519ef61723bcbc5572bcfa519)
-
-### Ris
-
-##### Adds filters to political businesses
-
-`Feature` | [OGC-2423](https://linear.app/onegovcloud/issue/OGC-2423) | [1412fcec16](https://github.com/onegov/onegov-cloud/commit/1412fcec1659f52650e44b084742a290ed77bc51)
-
-##### Remove date of death field from parliamentarian form
-
-`Feature` | [OGC-2393](https://linear.app/onegovcloud/issue/OGC-2393) | [7cc9da50d2](https://github.com/onegov/onegov-cloud/commit/7cc9da50d2ca3c94fd05c826545d612e55a76f3c)
-
-##### Fix delete parliamentarian
-
-`Bugfix` | [OGC-2397](https://linear.app/onegovcloud/issue/OGC-2397) | [bc4b8784c2](https://github.com/onegov/onegov-cloud/commit/bc4b8784c22678704900cc86cddf816aa08cb10f)
-
-##### Update political business types
-
-`Bugfix` | [OGC-2465, OGC-2466](https://linear.app/onegovcloud/issue/OGC-2465, OGC-2466) | [f88d24869c](https://github.com/onegov/onegov-cloud/commit/f88d24869ca6cbdf75684746acd72b1bd2c9e201)
 

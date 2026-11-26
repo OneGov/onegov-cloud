@@ -72,7 +72,7 @@ jobs:
         python -m pip install --upgrade uv
         uv pip install pytest-split pytest-xdist
         # TEMPORARY: editable build so we don't need a path-fix in codecov
-        uv pip install -e .[test]
+        uv pip install -e . --group test
       env:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy

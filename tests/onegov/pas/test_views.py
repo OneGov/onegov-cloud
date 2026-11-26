@@ -494,6 +494,55 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     assert 'Neue Anwesenheit hinzugefügt' in page
 
 
+def test_plenary_add_respects_unchecked_parliamentarians(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    transaction.begin()
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 3, 31),
+            closed=False,
+        )
+    )
+    people = PASParliamentarianCollection(client.app)
+    ids: dict[str, UUID] = {}
+    for name in ('Present', 'Absent'):
+        person = people.add(first_name=name, last_name='Test')
+        ids[name] = person.id
+        session.add(
+            PASParliamentarianRole(
+                parliamentarian_id=person.id,
+                role='member',
+                start=datetime.date(2020, 1, 1),
+                meta={'org_type': 'Kantonsrat'},
+            )
+        )
+    session.flush()
+    transaction.commit()
+
+    page = client.get('/attendences/new-bulk')
+    checked = [
+        checkbox.value for checkbox in page.form.fields['parliamentarian_id']
+    ]
+    assert set(checked) == {ids['Present'].hex, ids['Absent'].hex}
+    page.form.set(
+        'parliamentarian_id', False, index=checked.index(ids['Absent'].hex)
+    )
+
+    page.form['date'] = '2024-02-04'
+    page.form['duration'] = '3'
+    page = page.form.submit().follow()
+    assert 'Plenarsitzung hinzugefügt' in page
+
+    query = client.app.session().query(Attendence)
+    assert query.filter_by(parliamentarian_id=ids['Present']).count() == 1
+    assert query.filter_by(parliamentarian_id=ids['Absent']).count() == 0
+
+
 def test_attendance_blocked_outside_any_settlement_run(
     client: Client[TestPasApp],
 ) -> None:

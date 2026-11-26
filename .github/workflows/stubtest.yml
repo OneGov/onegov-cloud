@@ -65,8 +65,8 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip compile setup.cfg -U \
-        | uv pip install .[mypy] -r /dev/stdin
+        uv pip compile pyproject.toml --group mypy -U \
+        | uv pip install . --group mypy -r /dev/stdin
 
     - name: Stubtest
       run:  |

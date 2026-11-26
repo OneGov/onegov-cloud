@@ -450,12 +450,12 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
             SelectChoice(p.id.hex, p.title)
             for p in get_attendance_parliamentarians(self.request)
         ]
-        # FIXME: Setting this unconditionally seems wrong
-        self.parliamentarian_id.data = [
-            value
-            for choice in self.parliamentarian_id.choices
-            if (value := coerce_uuid(choice.value)) is not None
-        ]
+        if self.request.method != 'POST':
+            self.parliamentarian_id.data = [
+                value
+                for choice in self.parliamentarian_id.choices
+                if (value := coerce_uuid(choice.value)) is not None
+            ]
 
 
 BULK_MEETING_TYPES: dict[str, str] = {
@@ -564,8 +564,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             SelectChoice(p.id.hex, p.title)
             for p in parliamentarians
         ]
-        # FIXME: Setting this unconditionally seems wrong
-        self.parliamentarian_id.data = []
 
         self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
 
@@ -778,9 +776,9 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
             )
             for membership in self.model.memberships
         ]
-        # FIXME: Setting this uncondtionally seems wrong
-        self.parliamentarian_id.data = [
-            value
-            for choice in self.parliamentarian_id.choices
-            if (value := coerce_uuid(choice.value)) is not None
-        ]
+        if self.request.method != 'POST':
+            self.parliamentarian_id.data = [
+                value
+                for choice in self.parliamentarian_id.choices
+                if (value := coerce_uuid(choice.value)) is not None
+            ]

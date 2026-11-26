@@ -139,7 +139,10 @@ class TranslatorLayout(DefaultLayout):
 
     @property
     def time_tracking_links(self) -> list[Link]:
-        if not self.request.app.enable_time_tracking:
+        if (
+            not self.request.app.enable_time_tracking
+            or self.request.is_translator
+        ):
             return []
         return [
             Link(

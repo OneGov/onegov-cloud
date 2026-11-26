@@ -3329,6 +3329,30 @@ def test_view_qrbill(client: Client, scenario: Scenario) -> None:
     assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page
 
 
+def test_qrbill_settings_reject_invalid_beneficiary(client: Client) -> None:
+    # ONEGOV-CLOUD-615: a beneficiary whose parsed pcode exceeds the QR-bill
+    # 16 char limit must be rejected on save, not accepted and crash later
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['bank_qr_bill'] = True
+    page.form['bank_account'] = 'CH5604835012345678009'
+    page.form['bank_beneficiary'] = (
+        'Ferienpass, Öffentliche Sicherheit, Einwohnergemeinde 3550 Langnau'
+    )
+    # parsing puts "Einwohnergemeinde" (17 chars) into pcode -> rejected
+    page = page.form.submit()
+    assert page.status_code == 200
+    assert 'die Form "Name, Strasse, Postleitzahl Ort" haben' in page
+
+    # moving the comma yields a valid "name, street, code city" -> saved
+    page.form['bank_beneficiary'] = (
+        'Ferienpass, Öffentliche Sicherheit Einwohnergemeinde, 3550 Langnau'
+    )
+    saved = page.form.submit()
+    assert 'die Form "Name, Strasse, Postleitzahl Ort" haben' not in saved
+
+
 @freeze_time("2022-05-01 18:00")
 def test_activities_json(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="Ferienpass 2022", confirmed=True)
