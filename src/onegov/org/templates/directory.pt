@@ -31,10 +31,10 @@
                         <a tal:attributes="href python:'#panel'+str(repeat['entry'].index)">
                             <span class="h5">${entry.title}</span>
                         </a>
-                        <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
+                        <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content" tal:define="form python: entry.directory.form_class(data=entry.values)">
                             <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
-                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
-                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                                <!--? render via form.render_display so each field type (radio/checkbox/textarea) is formatted like the single-entry view -->
+                                <li tal:define="form_field form[field.id]; rendered layout.linkify_field(form_field, form.render_display(form_field)); new_line python: field.type in ('textarea', 'radio', 'checkbox')" tal:content="python: Markup('<strong>{}</strong>: {}{}').format(field.human_id, Markup('<br>') if new_line else '', rendered)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
