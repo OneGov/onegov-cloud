@@ -82,7 +82,7 @@ class PasRequest(TownRequest[AppT]):
             commission_id=commission_id,
             parliamentarian_id=parliamentarian_id,
         )
-        if not any(m.is_active_on(date.today()) for m in memberships):
+        if not any(m.is_active_on(attendance_date) for m in memberships):
             return False
         run = (
             self.session.query(SettlementRun)
