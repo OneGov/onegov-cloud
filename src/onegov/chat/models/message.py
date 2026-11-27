@@ -74,7 +74,13 @@ class Message(Base):
     modified: Mapped[datetime | None] = mapped_column(onupdate=sedate.utcnow)
 
     #: a single optional file associated with this message
+    #: FIXME: deprecated: superseded by `files`, dropped after data migration
     file = associated(File, 'file', 'one-to-one')
+
+    #: multiple optional files associated with this message
+    files = associated(
+        File, 'files', 'one-to-many', backref_suffix='message_files'
+    )
 
     # we need to override __hash__ and __eq__ to establish the equivalence of
     # polymorphic subclasses that differ - we need to compare the base class

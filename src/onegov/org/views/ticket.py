@@ -606,7 +606,8 @@ def handle_new_note(
     if form.submitted(request):
         message = form.text.data
         assert message is not None
-        note = TicketNote.create(self, request, message, form.file.create())
+        note = TicketNote.create(self, request, message)
+        form.files.populate_obj(note, 'files')
         request.success(_('Your note was added'))
 
         if note.text and note.text[0]:

@@ -97,13 +97,13 @@ class TicketNote(Message, TicketMessageMixin):
         ticket: Ticket,
         request: OrgRequest,
         text: str,
-        file: File | None = None,
+        files: list[File] | None = None,
         owner: str | None = None,
         origin: str = 'internal'
     ) -> Self:
         note = super().create(ticket, request, text=text, owner=owner,
                               origin=origin)
-        note.file = file
+        note.files = files or []
 
         return note
 

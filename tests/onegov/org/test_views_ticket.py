@@ -709,14 +709,17 @@ def test_ticket_notes(client: Client) -> None:
 
     assert "I will investigate" not in page
 
-    # upload a file
+    # upload a single file
     page = page.click("Neue Notiz")
+    assert "Anhänge" in page
     page.form['text'] = "The profile is actually okay, I got an ID scan"
-    page.form['file'] = Upload('Test.txt', b'Proof')
+    page.form.set('files', [Upload('Test.txt', b'Proof')], -1)
     page = page.form.submit().follow()
 
     assert "The profile is actually okay" in page
     assert "Test.txt" in page
+
+    ticket_url = page.request.url
 
     # access the file
     file_url_ex = re.compile(r'http://localhost/storage/[A-Z0-9a-z]+')
@@ -733,6 +736,31 @@ def test_ticket_notes(client: Client) -> None:
     page = client.get('/timeline')
     assert "The profile is actually okay" in page
     assert "Test.txt" in page
+
+    # upload multiple files to a single note
+    page = client.get(ticket_url).click("Neue Notiz")
+    page.form['text'] = "Attaching the scan and the signed form"
+    page.form.set('files', [
+        Upload('Scan.txt', b'Scan content'),
+        Upload('Form.txt', b'Form content'),
+    ], -1)
+    page = page.form.submit().follow()
+
+    assert "Attaching the scan and the signed form" in page
+    assert "Scan.txt" in page
+    assert "Form.txt" in page
+
+    # both files are accessible with their respective content
+    file_urls = file_url_ex.findall(str(page))
+    bodies = {client.get(url).body for url in file_urls}
+    assert b"Scan content" in bodies
+    assert b"Form content" in bodies
+
+    # and both show up in the timeline
+    page = client.get('/timeline')
+    assert "Attaching the scan and the signed form" in page
+    assert "Scan.txt" in page
+    assert "Form.txt" in page
 
 
 def test_ticket_chat(client: Client) -> None:

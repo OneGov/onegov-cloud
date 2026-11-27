@@ -112,3 +112,6 @@ dump.rdb
 .DS_Store
 
 .playwright-mcp
+
+# claude code
+.claude/

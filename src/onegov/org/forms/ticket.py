@@ -4,8 +4,12 @@ from functools import cached_property
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
-from onegov.form.fields import (ChosenSelectField,
-                                ChosenSelectMultipleEmailField, PanelField)
+from onegov.form.fields import (
+    ChosenSelectField,
+    ChosenSelectMultipleEmailField,
+    PanelField,
+    UploadMultipleFilesWithORMSupport,
+)
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
@@ -51,8 +55,8 @@ class TicketNoteForm(Form):
         filters=(strip_whitespace, ),
         render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
-    file = UploadFileWithORMSupport(
-        label=_('Attachment'),
+    files = UploadMultipleFilesWithORMSupport(
+        label=_('Attachments'),
         file_class=MessageFile,
         validators=[
             Optional(),
