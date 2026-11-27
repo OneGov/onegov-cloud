@@ -71,6 +71,9 @@ def test_new_reservation_notification(client: Client) -> None:
 
     ticket = client.get('/tickets/ALL/open')
     ticket = ticket.click("Annehmen").follow()
+    resource_link = ticket.pyquery('.reservation-resource-title a')
+    assert 'Gymnasium' in resource_link.text()
+    assert '/resource/gymnasium' in resource_link.attr('href')
     ticket.click("Alle Reservationen annehmen")
 
     # two mails for Jessie, one for John and none for Paul

@@ -108,8 +108,8 @@ def test_ticket_pdf(org_app: TestOrgApp) -> None:
         return cls.__name__
 
     def link(*args: object, **kwargs: object) -> str:
-        name = kwargs.pop('name')
-        return f'https://seantis.ch/{name or ""}'
+        name = kwargs.pop('name', '')
+        return f'https://seantis.ch/{name}'
 
     template_loader = (
         org_app.config.template_engine_registry._template_loaders['.pt'])
