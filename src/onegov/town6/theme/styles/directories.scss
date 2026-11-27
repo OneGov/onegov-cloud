@@ -4,7 +4,7 @@
 
 .directories-map {
     border-radius: .7rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 2rem;
 }
 
 /*
@@ -58,11 +58,11 @@
 }
 
 .further-information {
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
 }
 
 .directory-list {
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
 
     .learn-more {
         display: block;
@@ -73,9 +73,6 @@
 
 #directory-lead {
     margin-bottom: 2rem;
-    @media #{$medium-up} {
-        margin-bottom: 4rem;
-    }
 }
 
 .directory-entry-hash {
