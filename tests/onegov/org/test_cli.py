@@ -401,6 +401,20 @@ def test_fetch(
     assert result.exit_code == 0
     assert "1 added, 0 updated, 0 deleted" in result.output
 
+    # Bar[*] -> Qux, including only imported events with source prefix 'xx'
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+        '--source', 'bar',
+        '--include-imported-source', 'xx',
+    ])
+    assert result.exit_code == 0
+    # adds 1, 2, 3 and 6 (source 'xxx') to 4, 5 but not 7 (source 'yyy')
+    assert "4 added, 0 updated, 0 deleted" in result.output
+    titles = {e.title for e in get_session('qux').query(Event)}
+    assert titles == {'1', '2', '3', '4', '5', '6', 'b'}
+
 
 def test_fetch_multi_namespace(
     cfg_path_multi_namespace: str,
