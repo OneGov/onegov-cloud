@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from onegov.event import EventCollection
+from onegov.event import Event, EventCollection
 from sqlalchemy import text, Column
 
 
@@ -104,6 +104,63 @@ def migrate_filter_keywords_column(context: UpgradeContext) -> None:
         SET content = content - 'filter_keywords'
         WHERE "content" ? 'filter_keywords'
     """))
+
+
+@upgrade_task('Remove namespace from cross-namespace fetch sources')
+def remove_namespace_from_cross_namespace_fetch_sources(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('events'):
+        return
+
+    own_namespace = context.app.namespace
+    for schema in context.app.session_manager.list_schemas():
+        if '-' not in schema:
+            continue
+
+        namespace, entity = schema.split('-', 1)
+        if namespace == own_namespace:
+            continue
+
+        old_prefix = f'fetch-{namespace}-{entity}-'
+        new_prefix = f'fetch-{entity}-'
+
+        stale_ids = [
+            stale_id for stale_id, in context.session.execute(text("""
+                SELECT stale.id
+                FROM events stale
+                JOIN events renamed
+                ON left(renamed.meta->>'source', :length) = :old_prefix
+                AND stale.meta->>'source' = :new_prefix
+                    || substr(renamed.meta->>'source', :length + 1)
+            """), {
+                'old_prefix': old_prefix,
+                'new_prefix': new_prefix,
+                'length': len(old_prefix),
+            })
+        ]
+        if stale_ids:
+            query = context.session.query(Event)
+            query = query.filter(Event.id.in_(stale_ids))
+            for event in query:
+                context.session.delete(event)
+            context.session.flush()
+
+        context.session.execute(text("""
+            UPDATE events
+            SET meta = jsonb_set(
+                meta,
+                '{source}',
+                to_jsonb(
+                    :new_prefix || substr(meta->>'source', :length + 1)
+                )
+            )
+            WHERE left(meta->>'source', :length) = :old_prefix
+        """), {
+            'old_prefix': old_prefix,
+            'new_prefix': new_prefix,
+            'length': len(old_prefix),
+        })
 
 
 @upgrade_task('Add indexes to speed up occurrence filters')

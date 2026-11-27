@@ -186,6 +186,9 @@ def edit_time_report(
     request: TranslatorAppRequest,
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
+    if not can_delete_time_report(request, self):
+        raise HTTPForbidden()
+
     if self.status != 'pending':
         request.alert(_('Only pending time reports can be edited'))
         ticket = self.get_ticket(request.session)

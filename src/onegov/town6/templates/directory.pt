@@ -34,18 +34,11 @@
                         <a href="#" class="accordion-title">
                             <span class="h5">${entry.title}</span>
                         </a>
-                        <div class="accordion-content" data-tab-content>
+                        <div class="accordion-content" data-tab-content tal:define="form python: entry.directory.form_class(data=entry.values)">
                             <ul tal:repeat="field directory.fields" tal:define="content_labels entry.content_labels; hidden_labels entry.hidden_label_fields" style="list-style: none; margin-left: 0">
-                                <tal:block tal:condition="field.id in content_labels">
-                                    <li tal:condition="field.type == 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]" style="white-space: pre-wrap;">
-                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
-                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: &lt;br&gt;{}').format(human_id, value)" />
-                                    </li>
-                                    <li tal:condition="field.type != 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]">
-                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
-                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: {}').format(human_id, value)" />
-                                    </li>
-                                </tal:block>
+                                <li tal:condition="field.id in content_labels"
+                                    tal:define="form_field form[field.id]; rendered layout.linkify_field(form_field, form.render_display(form_field)); new_line python: field.type in ('textarea', 'radio', 'checkbox')"
+                                    tal:content="python: rendered if field.id in hidden_labels else Markup('&lt;strong&gt;{}&lt;/strong&gt;: {}{}').format(field.human_id, Markup('&lt;br&gt;') if new_line else '', rendered)"></li>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>

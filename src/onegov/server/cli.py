@@ -50,6 +50,7 @@ A onegov.yml file looks like this:
 """
 import bjoern  # type:ignore[import-untyped]
 import click
+import logging
 import multiprocessing
 import os
 import sentry_sdk
@@ -66,6 +67,7 @@ from onegov.server import Config
 from onegov.server import log
 from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
+from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
@@ -202,6 +204,11 @@ def run(
     if sentry_dsn:
         with_sentry = True
         integrations = [
+            LoggingIntegration(
+                breadcrumb_level=logging.INFO,
+                level=logging.WARNING,
+                event_level=logging.ERROR,
+            ),
             RedisIntegration(),
             SqlalchemyIntegration(),
         ]
@@ -227,9 +234,38 @@ def run(
             dsn=sentry_dsn,
             release=sentry_release,
             environment=sentry_environment,
-            send_default_pii=send_ppi,
+            # FIXME: We may be able to turn some of these on even with
+            #        send_ppi being `False`, but this roughly matches the
+            #        the old amount of collected data.
+            data_collection={} if send_ppi else {
+                'user_info': False,
+                'http_bodies': [],
+                'graphql': {'document': False, 'variables': False},
+                'gen_ai': {'inputs': False, 'outputs': False},
+                'mcp': {'inputs': False, 'outputs': False},
+                'database_query_data': False,
+                'queues': False,
+                'stack_frame_variables': {'mode': 'denylist'},
+                'http_headers': {
+                    'request': {
+                        'mode': 'denylist',
+                        'terms': [
+                            'forwarded', '-ip', 'remote-', 'via', '-user'
+                        ],
+                    },
+                },
+                'cookies': {
+                    'mode': 'denylist',
+                    'terms': ['forwarded', '-ip', 'remote-', 'via', '-user'],
+                },
+                'url_query_params': {
+                    'mode': 'denylist',
+                    'terms': ['forwarded', '-ip', 'remote-', 'via', '-user'],
+                },
+            },
             traces_sample_rate=traces_sample_rate,
-            profiles_sample_rate=profiles_sample_rate,
+            profile_session_sample_rate=profiles_sample_rate,
+            profile_lifecycle='trace',
             integrations=integrations)
 
         # somehow sentry attaches itself to the global exception hook, even if

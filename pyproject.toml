@@ -16,6 +16,7 @@ dependencies = [
     "attrs",
     "babel",
     "bad-passwords",
+    "bcrypt",
     "bjoern",
     "blinker",
     "bs4",
@@ -100,8 +101,7 @@ dependencies = [
     "requests-oauthlib",
     "rjsmin",
     "sedate",
-    # FIXME: OGC-3689
-    "sentry_sdk<3",
+    "sentry_sdk",
     "sortedcontainers",
     "sqlalchemy>=2.1, < 2.2",
     "sqlalchemy-utils",
@@ -133,10 +133,7 @@ dependencies = [
     "zope.sqlalchemy",
 ]
 
-[project.entry-points.morepath]
-scan = "onegov"
-
-[project.entry-points.console_scripts]
+[project.scripts]
 onegov-agency = "onegov.agency.cli:cli"
 onegov-core = "onegov.core.cli:cli"
 onegov-directory = "onegov.directory.cli:cli"
@@ -157,6 +154,9 @@ onegov-translator = "onegov.translator_directory.cli:cli"
 onegov-user = "onegov.user.cli:cli"
 onegov-websockets = "onegov.websockets.cli:cli"
 onegov-winterthur = "onegov.winterthur.cli:cli"
+
+[project.entry-points.morepath]
+scan = "onegov"
 
 [project.entry-points.onegov_upgrades]
 "onegov.activity" = "onegov.activity.upgrade"
@@ -285,6 +285,7 @@ dev = [
 ]
 
 [tool.setuptools]
+include-package-data = true
 package-dir = { "" = "src" }
 packages = [
     "onegov.activity",
@@ -588,7 +589,7 @@ preview = true
     "line-too-long",
 ]
 "src/onegov/*/upgrade.py" = [
-    "T2",
+    "T20",
 ]
 "tests/**/*.py" = [
     "C4",
@@ -646,7 +647,7 @@ multiline-quotes = "double"
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
-[tool.ruff.lint.ruff]
+[tool.ruff.lint.flake8-bandit]
 extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.lint.flake8-bugbear]
@@ -671,4 +672,4 @@ docstring-code-line-length = "dynamic"
 known_first_party = ["onegov"]
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["cssmin"]
+DEP002 = ["bcrypt", "cssmin"]

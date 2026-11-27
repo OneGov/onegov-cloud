@@ -1103,6 +1103,58 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     assert question in q2
     assert answer not in q2
 
+    # accordion listing renders each field inline (label: value, no <br>)
+    page = client.get('/directories/questions-and-answers-about-smurfs')
+    assert '<strong>Question</strong>: Are smurfs real?' in page
+    assert '<strong>Answer</strong>: Yes, they are.' in page
+    assert '<strong>Question</strong>: Who is the boss of the smurfs?' in page
+    assert '<strong>Answer</strong>: Papa Schlumpf' in page
+
+
+def test_accordion_layout_renders_field_types(client: Client) -> None:
+    # radio/checkbox/textarea in accordion mode must render via
+    # form.render_display (checkmarks, line breaks), not raw values
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Recycling'
+    page.form['structure'] = """
+        Name *= ___
+        Kosten *=
+            (x) kostenlos
+            ( ) kostenpflichtig
+        Abgabestelle *=
+            [ ] Ökihof
+            [ ] Landfill
+            [ ] Verbrennungsanlage
+        Details = ...
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['layout'] = 'accordion'
+    page.form.submit().follow()
+
+    entry = client.get('/directories/recycling').click('Eintrag')
+    entry.form['name'] = 'Aluminium'
+    entry.form['kosten'] = 'kostenlos'
+    entry.form['abgabestelle'] = ['Ökihof', 'Landfill']
+    entry.form['details'] = 'Besuch https://example.org\nTelefon 041 499 66 88'
+    entry.form.submit().follow()
+
+    page = client.get('/directories/recycling')
+
+    # radio: checkmark, label on its own line
+    assert '<strong>Kosten</strong>: <br>✓ kostenlos' in page
+
+    # checkbox: each selected value on its own line with a checkmark
+    assert '<strong>Abgabestelle</strong>: <br>✓ Ökihof<br>✓ Landfill' in page
+
+    # textarea: newlines become <br>, raw value never leaks
+    assert '<strong>Details</strong>: <br>Besuch ' in page
+
+    # links: urls, phone numbers and emails in free text get linkified
+    assert '<a href="https://example.org" rel="nofollow">' in page
+    assert '<a href="tel:+41414996688">041 499 66 88</a>' in page
+
 
 def test_directory_migration(client: Client) -> None:
     # tests changing radio and checkbox options in directory structure
