@@ -1,3 +1,4 @@
+import re
 import textwrap
 import transaction
 import zipfile
@@ -547,3 +548,67 @@ def test_copy_event(client: Client) -> None:
         assert '18:00 - 22:00' in page
         assert 'Art Gallery' in page
         assert 'Art Club' in page
+
+
+def test_ticket_note_attachments(client: Client) -> None:
+    collection = FormCollection(client.app.session())
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
+
+    transaction.commit()
+
+    # submit a form to create a ticket
+    client.login_admin()
+
+    page = client.get('/forms').click('Profile')
+    page.form['first_name'] = 'Foo'
+    page.form['last_name'] = 'Bar'
+    page.form['e_mail'] = 'foo@bar.baz'
+    page = page.form.submit().follow().form.submit().follow()
+
+    assert 'FRM-' in page
+
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    # the attachment field label is plural now that multiple files are allowed
+    page = page.click("Neue Notiz")
+    assert "Anhänge" in page
+
+    # a note with a single attachment
+    page.form['text'] = "The profile is actually okay, I got an ID scan"
+    page.form.set('files', [Upload('Test.txt', b'Proof')], -1)
+    page = page.form.submit().follow()
+
+    assert "The profile is actually okay" in page
+    assert "Test.txt" in page
+
+    ticket_url = page.request.url
+
+    file_url_ex = re.compile(r'http://localhost/storage/[A-Z0-9a-z]+')
+    file_url = file_url_ex.search(str(page)).group()  # type: ignore[union-attr]
+    assert client.get(file_url).body == b"Proof"
+
+    # a note with multiple attachments
+    page = client.get(ticket_url).click("Neue Notiz")
+    page.form['text'] = "Attaching the scan and the signed form"
+    page.form.set('files', [
+        Upload('Scan.txt', b'Scan content'),
+        Upload('Form.txt', b'Form content'),
+    ], -1)
+    page = page.form.submit().follow()
+
+    assert "Attaching the scan and the signed form" in page
+    assert "Scan.txt" in page
+    assert "Form.txt" in page
+
+    file_urls = file_url_ex.findall(str(page))
+    bodies = {client.get(url).body for url in file_urls}
+    assert b"Scan content" in bodies
+    assert b"Form content" in bodies

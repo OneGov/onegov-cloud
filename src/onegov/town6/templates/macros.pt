@@ -2307,6 +2307,9 @@
     <div class="file" tal:condition="model.file">
         <a href="${request.link(model.file)}">${model.file.name}</a>
     </div>
+    <div class="file" tal:repeat="file model.files">
+        <a href="${request.link(file)}">${file.name}</a>
+    </div>
     <div class="actions">
         <metal:b define-slot="actions" />
     </div>

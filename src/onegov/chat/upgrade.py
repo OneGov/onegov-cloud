@@ -4,7 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 # pragma: exclude file
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import text, Column, Text
+from sqlalchemy import text, Column, ForeignKey, Text, UniqueConstraint
 
 
 from typing import TYPE_CHECKING
@@ -38,3 +38,22 @@ def make_message_type_not_nullable(context: UpgradeContext) -> None:
              WHERE type IS NULL;
         """))
         context.operations.alter_column('messages', 'type', nullable=False)
+
+
+@upgrade_task('Add files association table for messages')
+def add_files_association_table_for_messages(
+    context: UpgradeContext
+) -> None:
+    if context.has_table('files_for_messages_files'):
+        return
+
+    context.operations.create_table(
+        'files_for_messages_files',
+        Column('messages_id', Text, ForeignKey('messages.id'),
+               nullable=False),
+        Column('file_id', Text, ForeignKey('files.id'), nullable=False),
+        UniqueConstraint(
+            'messages_id', 'file_id',
+            name='uq_assoc_files_for_messages_files'
+        )
+    )
