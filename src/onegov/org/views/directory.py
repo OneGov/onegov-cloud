@@ -1056,7 +1056,10 @@ def view_directory_entry(
         'entry': self,
         'more_entries': more_entries,
         'prev_entry': prev_entry,
-        'next_entry': next_entry
+        'next_entry': next_entry,
+        'directory_link': request.link(
+            ExtendedDirectoryEntryCollection(directory)
+        ),
     }
 
 

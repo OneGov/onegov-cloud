@@ -925,6 +925,9 @@ msgstr "Vorheriger Eintrag"
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
 
+msgid "All Entries"
+msgstr "Alle Einträge"
+
 msgid "Content"
 msgstr "Inhalt"
 
