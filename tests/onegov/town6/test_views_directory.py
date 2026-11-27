@@ -454,3 +454,48 @@ def test_directory_search_preserves_filter(client_with_fts: Client) -> None:
     assert 'Pilatus' in reset
     assert 'Rigi' in reset  # search cleared
     assert 'Napf' not in reset  # filter kept
+
+
+def test_directory_contact_in_sidebar(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = "Waste"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['contact'] = 'Ökihof\n041 000 00 00'
+    page.form.submit()
+
+    page = client.get('/directories/waste').click("^Eintrag$")
+    page.form['name'] = 'Papier'
+    page.form.submit()
+
+    # the directory contact is shown in the overview sidebar
+    page = client.get('/directories/waste')
+    assert 'Ökihof' in page
+    assert '041 000 00 00' in page
+    panel = page.pyquery('.contact-panel')
+    assert panel
+    assert 'Ökihof' in panel.text()
+
+    # but not on an individual entry page (that sidebar is per-entry)
+    entry = client.get('/directories/waste/papier')
+    assert 'Ökihof' not in entry
+    assert '041 000 00 00' not in entry
+
+    # the same holds in accordion layout: contact in the overview sidebar,
+    # never bleeding into an entry page
+    page = client.get('/directories/waste/+edit')
+    page.form['layout'] = 'accordion'
+    page.form.submit()
+
+    page = client.get('/directories/waste')
+    panel = page.pyquery('.contact-panel')
+    assert panel
+    assert 'Ökihof' in panel.text()
+
+    entry = client.get('/directories/waste/papier')
+    assert 'Ökihof' not in entry
+    assert '041 000 00 00' not in entry

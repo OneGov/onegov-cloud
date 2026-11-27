@@ -95,6 +95,13 @@
 
             <div class="cell medium-3 large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
+                    <div class="side-panel contact-panel" tal:condition="directory.contact_html">
+                        <h3 i18n:translate>Contact</h3>
+                        <div class="side-panel-with-bg">
+                            <tal:b content="directory.contact_html" />
+                        </div>
+                    </div>
+
                     <div class="side-panel" tal:condition="search_widget and directory.enable_search">
                         <h3 i18n:translate>Search</h3>
                         <tal:b replace="search_widget.html(layout)" />

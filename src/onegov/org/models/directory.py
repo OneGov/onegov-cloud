@@ -15,8 +15,8 @@ from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import (
-    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension,
-    DeletableContentExtension)
+    ContactExtension, CoordinatesExtension, GeneralFileLinkExtension,
+    PublicationExtension, DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.org.observer import observes
@@ -376,8 +376,8 @@ class DirectorySubmissionAction:
                 'change-rejection-withdrawn')
 
 
-class ExtendedDirectory(Directory, AccessExtension, Extendable,
-                        GeneralFileLinkExtension):
+class ExtendedDirectory(Directory, AccessExtension, ContactExtension,
+                        Extendable, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     fts_type_title = _('Directories')

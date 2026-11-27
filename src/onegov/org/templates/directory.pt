@@ -79,6 +79,11 @@
 
             <div class="columns medium-4">
 
+                <div class="side-panel contact-panel" tal:condition="directory.contact_html">
+                    <h2 i18n:translate>Contact</h2>
+                    <tal:b content="directory.contact_html" />
+                </div>
+
                 <div class="filter-panel" tal:condition="search_widget and directory.enable_search">
                     <h2 class="filter-title" i18n:translate>Search</h2>
                     <tal:b replace="search_widget.html(layout)" />
