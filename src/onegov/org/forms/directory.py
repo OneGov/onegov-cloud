@@ -171,8 +171,10 @@ class DirectoryBaseForm(Form):
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox',
             'long_description':
-                _('The contact information is displayed in the sidebar '
-                  'without field names.')
+                _('The contact information is displayed in the sidebar of '
+                  'each individual entry page, without field names. To show a '
+                  'contact for the whole directory in the overview, use the '
+                  'contact field in the "Contact" section instead.')
         })
 
     keyword_fields = TextAreaField(
