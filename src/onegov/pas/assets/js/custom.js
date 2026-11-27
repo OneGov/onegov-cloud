@@ -48,7 +48,7 @@ function handleBulkAddCommission() {
       }
       isInitialLoad = false;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("DEBUG: Fetch error:", error);
     });
 
@@ -66,7 +66,7 @@ function handleBulkAddCommission() {
     const commissionOptions = commissionSelect.querySelectorAll('option');
     let firstValidCommission = null;
 
-    commissionOptions.forEach(option => {
+    commissionOptions.forEach((option) => {
       // Skip the empty/placeholder option
       if (!option.value) {
         return;
@@ -85,7 +85,10 @@ function handleBulkAddCommission() {
     });
 
     // If the selected commission is not in the data, default to first valid
-    if (commissionSelect.value && !commissionParliamentarians[commissionSelect.value]) {
+    if (
+      commissionSelect.value
+      && !(commissionParliamentarians[commissionSelect.value] || []).length
+    ) {
       commissionSelect.value = firstValidCommission || '';
     }
 
@@ -95,10 +98,16 @@ function handleBulkAddCommission() {
 
   function updateParliamentarians(commissionId) {
 
+    // A form re-rendered after a failed submit carries the user's selection
+    const submitted = new Set(isInitialLoad ? Array.from(
+      parliamentarianList.querySelectorAll('input[type="checkbox"]:checked'),
+      (checkbox) => checkbox.value
+    ) : []);
+
     // Hide all existing checkboxes first
     const allCheckboxes = parliamentarianList.querySelectorAll('li');
 
-    allCheckboxes.forEach(li => {
+    allCheckboxes.forEach((li) => {
       li.style.display = 'none';
       const checkbox = li.querySelector('input[type="checkbox"]');
       if (checkbox) {
@@ -120,8 +129,10 @@ function handleBulkAddCommission() {
         const li = existingCheckbox.closest('li');
         if (li) {
           li.style.display = 'block';
-          // Only check for commission bulk forms, not file study bulk forms
-          if (url.includes('new-commission-bulk')) {
+          if (submitted.size) {
+            existingCheckbox.checked = submitted.has(parliamentarian.id);
+          } else if (url.includes('new-commission-bulk')) {
+            // Only check for commission bulk forms, not file study bulk forms
             existingCheckbox.checked = true;
           }
           if (!isInitialLoad) {
@@ -205,8 +216,8 @@ function handleAttendanceFormSync() {
       commissionParliamentarians = data;
 
       // Build reverse mapping: parliamentarian -> commissions
-      Object.keys(data).forEach(commissionId => {
-        data[commissionId].forEach(parliamentarian => {
+      Object.keys(data).forEach((commissionId) => {
+        data[commissionId].forEach((parliamentarian) => {
           if (!parliamentarianCommissions[parliamentarian.id]) {
             parliamentarianCommissions[parliamentarian.id] = [];
           }
@@ -218,7 +229,7 @@ function handleAttendanceFormSync() {
         filterParliamentariansByCommission(commissionSelect.value);
       }
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("DEBUG: Fetch error:", error);
     });
 
@@ -239,7 +250,7 @@ function handleAttendanceFormSync() {
     const parliamentarianOptions = parliamentarianSelect.querySelectorAll('option');
 
     // Reset all options to visible
-    parliamentarianOptions.forEach(option => {
+    parliamentarianOptions.forEach((option) => {
       option.style.display = '';
       option.disabled = false;
     });
@@ -251,9 +262,9 @@ function handleAttendanceFormSync() {
     }
 
     const validParliamentarians = commissionParliamentarians[commissionId] || [];
-    const validIds = validParliamentarians.map(p => p.id.toString());
+    const validIds = validParliamentarians.map((p) => p.id.toString());
 
-    parliamentarianOptions.forEach(option => {
+    parliamentarianOptions.forEach((option) => {
       if (option.value && !validIds.includes(option.value)) {
         option.style.display = 'none';
         option.disabled = true;
@@ -275,7 +286,7 @@ function handleAttendanceFormSync() {
     const commissionOptions = commissionSelect.querySelectorAll('option');
 
     // Reset all options to visible
-    commissionOptions.forEach(option => {
+    commissionOptions.forEach((option) => {
       option.style.display = '';
       option.disabled = false;
     });
@@ -288,7 +299,7 @@ function handleAttendanceFormSync() {
 
     const validCommissions = parliamentarianCommissions[parliamentarianId] || [];
 
-    commissionOptions.forEach(option => {
+    commissionOptions.forEach((option) => {
       if (option.value && !validCommissions.includes(option.value)) {
         option.style.display = 'none';
         option.disabled = true;

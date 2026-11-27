@@ -1103,6 +1103,58 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     assert question in q2
     assert answer not in q2
 
+    # accordion listing renders each field inline (label: value, no <br>)
+    page = client.get('/directories/questions-and-answers-about-smurfs')
+    assert '<strong>Question</strong>: Are smurfs real?' in page
+    assert '<strong>Answer</strong>: Yes, they are.' in page
+    assert '<strong>Question</strong>: Who is the boss of the smurfs?' in page
+    assert '<strong>Answer</strong>: Papa Schlumpf' in page
+
+
+def test_accordion_layout_renders_field_types(client: Client) -> None:
+    # radio/checkbox/textarea in accordion mode must render via
+    # form.render_display (checkmarks, line breaks), not raw values
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Recycling'
+    page.form['structure'] = """
+        Name *= ___
+        Kosten *=
+            (x) kostenlos
+            ( ) kostenpflichtig
+        Abgabestelle *=
+            [ ] Ökihof
+            [ ] Landfill
+            [ ] Verbrennungsanlage
+        Details = ...
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['layout'] = 'accordion'
+    page.form.submit().follow()
+
+    entry = client.get('/directories/recycling').click('Eintrag')
+    entry.form['name'] = 'Aluminium'
+    entry.form['kosten'] = 'kostenlos'
+    entry.form['abgabestelle'] = ['Ökihof', 'Landfill']
+    entry.form['details'] = 'Besuch https://example.org\nTelefon 041 499 66 88'
+    entry.form.submit().follow()
+
+    page = client.get('/directories/recycling')
+
+    # radio: checkmark, label on its own line
+    assert '<strong>Kosten</strong>: <br>✓ kostenlos' in page
+
+    # checkbox: each selected value on its own line with a checkmark
+    assert '<strong>Abgabestelle</strong>: <br>✓ Ökihof<br>✓ Landfill' in page
+
+    # textarea: newlines become <br>, raw value never leaks
+    assert '<strong>Details</strong>: <br>Besuch ' in page
+
+    # links: urls, phone numbers and emails in free text get linkified
+    assert '<a href="https://example.org" rel="nofollow">' in page
+    assert '<a href="tel:+41414996688">041 499 66 88</a>' in page
+
 
 def test_directory_migration(client: Client) -> None:
     # tests changing radio and checkbox options in directory structure
@@ -1708,3 +1760,85 @@ def test_directory_settings_field_dependencies(
         'required_publication/y;enable_change_requests/!y')
     assert depends_on('[name="change_requests_guideline"]') == (
         'enable_change_requests/y')
+
+
+def test_directory_search_widget(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    def create_directory(title: str, enable_search: bool) -> None:
+        page = client.get('/directories').click('^Verzeichnis$')
+        page.form['title'] = title
+        page.form['structure'] = 'Name *= ___'
+        page.form['title_format'] = '[Name]'
+        page.form['enable_search'] = enable_search
+        page = page.form.submit().follow()
+        page = page.click('Eintrag', index=0)
+        page.form['name'] = f'Pilatus {title}'
+        page.form.submit().follow()
+
+    create_directory('Clubs', enable_search=True)
+    create_directory('Bars', enable_search=False)
+
+    assert client.get('/directories/clubs').pyquery('#inline-search')
+    assert not client.get('/directories/bars').pyquery('#inline-search')
+
+    # the box stays hidden even when search is forced into the url
+    assert not client.get(
+        '/directories/bars?search=inline').pyquery('#inline-search')
+
+    # ...and a forced search does not filter a disabled directory
+    assert 'Pilatus Bars' in client.get(
+        '/directories/bars?search=inline'
+        '&search_query={"term"%3A"zzz"}')
+
+    # results are limited to the searched directory
+    page = client.get(
+        '/directories/clubs?search=inline&search_query={"term"%3A"Pilatus"}')
+    assert 'Pilatus Clubs' in page
+    assert 'Pilatus Bars' not in page
+
+
+def test_directory_search_preserves_filter(client_with_fts: Client) -> None:
+    client = client_with_fts
+
+    session = client.app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure=dedent("""
+            Name *= ___
+            Choice =
+                (x) yes
+                ( ) no
+        """),
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name'],
+            keywords=['Choice']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus', 'choice': 'yes'})
+    directory.add(values={'name': 'Rigi', 'choice': 'yes'})
+    directory.add(values={'name': 'Napf', 'choice': 'no'})
+    transaction.commit()
+
+    client.login_admin()
+
+    # an active category filter is preserved as a hidden field, so submitting
+    # a search keeps the filter instead of dropping it
+    searched = client.get(
+        '/directories/clubs?keywords=choice:yes'
+        '&search=inline&search_query={"term"%3A"Pilatus"}')
+    assert searched.pyquery(
+        '#inline-search input[name="keywords"]')[0].attrib['value'] \
+        == 'choice:yes'
+    assert 'Pilatus' in searched
+    assert 'Rigi' not in searched  # excluded by the search term
+    assert 'Napf' not in searched  # excluded by the category filter
+
+    # the reset target (filter kept, search dropped) keeps the filter active
+    reset = client.get('/directories/clubs?keywords=choice:yes')
+    assert 'Pilatus' in reset
+    assert 'Rigi' in reset  # search cleared
+    assert 'Napf' not in reset  # filter kept

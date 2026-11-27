@@ -294,3 +294,118 @@ def monkey_patch_visit_to_ignore_console_errors(
     browser.visit = functools.partial(  # type: ignore[method-assign]
         original_visit, ignore_all_console_errors=True
     )
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_directory_inline_search(
+    browser_with_fts: ExtendedBrowser,
+    fts_town_app: TestTownApp,
+) -> None:
+    from onegov.directory import DirectoryCollection, DirectoryConfiguration
+    from onegov.org.models import ExtendedDirectory
+
+    session = fts_town_app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus'})
+    directory.add(values={'name': 'Rigi'})
+
+    # a directory with search disabled shows no search box
+    disabled = directories.add(
+        title='Bars',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name']),
+    )
+    disabled.enable_search = False
+    disabled.add(values={'name': 'Jamaica'})
+    transaction.commit()
+
+    browser = browser_with_fts
+    browser.visit('/directories/clubs')
+
+    assert browser.find_by_text('Pilatus')
+    assert browser.find_by_text('Rigi')
+
+    # town6 clones the sidebar into the off-canvas menu, so the search form
+    # exists twice; drive the visible one in the sidebar
+    search = browser.page.locator('.sidebar #inline-search #search-term')
+    search.fill('Pilatus')
+    browser.page.locator(
+        '.sidebar #inline-search button[type="submit"]').click()
+
+    # the term reached search_query (not the empty off-canvas clone)
+    assert 'search=inline' in browser.url
+    assert 'Pilatus' in browser.url
+    assert browser.find_by_text('Pilatus')
+    assert not browser.find_by_text('Rigi')
+
+    # the reset button returns to the unfiltered directory with a clean url
+    # (no search params) and shows all entries again
+    browser.page.locator('.sidebar #inline-search .reset-button').click()
+
+    assert browser.url.endswith('/directories/clubs')
+    assert browser.find_by_text('Pilatus')
+    assert browser.find_by_text('Rigi')
+
+    # the disabled directory has no search box, even when search is forced
+    # into the url
+    browser.visit('/directories/bars')
+    assert browser.page.locator('#inline-search').count() == 0
+
+    browser.visit('/directories/bars?search=inline')
+    assert browser.page.locator('#inline-search').count() == 0
+    assert browser.find_by_text('Jamaica')
+
+
+@pytest.mark.xdist_group(name='browser')
+def test_directory_search_keeps_filter(
+    browser_with_fts: ExtendedBrowser,
+    fts_town_app: TestTownApp,
+) -> None:
+    from textwrap import dedent
+    from onegov.directory import DirectoryCollection, DirectoryConfiguration
+    from onegov.org.models import ExtendedDirectory
+
+    session = fts_town_app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Clubs',
+        structure=dedent("""
+            Name *= ___
+            Choice =
+                (x) yes
+                ( ) no
+        """),
+        configuration=DirectoryConfiguration(
+            title='[Name]', order=['Name'], searchable=['Name'],
+            keywords=['Choice']),
+    )
+    directory.enable_search = True
+    directory.add(values={'name': 'Pilatus', 'choice': 'yes'})
+    directory.add(values={'name': 'Rigi', 'choice': 'yes'})
+    transaction.commit()
+
+    browser = browser_with_fts
+    browser.visit('/directories/clubs?keywords=choice:yes')
+
+    # searching keeps the active category filter in the url
+    browser.page.locator(
+        '.sidebar #inline-search #search-term').fill('Pilatus')
+    browser.page.locator(
+        '.sidebar #inline-search button[type="submit"]').click()
+    assert 'keywords=choice' in browser.url
+    assert 'search=inline' in browser.url
+
+    # resetting clears the search term but keeps the filter
+    browser.page.locator('.sidebar #inline-search .reset-button').click()
+    assert 'keywords=choice' in browser.url
+    assert 'search=inline' not in browser.url

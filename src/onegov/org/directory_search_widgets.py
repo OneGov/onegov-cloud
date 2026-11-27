@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from functools import cached_property
 from itertools import islice
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id
+from onegov.org.app import OrgApp
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.search import Search
 from onegov.search.search_index import SearchIndex
-from onegov.winterthur.app import WinterthurApp
 from sqlalchemy import func
 from sqlalchemy import exc
 from sqlalchemy.dialects.postgresql import array
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.org.layout import DefaultLayout
     from onegov.org.models import ExtendedDirectory
-    from onegov.winterthur.request import WinterthurRequest
+    from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
     from uuid import UUID
 
@@ -30,14 +32,14 @@ def lines(value: str | tuple[str, ...] | list[str]) -> Iterator[str]:
     yield from str(value).split('\n')
 
 
-@WinterthurApp.directory_search_widget('inline')
+@OrgApp.directory_search_widget('inline')
 class InlineDirectorySearch:
 
     name: ClassVar[Literal['inline']]
 
     def __init__(
         self,
-        request: WinterthurRequest,
+        request: OrgRequest,
         directory: ExtendedDirectory,
         search_query: dict[str, str] | None
     ) -> None:
@@ -81,7 +83,7 @@ class InlineDirectorySearch:
             return ()
 
     def html(self, layout: DefaultLayout) -> Markup:
-        return render_macro(layout.macros['inline_search'],
+        return render_macro(layout.macros['directory_search'],
                             self.request, {
             'term': self.term,
             'directory': self.directory,

@@ -642,8 +642,9 @@ class TimeReportHandler(Handler):
         time_report_links = []
 
         if self.time_report:
-            if self.time_report.status == 'pending' and (
-                request.is_editor or request.is_admin
+            if (
+                self.time_report.status == 'pending'
+                and self.can_delete_time_report(request)
             ):
                 time_report_links.append(
                     Link(

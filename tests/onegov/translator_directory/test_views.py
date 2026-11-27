@@ -2555,7 +2555,7 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     }
     transaction.commit()
 
-    client.login_translator()
+    client.login_member()
     page = client.get(f'/translator/{translator_id}/add-time-report')
     page.form['assignment_type'] = 'on-site'
     page.form['assignment_location'] = 'obergericht'
@@ -2565,15 +2565,18 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     page.form['end_date'] = '2025-01-11'
     page.form['end_time'] = '10:00'
     page.form['case_number'] = 'SELF-APPROVAL'
-    page = page.form.submit().follow()
+    page.form.submit().follow()
 
     report = session.query(TranslatorTimeReport).one()
     ticket = report.get_ticket(session)
     assert ticket is not None
-    assert ticket.handler.email == 'translator@example.org'
+    assert ticket.handler.email == 'member@example.org'
     assert report.status == 'pending'
     assert ticket.state != 'closed'
 
+    client.logout()
+    client.login_translator()
+    page = client.get(f'/ticket/TRP/{ticket.id}/status')
     csrf_match = re.search(r'csrf-token=([a-zA-Z0-9._-]+)', page.text)
     assert csrf_match is not None
     url = f'/ticket/TRP/{ticket.id}/accept-time-report'
@@ -2587,6 +2590,97 @@ def test_translator_cannot_confirm_own_time_report_by_post(
     assert report.status == 'pending'
     assert ticket.state == 'open'
     assert ticket.closed_on is None
+
+
+def test_translator_cannot_add_own_time_report(client: Client) -> None:
+    session = client.app.session()
+    create_languages(session)
+    translator_id = (
+        TranslatorCollection(client.app)
+        .add(
+            first_name='Test',
+            last_name='Translator',
+            admission='certified',
+            email='translator@example.org',
+        )
+        .id
+    )
+    transaction.commit()
+
+    client.login_translator()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' not in page
+    assert 'add-time-report' not in page
+
+    client.get(f'/translator/{translator_id}/add-time-report', status=403)
+    client.post(f'/translator/{translator_id}/add-time-report', status=403)
+    assert session.query(TranslatorTimeReport).count() == 0
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_only_accountant_can_edit_pending_time_report(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    session = client.app.session()
+    create_languages(session)
+    translator_id = (
+        TranslatorCollection(client.app)
+        .add(
+            first_name='Test',
+            last_name='Translator',
+            admission='certified',
+            email='translator@example.org',
+        )
+        .id
+    )
+    group = UserGroupCollection(session).add(name='Accounting')
+    group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['admin@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}/add-time-report')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:00'
+    page.form['case_number'] = 'CASE-1'
+    page.form.submit().follow()
+
+    report = session.query(TranslatorTimeReport).one()
+    duration = report.duration
+    edit_url = f'/time-report/{report.id}/edit'
+
+    client.login_admin()
+    form = client.get(edit_url).form
+    form['end_time'] = '18:00'
+
+    for login in (client.login_member, client.login_editor):
+        login()
+        client.get(edit_url, status=403)
+        form.submit(status=403)
+
+    session.expire_all()
+    report = session.query(TranslatorTimeReport).one()
+    assert report.duration == duration
+
+    client.login_admin()
+    form = client.get(edit_url).form
+    form['end_time'] = '18:00'
+    form.submit().follow()
+    session.expire_all()
+    report = session.query(TranslatorTimeReport).one()
+    assert report.duration != duration
 
 
 @patch('onegov.websockets.integration.connect')
@@ -2743,10 +2837,8 @@ def test_time_report_workflow(
         Decimal(421.87), abs=Decimal('0.01')
     )
 
-    # Test that member can also edit (Personal permission)
     client.login_member()
-    member_edit_page = client.get(edit_url)
-    assert member_edit_page.status_code == 200
+    client.get(edit_url, status=403)
 
     # Accept time report as editor
     client.login_editor()
@@ -2950,7 +3042,6 @@ def test_time_report_edit_toggle_skip_travel(
     assert len(edit_links) > 0
     edit_url = edit_links[0].attrib['href']
 
-    client.login_member()
     edit_page = client.get(edit_url)
     assert edit_page.form['skip_travel_calculation'].checked is False
     edit_page.form['skip_travel_calculation'] = True

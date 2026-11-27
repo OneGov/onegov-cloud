@@ -19,7 +19,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.5
+    rev: v0.17.6
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
@@ -29,9 +29,10 @@ repos:
       - id: flake8
         files: '^src.*\.py'
         additional_dependencies:
+        - flake8-pyproject
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v18.0.0
+    rev: v18.1.0
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -60,7 +61,13 @@ repos:
         language_version: python3.12
   - repo: local
     hooks:
-      - id: system
+      - id: deptry
+        name: deptry
+        entry: ./deptry.sh
+        language: system
+        always_run: true
+        pass_filenames: false
+      - id: mypy
         name: mypy
         entry: ./mypy.sh
         language: system
@@ -69,7 +76,7 @@ repos:
         exclude: '.*'
         always_run: true
         pass_filenames: false
-      - id: system
+      - id: stubtest
         name: stubtest
         entry: ./stubtest.sh
         language: system
@@ -88,6 +95,6 @@ repos:
     hooks:
       - id: gitleaks
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.32.0
+    rev: v1.33.1
     hooks:
       - id: zizmor

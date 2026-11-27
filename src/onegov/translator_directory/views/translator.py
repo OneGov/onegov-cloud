@@ -532,7 +532,7 @@ def add_time_report(
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
 
-    if not request.app.enable_time_tracking:
+    if not request.app.enable_time_tracking or request.is_translator:
         raise HTTPForbidden()
 
     submitted = form.submitted(request)

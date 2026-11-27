@@ -103,7 +103,7 @@ def test_view_vote_statistics(election_day_app_gr: TestApp) -> None:
     ):
         response = client.get(f'/vote/{view}')
         assert 'Vaz/Obervaz' in response
-        assert '13’828' in response
+        assert "13'828" in response
 
 
 def test_view_vote_json(election_day_app_zg: TestApp) -> None:
