@@ -925,7 +925,8 @@ class ReservationHandler(Handler):
         request: OrgRequest  # type:ignore[override]
     ) -> Markup:
 
-        layout = DefaultLayout(self.resource, request)
+        resource = self.resource
+        layout = DefaultLayout(resource, request)
 
         is_manager = request.is_manager_for_model(self.ticket)
         parts = []
@@ -936,8 +937,8 @@ class ReservationHandler(Handler):
                 if is_manager and self.ticket.state == 'pending' else None,
                 'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout,
-                'resource_title': self.resource.title,
-                'resource_url': request.link(self.resource),
+                'resource_title': resource.title if resource else None,
+                'resource_url': request.link(resource) if resource else None,
             })
         )
 
