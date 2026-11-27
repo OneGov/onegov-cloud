@@ -688,6 +688,8 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
 @click.option('--include-imported', is_flag=True, default=False)
+@click.option('--include-imported-source', multiple=True,
+              help='Include imported events with this source prefix')
 @click.option('--cross-namespace', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
@@ -699,6 +701,7 @@ def fetch(
     published_only: bool,
     delete_orphaned_tickets: bool,
     include_imported: bool,
+    include_imported_source: Sequence[str],
     cross_namespace: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
@@ -747,6 +750,13 @@ def fetch(
         By default skip events that have a source attribute, which means they
         have been imported. If the flag is set, imported events will be
         included in the fetch transfer.
+
+    - ``--include-imported-source ical-``
+
+        Includes only those imported events whose source starts with the
+        given prefix, e.g. events imported from an iCal feed. May be passed
+        multiple times. Use separate fetch calls to only apply this to some
+        of the sources.
 
     - ``--cross-namespace``
 
@@ -828,7 +838,13 @@ def fetch(
                     query = query.filter(
                         or_(
                             Event.meta['source'].astext.is_(None),
-                            Event.meta['source'].astext == ''
+                            Event.meta['source'].astext == '',
+                            *(
+                                Event.meta['source'].astext.startswith(
+                                    prefix, autoescape=True
+                                )
+                                for prefix in include_imported_source
+                            )
                         )
                     )
                 if tag:
