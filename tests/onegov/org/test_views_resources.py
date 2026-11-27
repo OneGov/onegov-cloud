@@ -1654,8 +1654,9 @@ def test_reserve_allocation(
     assert 'Foobar' in ticket
     assert '28. August 2015' in ticket
     assert '4' in ticket
-    # the reservation summary shows the resource title (OGC-3564)
-    assert 'Tageskarte - Freitag, 28. August 2015' in ticket
+    resource_link = ticket.pyquery('.reservation-resource-title a')
+    assert 'Tageskarte' in resource_link.text()
+    assert '/resource/tageskarte' in resource_link.attr('href')
 
     # accept it
     assert 'Alle Reservationen annehmen' in ticket
@@ -1778,8 +1779,9 @@ def test_internal_reserve(
     assert 'Foobar' in ticket
     assert '28. August 2015' in ticket
     assert '4' in ticket
-    # the reservation summary shows the resource title (OGC-3564)
-    assert 'Konferenzraum - Freitag, 28. August 2015' in ticket
+    resource_link = ticket.pyquery('.reservation-resource-title a')
+    assert 'Konferenzraum' in resource_link.text()
+    assert '/resource/konferenzraum' in resource_link.attr('href')
 
     # accept it
     assert 'Alle Reservationen annehmen' in ticket
