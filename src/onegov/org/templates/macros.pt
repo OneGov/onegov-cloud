@@ -1051,13 +1051,13 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
-    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None; resource_title resource_title|None" class="reservations">
+    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None; resource_title resource_title|None; resource_url resource_url|None" class="reservations">
+        <metal:b use-macro="layout.macros['reservation_resource_title']" />
         <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
             <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []; url get_occupancy_url(reservation, request) if get_occupancy_url else None">
-                <div class="reservation-details" tal:omit-tag="not:links">
+                <div class="reservation-details">
                     <a href="${url}" title="Occupancy" tal:omit-tag="not:url" i18n:attributes="title">
                         <strong>
-                            ${resource_title + ' - ' if resource_title else ''}
                             ${layout.format_date(start, 'weekday_long')},
                             ${layout.format_date(start, 'date_long')}
                         </strong>
@@ -1079,6 +1079,16 @@
         </li>
     </ul>
 </metal:reservations>
+
+<metal:reservation_resource_title define-macro="reservation_resource_title" i18n:domain="onegov.org">
+    <div tal:condition="resource_title|nothing" tal:define="resource_url resource_url|None" class="reservation-resource-title">
+        <a tal:omit-tag="not:resource_url" href="${resource_url}">
+            <strong>
+                ${resource_title}
+            </strong>
+        </a>
+    </div>
+</metal:reservation_resource_title>
 
 <metal:display_event define-macro="display_event" i18n:domain="onegov.org">
     <dl>

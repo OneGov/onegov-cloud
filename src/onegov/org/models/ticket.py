@@ -936,7 +936,8 @@ class ReservationHandler(Handler):
                 if is_manager and self.ticket.state == 'pending' else None,
                 'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout,
-                'resource_title': self.resource.title
+                'resource_title': self.resource.title,
+                'resource_url': request.link(self.resource),
             })
         )
 

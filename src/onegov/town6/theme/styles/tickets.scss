@@ -646,28 +646,44 @@ button {
     }
 
     .reservations {
+        background: $white-smoke;
+        border-radius: 2px;
         list-style: none;
-        margin: 0;
+        margin: 0 0 1.4rem;
+        padding: 1rem;
 
         li {
             margin-bottom: .5rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
         }
 
         .reservation {
             background: $white-smoke;
             border-radius: 2px;
             margin-bottom: 1rem;
-            margin-left: -0.5rem;
             position: relative;
         }
 
         .reservation-details {
-            font-size: .8rem;
-            padding: .5rem 8rem .5rem .5rem;
+            background: $white-smoke;
+            border-radius: 2px;
+            padding: 0 8rem 0 0;
+        }
+
+        .reservation-resource-title {
+            display: block;
+            font-size: 1.4rem;
+
+            a {
+                color: $primary-color;
+            }
         }
 
         .reservation-actions {
-            font-size: .8rem;
+            font-size: .875rem;
             position: absolute;
             right: .5rem;
             top: .275rem;
