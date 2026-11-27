@@ -924,6 +924,9 @@ msgstr "Voce precedente"
 msgid "Next Entry"
 msgstr "Prossima voce"
 
+msgid "All Entries"
+msgstr "Tutte le voci"
+
 #, fuzzy
 msgid "Content"
 msgstr "Contatti"

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
-def test_directory_prev_next(client: Client) -> None:
+def test_directory_prev_next_all(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('^Verzeichnis$')
@@ -52,6 +52,14 @@ def test_directory_prev_next(client: Client) -> None:
 
     assert 'Emily Larlham' not in zak_page
     assert 'Susan Light' in zak_page
+
+    # Each entry links back to the full directory listing
+    assert 'Alle Einträge' in emily_page
+    all_entries = emily_page.pyquery(
+        '.more-entries .fa-chevron-up'
+    ).closest('a')
+    assert all_entries
+    assert '/directories/trainers?' in all_entries.attr('href')
 
     # Anonymous users only see public entries
     client = client.spawn()

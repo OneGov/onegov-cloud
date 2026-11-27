@@ -791,8 +791,12 @@ $pageref-color-hover: $iron;
             i.fa,
             i.fas,
             i.far {
-                margin-top: .15rem;
+                margin-top: .35rem;
                 margin-right: .3rem;
+            }
+
+            i.fa-chevron-up {
+                margin-top: .25rem;
             }
 
             a.no-chevron .list-title::after {
